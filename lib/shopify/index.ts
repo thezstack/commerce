@@ -309,7 +309,7 @@ export async function getCollectionProducts({
   return reshapeProducts(removeEdgesAndNodes(res.body.data.collection.products));
 }
 
-export async function getCollections(): Promise<Collection[]> {
+export async function getCollections(): Promise<ShopifyCollection[]> {
   const res = await shopifyFetch<ShopifyCollectionsOperation>({
     query: getCollectionsQuery,
     tags: [TAGS.collections]
@@ -334,7 +334,7 @@ export async function getCollections(): Promise<Collection[]> {
     )
   ];
 
-  return collections;
+  return shopifyCollections;
 }
 
 export async function getMenu(handle: string): Promise<Menu[]> {

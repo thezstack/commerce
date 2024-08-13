@@ -3,7 +3,6 @@ const plugin = require('tailwindcss/plugin');
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./app/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
-  darkMode: false,
   theme: {
     extend: {
       colors: {
@@ -48,7 +47,11 @@ module.exports = {
       animation: {
         fadeIn: 'fadeIn .3s ease-in-out',
         carousel: 'marquee 60s linear infinite',
-        blink: 'blink 1.4s both infinite'
+        blink: 'blink 1.4s both infinite',
+        spinSlow: 'spin 3s linear infinite',
+        pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      bounce: 'bounce 1s infinite'
+        
       }
     }
   },

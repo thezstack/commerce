@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import SKLogo from './icons/logo.svg';
+import SKLogo from '../media/logo.png';
 
 export default function LogoSquare({ size }: { size?: 'sm' | undefined }) {
   return (

@@ -33,6 +33,12 @@ export type Collection = ShopifyCollection & {
   path: string;
 };
 
+
+export type Collections = ShopifyCollection & {
+  path: string;
+};
+
+
 export type Image = {
   url: string;
   altText: string;
@@ -106,6 +112,10 @@ export type ShopifyCollection = {
   description: string;
   seo: SEO;
   updatedAt: string;
+  path:string;
+  image:{
+    src:string;
+  }
 };
 
 export type ShopifyProduct = {

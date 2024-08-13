@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 
+import ContactForm from 'components/contact';
 import Prose from 'components/prose';
+import Stores from 'components/stores';
 import { getPage } from 'lib/shopify';
 import { notFound } from 'next/navigation';
-
 export const runtime = 'edge';
 
 export const revalidate = 43200; // 12 hours in seconds
@@ -33,6 +34,20 @@ export default async function Page({ params }: { params: { page: string } }) {
 
   if (!page) return notFound();
 
+  if (page.handle === 'contact') {
+    return (
+      <>
+        <ContactForm />
+      </>
+    );
+  }
+  if(page.handle === 'stores'){
+    return(
+      <>
+      <Stores/>
+      </>
+    )
+  }
   return (
     <>
       <h1 className="mb-8 text-5xl font-bold">{page.title}</h1>
