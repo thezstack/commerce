@@ -1,4 +1,3 @@
-import Footer from 'components/layout/footer';
 import { Suspense } from 'react';
 
 export default function SearchLayout({ children }: { children: React.ReactNode }) {
@@ -12,7 +11,6 @@ export default function SearchLayout({ children }: { children: React.ReactNode }
         <div className="order-last min-h-screen w-full md:order-none">{children}</div>
   
       </div>
-      <Footer />
     </Suspense>
   );
 }

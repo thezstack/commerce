@@ -2,8 +2,8 @@ import { AddToCart } from 'components/cart/add-to-cart';
 import Price from 'components/price';
 import Prose from 'components/prose';
 import { Product } from 'lib/shopify/types';
+import { Suspense } from 'react';
 import { VariantSelector } from './variant-selector';
-
 export function ProductDescription({ product }: { product: Product }) {
   return (
     <>
@@ -24,8 +24,10 @@ export function ProductDescription({ product }: { product: Product }) {
           html={product.descriptionHtml}
         />
       ) : null}
+  <Suspense>
+  <AddToCart variants={product.variants} availableForSale={product.availableForSale} />
 
-      <AddToCart variants={product.variants} availableForSale={product.availableForSale} />
+  </Suspense>
     </>
   );
 }
