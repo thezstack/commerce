@@ -7,7 +7,6 @@ import { Fragment, useEffect, useState } from 'react';
 
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Menu } from 'lib/shopify/types';
-import Search from './search';
 
 export default function MobileMenu({ menu }: { menu: Menu[] }) {
   const pathname = usePathname();
@@ -71,9 +70,9 @@ export default function MobileMenu({ menu }: { menu: Menu[] }) {
                   <XMarkIcon className="h-6" />
                 </button>
 
-                <div className="mb-4 w-full">
+                {/* <div className="mb-4 w-full">
                   <Search />
-                </div>
+                </div> */}
                 {menu.length ? (
                   <ul className="flex w-full flex-col">
                     {menu.map((item: Menu) => (
