@@ -71,24 +71,6 @@ export default async function ProductPage({ params }: { params: { handle: string
 
   return (
     <>
-
-      {/* <div className="mx-auto max-w-screen-2xl px-4">
-        <div className="flex flex-col rounded-lg border border-neutral-200 bg-white p-8 dark:border-neutral-800 dark:bg-black md:p-12 lg:flex-row lg:gap-8">
-          <div className="h-full w-full basis-full lg:basis-4/6">
-            <Gallery
-              images={product.images.map((image: Image) => ({
-                src: image.url,
-                altText: image.altText
-              }))}
-            />
-          </div>
-
-          <div className="basis-full lg:basis-2/6">
-            <ProductDescription product={product} />
-          </div>
-        </div>
-
-      </div> */}
  <div className="mx-auto max-w-screen-2xl px-4 py-8">
       <div className="flex flex-col lg:flex-row gap-8 rounded-lg bg-gradient-to-br from-blue-100 to-white p-6">
         <div className="w-full lg:w-1/2">
