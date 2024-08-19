@@ -184,18 +184,18 @@ const reshapeImages = (images: Connection<Image>, productTitle: string) => {
 //     variants: removeEdgesAndNodes(variants)
 //   };
 // };
-const reshapeProduct = (product: ShopifyProduct, filterHiddenProducts: boolean = true) => {
+const reshapeProduct = (product: ShopifyProduct, filterHiddenProducts: boolean = true): Product | undefined => {
   if (!product || (filterHiddenProducts && product.tags.includes(HIDDEN_PRODUCT_TAG))) {
     return undefined;
   }
 
-  const { images, variants, collections, ...rest } = product;
+  const { images, variants, ...rest } = product;
 
   return {
     ...rest,
     images: reshapeImages(images, product.title),
     variants: removeEdgesAndNodes(variants),
-    collection: collections.edges[0]?.node.title || ''
+    collection: (product as any).collections?.edges[0]?.node.title || ''
   };
 };
 
