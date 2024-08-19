@@ -4,6 +4,13 @@ export const getProductQuery = /* GraphQL */ `
   query getProduct($handle: String!) {
     product(handle: $handle) {
       ...product
+      collections(first: 1) {
+        edges {
+          node {
+            title
+          }
+        }
+      }
     }
   }
   ${productFragment}

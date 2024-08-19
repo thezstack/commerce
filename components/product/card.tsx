@@ -14,7 +14,7 @@ const Card: React.FC<CardProps> = ({ product }) => {
   const isOnSale = compareAtPrice && compareAtPrice > price;
 
   return (
-    <div className="bg-white rounded-3xl shadow-md overflow-hidden relative p-6">
+    <div className="bg-white rounded-2xl shadow-md overflow-hidden relative p-6">
       {isOnSale && (
         <div className="absolute top-0 right-0 bg-[#0B80A7] text-white px-4 py-2 text-sm font-bold rounded-bl-3xl">
           SALE

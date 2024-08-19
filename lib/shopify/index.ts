@@ -171,17 +171,31 @@ const reshapeImages = (images: Connection<Image>, productTitle: string) => {
   });
 };
 
+// const reshapeProduct = (product: ShopifyProduct, filterHiddenProducts: boolean = true) => {
+//   if (!product || (filterHiddenProducts && product.tags.includes(HIDDEN_PRODUCT_TAG))) {
+//     return undefined;
+//   }
+
+//   const { images, variants, ...rest } = product;
+
+//   return {
+//     ...rest,
+//     images: reshapeImages(images, product.title),
+//     variants: removeEdgesAndNodes(variants)
+//   };
+// };
 const reshapeProduct = (product: ShopifyProduct, filterHiddenProducts: boolean = true) => {
   if (!product || (filterHiddenProducts && product.tags.includes(HIDDEN_PRODUCT_TAG))) {
     return undefined;
   }
 
-  const { images, variants, ...rest } = product;
+  const { images, variants, collections, ...rest } = product;
 
   return {
     ...rest,
     images: reshapeImages(images, product.title),
-    variants: removeEdgesAndNodes(variants)
+    variants: removeEdgesAndNodes(variants),
+    collection: collections.edges[0]?.node.title || ''
   };
 };
 

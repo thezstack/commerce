@@ -40,13 +40,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   return (
     <html lang="en" className={openSans.className}>
       <body className="bg-neutral-50 text-black selection:bg-teal-300">
-    
         <Suspense>
-        <Navbar />
+          <Navbar />
           <main>{children}</main>
           <Footer />
         </Suspense>
-   
       </body>
     </html>
   );

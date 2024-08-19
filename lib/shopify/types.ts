@@ -140,6 +140,8 @@ export type ShopifyProduct = {
   seo: SEO;
   tags: string[];
   updatedAt: string;
+  collections: Connection<ShopifyCollection>;
+  collection?: string;
 };
 
 export type ShopifyCartOperation = {
