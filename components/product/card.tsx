@@ -8,10 +8,13 @@ interface CardProps {
 const Card: React.FC<CardProps> = ({ product }) => {
   const { title, priceRange, compareAtPriceRange } = product;
   const price = parseFloat(priceRange.minVariantPrice.amount);
-  const compareAtPrice = compareAtPriceRange?.minVariantPrice.amount 
+  const compareAtPrice = compareAtPriceRange?.minVariantPrice?.amount 
     ? parseFloat(compareAtPriceRange.minVariantPrice.amount)
     : null;
-  const isOnSale = compareAtPrice && compareAtPrice > price;
+  console.log('Compare At Price:', compareAtPrice);
+  
+  // Check if compareAtPrice is not null and greater than price
+  const isOnSale = compareAtPrice !== null && compareAtPrice > price;
 
   return (
     <div className="bg-white rounded-2xl shadow-md overflow-hidden relative p-6">
@@ -27,7 +30,7 @@ const Card: React.FC<CardProps> = ({ product }) => {
         <span className="text-[#0B80A7] font-bold text-2xl sm:text-3xl lg:text-4xl mb-2">
           ${price.toFixed(2)}
         </span>
-        {isOnSale && (
+        {isOnSale && compareAtPrice !== null && (
           <span className="text-gray-400 line-through text-xl sm:text-2xl lg:text-3xl">
             ${compareAtPrice.toFixed(2)}
           </span>
