@@ -195,7 +195,7 @@ const reshapeProduct = (product: ShopifyProduct, filterHiddenProducts: boolean =
     ...rest,
     images: reshapeImages(images, product.title),
     variants: removeEdgesAndNodes(variants),
-    collection: collections.edges[0]?.node.title || ''
+    collection: collections?.edges[0]?.node.title || ''
   };
 };
 
