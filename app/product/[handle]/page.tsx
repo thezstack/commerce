@@ -106,8 +106,10 @@ export default async function ProductPage({ params }: { params: { handle: string
       </div>
       <div className="mt-8 rounded-lg bg-white p-6">
         <h3 className="text-2xl font-bold mb-4 text-[#344054]">School Kit Contents</h3>
+        <p>Please note, this kit contains majority of but not all teacher required items. 
+        </p>
         <div className="border-t border-[#E5E5E5] my-6"></div>
-
+          
         {product.descriptionHtml && (
           <Prose
             className="mb-6 text-sm leading-tight dark:text-white/[60%]"
