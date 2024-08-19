@@ -6,11 +6,10 @@ import { VariantSelector } from './variant-selector';
 
 export function ProductDescription({ product }: { product: Product }) {
   const price = parseFloat(product.priceRange.maxVariantPrice.amount);
-  const compareAtPrice = product.compareAtPriceRange?.maxVariantPrice?.amount
-    ? parseFloat(product.compareAtPriceRange.maxVariantPrice.amount)
+  const compareAtPrice = product.compareAtPriceRange?.minVariantPrice?.amount
+    ? parseFloat(product.compareAtPriceRange.minVariantPrice.amount)
     : null;
   const isOnSale = compareAtPrice !== null && compareAtPrice > price;
-
   return (
     <div className="flex flex-col">
       <h1 className="text-3xl font-bold mb-2">{product.title}</h1>

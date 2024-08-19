@@ -50,7 +50,6 @@ export async function generateMetadata({
 
 export default async function ProductPage({ params }: { params: { handle: string } }) {
   const product = await getProduct(params.handle);
-
   if (!product) return notFound();
 
   const productJsonLd = {
