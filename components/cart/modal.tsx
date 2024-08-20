@@ -238,13 +238,25 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
     const storedNames = loadChildNames();
     const updatedChildNames = { ...storedNames };
 
-    if (cart?.lines) {
-      cart.lines.forEach((item) => {
-        if (!updatedChildNames[item.id] || updatedChildNames[item.id].length !== item.quantity) {
-          updatedChildNames[item.id] = Array(item.quantity).fill('');
+    // Clean up removed items and adjust quantities
+    Object.keys(updatedChildNames).forEach(id => {
+      const cartItem = cart?.lines.find(line => line.id === id);
+      if (!cartItem) {
+        delete updatedChildNames[id];
+      } else if (updatedChildNames[id].length !== cartItem.quantity) {
+        updatedChildNames[id] = updatedChildNames[id].slice(0, cartItem.quantity);
+        while (updatedChildNames[id].length < cartItem.quantity) {
+          updatedChildNames[id].push('');
         }
-      });
-    }
+      }
+    });
+
+    // Add new items
+    cart?.lines.forEach((item) => {
+      if (!updatedChildNames[item.id]) {
+        updatedChildNames[item.id] = Array(item.quantity).fill('');
+      }
+    });
 
     setChildNames(updatedChildNames);
     try {
@@ -269,6 +281,18 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
       }
       return updatedChildNames;
     });
+  };
+
+  const prepareShopifyNotes = () => {
+    const notes = cart?.lines.map(item => {
+      const names = childNames[item.id]?.filter(name => name.trim() !== '');
+      if (names && names.length > 0) {
+        return `${item.merchandise.product.title}: ${names.join(', ')}`;
+      }
+      return null;
+    }).filter(note => note !== null);
+
+    return notes?.join(' | ');
   };
 
   const renderChildNameInputs = (item: Cart['lines'][number]) => {
