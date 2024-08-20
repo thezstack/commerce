@@ -11,9 +11,7 @@ const Card: React.FC<CardProps> = ({ product }) => {
   const compareAtPrice = compareAtPriceRange?.minVariantPrice?.amount 
     ? parseFloat(compareAtPriceRange.minVariantPrice.amount)
     : null;
-  console.log('Compare At Price:', compareAtPrice);
   
-  // Check if compareAtPrice is not null and greater than price
   const isOnSale = compareAtPrice !== null && compareAtPrice > price;
 
   return (

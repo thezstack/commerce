@@ -10,34 +10,41 @@ export function ProductDescription({ product }: { product: Product }) {
     ? parseFloat(product.compareAtPriceRange.minVariantPrice.amount)
     : null;
   const isOnSale = compareAtPrice !== null && compareAtPrice > price;
+
   return (
     <div className="flex flex-col">
       <h1 className="mb-2 text-3xl font-bold">{product.title}</h1>
       <h2 className="mb-4 text-xl text-gray-600">{product.collection}</h2>
       <div className="my-6 border-t border-[#E5E5E5]"></div>
 
-      <div className="mb-6 flex items-center">
-        <div className={`text-3xl font-bold ${isOnSale ? 'text-[#0B80A7]' : 'text-black'}`}>
-          <Price
-            amount={price.toString()}
-            currencyCode={product.priceRange.maxVariantPrice.currencyCode}
-          />
-        </div>
+      <div className="mb-6">
+        <div className="flex flex-wrap items-baseline">
+          <div className={`text-3xl font-bold ${isOnSale ? 'text-[#0B80A7]' : 'text-black'}`}>
+            <Price
+              amount={price.toString()}
+              currencyCode={product.priceRange.maxVariantPrice.currencyCode}
+            />
+          </div>
 
-        {isOnSale && compareAtPrice && (
-          <>
+          {isOnSale && compareAtPrice && (
             <div className="ml-2 text-lg text-gray-500 line-through">
               <Price
                 amount={compareAtPrice.toString()}
                 currencyCode={product.priceRange.maxVariantPrice.currencyCode}
               />
             </div>
-            <div className="ml-2 rounded bg-red-100 px-2.5 py-0.5 text-sm font-medium text-red-800">
+          )}
+        </div>
+
+        {isOnSale && (
+          <div className="mt-2">
+            <span className="inline-block rounded bg-red-100 px-2.5 py-0.5 text-sm font-medium text-red-800">
               Sale
-            </div>
-          </>
+            </span>
+          </div>
         )}
       </div>
+
       <div className="my-6 border-t border-[#E5E5E5]"></div>
 
       <VariantSelector options={product.options} variants={product.variants} />
