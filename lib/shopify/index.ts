@@ -254,18 +254,23 @@ export async function removeFromCart(cartId: string, lineIds: string[]): Promise
 
 export async function updateCart(
   cartId: string,
-  lines: { id: string; merchandiseId: string; quantity: number }[]
+  lines: { id: string; merchandiseId: string; quantity: number }[],
+  note?: string
 ): Promise<Cart> {
   const res = await shopifyFetch<ShopifyUpdateCartOperation>({
     query: editCartItemsMutation,
     variables: {
       cartId,
-      lines
+      lines,
+      note
     },
     cache: 'no-store'
   });
 
-  return reshapeCart(res.body.data.cartLinesUpdate.cart);
+  // The cart returned from cartLinesUpdate will be the most up-to-date
+  const updatedCart = res.body.data.cartLinesUpdate.cart;
+
+  return reshapeCart(updatedCart);
 }
 
 export async function getCart(cartId: string): Promise<Cart | undefined> {

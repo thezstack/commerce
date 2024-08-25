@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 
 // import { Dialog, Transition } from '@headlessui/react';
 // import { ShoppingCartIcon } from '@heroicons/react/24/outline';
@@ -188,8 +188,7 @@
 //       </Transition>
 //     </>
 //   );
-// }
-
+//}
 import { Dialog, Transition } from '@headlessui/react';
 import { ShoppingCartIcon } from '@heroicons/react/24/outline';
 import Price from 'components/price';
@@ -198,7 +197,7 @@ import type { Cart } from 'lib/shopify/types';
 import { createUrl } from 'lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Fragment, useEffect, useRef, useState } from 'react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import CloseCart from './close-cart';
 import { DeleteItemButton } from './delete-item-button';
 import { EditItemQuantityButton } from './edit-item-quantity-button';
@@ -211,26 +210,31 @@ type MerchandiseSearchParams = {
 export default function CartModal({ cart }: { cart: Cart | undefined }) {
   const [isOpen, setIsOpen] = useState(false);
   const [childNames, setChildNames] = useState<{ [key: string]: string[] }>({});
-  const [errors, setErrors] = useState<{ [key: string]: boolean[] }>({});
+  const [isCheckoutDisabled, setIsCheckoutDisabled] = useState(false);
 
   const quantityRef = useRef(cart?.totalQuantity);
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
 
   useEffect(() => {
+    // Open cart modal when quantity changes.
     if (cart?.totalQuantity !== quantityRef.current) {
+      // But only if it's not already open (quantity also changes when editing items in cart).
       if (!isOpen) {
         setIsOpen(true);
       }
+
+      // Always update the quantity reference
       quantityRef.current = cart?.totalQuantity;
     }
-  }, [isOpen, cart?.totalQuantity, quantityRef]);
+  }, [isOpen, cart?.totalQuantity]);
 
   useEffect(() => {
+    // Load child names from localStorage
     const loadChildNames = () => {
       try {
-        const storedChildNames = localStorage.getItem('childNames');
-        return storedChildNames ? JSON.parse(storedChildNames) : {};
+        const storedNames = localStorage.getItem('childNames');
+        return storedNames ? JSON.parse(storedNames) : {};
       } catch (error) {
         console.error('Error loading child names from local storage:', error);
         return {};
@@ -241,8 +245,8 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
     const updatedChildNames = { ...storedNames };
 
     // Clean up removed items and adjust quantities
-    Object.keys(updatedChildNames).forEach(id => {
-      const cartItem = cart?.lines.find(line => line.id === id);
+    Object.keys(updatedChildNames).forEach((id) => {
+      const cartItem = cart?.lines.find((line) => line.id === id);
       if (!cartItem) {
         delete updatedChildNames[id];
       } else if (updatedChildNames[id].length !== cartItem.quantity) {
@@ -266,6 +270,8 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
     } catch (error) {
       console.error('Error saving child names to local storage:', error);
     }
+
+   validateChildNames(updatedChildNames);
   }, [cart?.lines]);
 
   const handleChildNameChange = (lineId: string, index: number, value: string) => {
@@ -281,33 +287,48 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
       } catch (error) {
         console.error('Error saving child names to local storage:', error);
       }
+      validateChildNames(updatedChildNames);
       return updatedChildNames;
     });
   };
 
+  const validateChildNames = (names: { [key: string]: string[] }) => {
+    const isValid = Object.values(names).every((nameArray) => 
+      nameArray.length > 0 && nameArray.every((name) => name.trim() !== '')
+    );
+    setIsCheckoutDisabled(!isValid);
+  };
+
   const prepareShopifyNotes = () => {
-    const notes = cart?.lines.map(item => {
-      const names = childNames[item.id]?.filter(name => name.trim() !== '');
-      if (names && names.length > 0) {
-        return `${item.merchandise.product.title}: ${names.join(', ')}`;
-      }
-      return null;
-    }).filter(note => note !== null);
+    const notes = cart?.lines
+      .map((item) => {
+        const names = childNames[item.id]?.filter((name) => name.trim() !== '');
+        if (names && names.length > 0) {
+          return `${item.merchandise.product.title}: ${names.join(', ')}`;
+        }
+        return null;
+      })
+      .filter((note) => note !== null);
 
     return notes?.join(' | ');
   };
 
-  const renderChildNameInputs = (item: Cart['lines'][number]) => {
-    return childNames[item.id]?.map((name, index) => (
-      <input
-        key={`${item.id}-${index}`}
-        type="text"
-        value={name}
-        onChange={(e) => handleChildNameChange(item.id, index, e.target.value)}
-        placeholder={`Child ${index + 1}'s name`}
-        className="mt-2 w-full rounded-md border border-neutral-200 px-3 py-2 text-sm placeholder-neutral-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-neutral-700 dark:bg-black dark:text-white dark:placeholder-neutral-400"
-      />
-    ));
+  const handleCheckout = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+
+    if (isCheckoutDisabled) {
+      alert('Please enter names for all children before proceeding to checkout.');
+      return;
+    }
+
+    const notes = prepareShopifyNotes();
+    console.log('Cart notes:', notes);
+    // Here you would typically update the cart with notes before checkout
+    // For now, we'll just proceed to checkout
+
+    if (cart?.checkoutUrl) {
+      window.location.href = cart.checkoutUrl;
+    }
   };
 
   return (
@@ -337,7 +358,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
             leaveFrom="translate-x-0"
             leaveTo="translate-x-full"
           >
-            <Dialog.Panel className="fixed bottom-0 right-0 top-0 flex h-full w-full flex-col border-l border-neutral-200 bg-white p-6 text-black backdrop-blur-xl dark:border-neutral-700 dark:bg-black/80 dark:text-white md:w-[390px]">
+            <Dialog.Panel className="fixed bottom-0 right-0 top-0 flex h-full w-full flex-col border-l border-neutral-200 bg-white/80 p-6 text-black backdrop-blur-xl dark:border-neutral-700 dark:bg-black/80 dark:text-white md:w-[390px]">
               <div className="flex items-center justify-between">
                 <p className="text-lg font-semibold">My Cart</p>
                 <button aria-label="Close cart" onClick={closeCart}>
@@ -421,7 +442,16 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                             </div>
                           </div>
                           <div className="px-1 pb-4">
-                            {renderChildNameInputs(item)}
+                            {Array.from({ length: item.quantity }).map((_, index) => (
+                              <input
+                                key={`${item.id}-${index}`}
+                                type="text"
+                                value={childNames[item.id]?.[index] || ''}
+                                onChange={(e) => handleChildNameChange(item.id, index, e.target.value)}
+                                placeholder={`Child ${index + 1}'s name`}
+                                className="mt-2 w-full rounded-md border border-neutral-200 px-3 py-2 text-sm placeholder-neutral-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-neutral-700 dark:bg-black dark:text-white dark:placeholder-neutral-400"
+                              />
+                            ))}
                           </div>
                         </li>
                       );
@@ -451,9 +481,14 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                   </div>
                   <a
                     href={cart.checkoutUrl}
-                    className="block w-full rounded-full bg-blue-600 p-3 text-center text-sm font-medium text-white opacity-90 hover:opacity-100"
+                    className={`block w-full rounded-full p-3 text-center text-sm font-medium text-white ${
+                      isCheckoutDisabled
+                        ? 'cursor-not-allowed bg-gray-400'
+                        : 'bg-blue-600 opacity-90 hover:opacity-100'
+                    }`}
+                    onClick={handleCheckout}
                   >
-                    Proceed to Checkout
+                    {isCheckoutDisabled ? 'Please Enter All Child Names' : 'Proceed to Checkout'}
                   </a>
                 </div>
               )}

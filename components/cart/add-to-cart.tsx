@@ -46,6 +46,7 @@ function SubmitButton({
   return (
     <button
       onClick={(e: React.FormEvent<HTMLButtonElement>) => {
+        console.log("clicking")
         if (pending) e.preventDefault();
       }}
       aria-label="Add to cart"

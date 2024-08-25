@@ -4,6 +4,7 @@ const cartFragment = /* GraphQL */ `
   fragment cart on Cart {
     id
     checkoutUrl
+    note
     cost {
       subtotalAmount {
         amount

@@ -29,6 +29,11 @@ export const editCartItemsMutation = /* GraphQL */ `
         ...cart
       }
     }
+    cartNoteUpdate(cartId: $cartId, note: $note) {
+      cart {
+        ...cart
+      }
+    }
   }
   ${cartFragment}
 `;

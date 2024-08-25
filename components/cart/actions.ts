@@ -81,3 +81,21 @@ export async function updateItemQuantity(
     return 'Error updating item quantity';
   }
 }
+
+
+export async function updateCartNotes(notes: string) {
+  const cartId = cookies().get('cartId')?.value;
+
+  if (!cartId) {
+    return { error: 'Missing cart ID' };
+  }
+
+  try {
+    // const updatedCart = await updateCart(cartId, {}, "" );
+    revalidateTag(TAGS.cart);
+    return { success: true };
+  } catch (e) {
+    console.error('Error updating cart notes:', e);
+    return { error: 'Error updating cart notes' };
+  }
+}
