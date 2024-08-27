@@ -8,7 +8,8 @@ import {
   addToCartMutation,
   createCartMutation,
   editCartItemsMutation,
-  removeFromCartMutation
+  removeFromCartMutation,
+  updateCartNoteMutation
 } from './mutations/cart';
 import { getCartQuery } from './queries/cart';
 import {
@@ -47,6 +48,7 @@ import {
   ShopifyProductRecommendationsOperation,
   ShopifyProductsOperation,
   ShopifyRemoveFromCartOperation,
+  ShopifyUpdateCartNoteOperation,
   ShopifyUpdateCartOperation
 } from './types';
 
@@ -269,6 +271,23 @@ export async function updateCart(
 
   return reshapeCart(updatedCart);
 }
+
+export async function updateCartNote(cartId: string, note: string): Promise<Cart> {
+  const res = await shopifyFetch<ShopifyUpdateCartNoteOperation>({
+    query: updateCartNoteMutation,
+    variables: {
+      cartId,
+      note
+    },
+    cache: 'no-store'
+  });
+
+  // The cart returned from cartNoteUpdate will be the most up-to-date
+  const updatedCart = res.body.data.cartNoteUpdate.cart;
+
+  return reshapeCart(updatedCart);
+}
+
 
 export async function getCart(cartId: string): Promise<Cart | undefined> {
   const res = await shopifyFetch<ShopifyCartOperation>({

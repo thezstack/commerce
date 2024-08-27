@@ -1,7 +1,7 @@
 'use server';
 
 import { TAGS } from 'lib/constants';
-import { addToCart, createCart, getCart, removeFromCart, updateCart } from 'lib/shopify';
+import { addToCart, createCart, getCart, removeFromCart, updateCart, updateCartNote } from 'lib/shopify';
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 
@@ -91,9 +91,9 @@ export async function updateCartNotes(notes: string) {
   }
 
   try {
-    // const updatedCart = await updateCart(cartId, {}, "" );
+    const updatedCart = await updateCartNote(cartId, notes);
     revalidateTag(TAGS.cart);
-    return { success: true };
+    return { success: true, cart: updatedCart };
   } catch (e) {
     console.error('Error updating cart notes:', e);
     return { error: 'Error updating cart notes' };
