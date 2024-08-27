@@ -80,7 +80,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
       console.error('Error saving child names to local storage:', error);
     }
 
-    // validateChildNames(updatedChildNames);
+     validateChildNames(updatedChildNames);
   }, [localCart?.lines]);
 
   const handleChildNameChange = (lineId: string, index: number, value: string) => {
@@ -96,7 +96,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
       } catch (error) {
         console.error('Error saving child names to local storage:', error);
       }
-      // validateChildNames(updatedChildNames);
+      validateChildNames(updatedChildNames);
       return updatedChildNames;
     });
   };
