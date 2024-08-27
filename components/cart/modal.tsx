@@ -188,7 +188,6 @@
 //       </Transition>
 //     </>
 //   );
-//}
 import { Dialog, Transition } from '@headlessui/react';
 import { ShoppingCartIcon } from '@heroicons/react/24/outline';
 import Price from 'components/price';
@@ -211,26 +210,26 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
   const [isOpen, setIsOpen] = useState(false);
   const [childNames, setChildNames] = useState<{ [key: string]: string[] }>({});
   const [isCheckoutDisabled, setIsCheckoutDisabled] = useState(false);
+  const [localCart, setLocalCart] = useState(cart);
 
   const quantityRef = useRef(cart?.totalQuantity);
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
 
   useEffect(() => {
-    // Open cart modal when quantity changes.
-    if (cart?.totalQuantity !== quantityRef.current) {
-      // But only if it's not already open (quantity also changes when editing items in cart).
+    setLocalCart(cart);
+  }, [cart]);
+
+  useEffect(() => {
+    if (localCart?.totalQuantity !== quantityRef.current) {
       if (!isOpen) {
         setIsOpen(true);
       }
-
-      // Always update the quantity reference
-      quantityRef.current = cart?.totalQuantity;
+      quantityRef.current = localCart?.totalQuantity;
     }
-  }, [isOpen, cart?.totalQuantity]);
+  }, [isOpen, localCart?.totalQuantity]);
 
   useEffect(() => {
-    // Load child names from localStorage
     const loadChildNames = () => {
       try {
         const storedNames = localStorage.getItem('childNames');
@@ -244,9 +243,8 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
     const storedNames = loadChildNames();
     const updatedChildNames = { ...storedNames };
 
-    // Clean up removed items and adjust quantities
     Object.keys(updatedChildNames).forEach((id) => {
-      const cartItem = cart?.lines.find((line) => line.id === id);
+      const cartItem = localCart?.lines.find((line) => line.id === id);
       if (!cartItem) {
         delete updatedChildNames[id];
       } else if (updatedChildNames[id].length !== cartItem.quantity) {
@@ -257,8 +255,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
       }
     });
 
-    // Add new items
-    cart?.lines.forEach((item) => {
+    localCart?.lines.forEach((item) => {
       if (!updatedChildNames[item.id]) {
         updatedChildNames[item.id] = Array(item.quantity).fill('');
       }
@@ -271,8 +268,8 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
       console.error('Error saving child names to local storage:', error);
     }
 
-   validateChildNames(updatedChildNames);
-  }, [cart?.lines]);
+    // validateChildNames(updatedChildNames);
+  }, [localCart?.lines]);
 
   const handleChildNameChange = (lineId: string, index: number, value: string) => {
     setChildNames((prev) => {
@@ -287,7 +284,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
       } catch (error) {
         console.error('Error saving child names to local storage:', error);
       }
-      validateChildNames(updatedChildNames);
+      // validateChildNames(updatedChildNames);
       return updatedChildNames;
     });
   };
@@ -300,7 +297,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
   };
 
   const prepareShopifyNotes = () => {
-    const notes = cart?.lines
+    const notes = localCart?.lines
       .map((item) => {
         const names = childNames[item.id]?.filter((name) => name.trim() !== '');
         if (names && names.length > 0) {
@@ -323,18 +320,16 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
 
     const notes = prepareShopifyNotes();
     console.log('Cart notes:', notes);
-    // Here you would typically update the cart with notes before checkout
-    // For now, we'll just proceed to checkout
 
-    if (cart?.checkoutUrl) {
-      window.location.href = cart.checkoutUrl;
+    if (localCart?.checkoutUrl) {
+      window.location.href = localCart.checkoutUrl;
     }
   };
 
   return (
     <>
       <button aria-label="Open cart" onClick={openCart}>
-        <OpenCart quantity={cart?.totalQuantity} />
+        <OpenCart quantity={localCart?.totalQuantity} />
       </button>
       <Transition show={isOpen}>
         <Dialog onClose={closeCart} className="relative z-50">
@@ -366,7 +361,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                 </button>
               </div>
 
-              {!cart || cart.lines.length === 0 ? (
+              {!localCart || localCart.lines.length === 0 ? (
                 <div className="mt-20 flex w-full flex-col items-center justify-center overflow-hidden">
                   <ShoppingCartIcon className="h-16" />
                   <p className="mt-6 text-center text-2xl font-bold">Your cart is empty.</p>
@@ -374,7 +369,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
               ) : (
                 <div className="flex h-full flex-col justify-between overflow-hidden p-1">
                   <ul className="flex-grow overflow-auto py-4">
-                    {cart.lines.map((item, i) => {
+                    {localCart.lines.map((item, i) => {
                       const merchandiseSearchParams = {} as MerchandiseSearchParams;
 
                       item.merchandise.selectedOptions.forEach(({ name, value }) => {
@@ -462,8 +457,8 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                       <p>Taxes</p>
                       <Price
                         className="text-right text-base text-black dark:text-white"
-                        amount={cart.cost.totalTaxAmount.amount}
-                        currencyCode={cart.cost.totalTaxAmount.currencyCode}
+                        amount={localCart.cost.totalTaxAmount.amount}
+                        currencyCode={localCart.cost.totalTaxAmount.currencyCode}
                       />
                     </div>
                     <div className="mb-3 flex items-center justify-between border-b border-neutral-200 pb-1 pt-1 dark:border-neutral-700">
@@ -474,13 +469,13 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                       <p>Total</p>
                       <Price
                         className="text-right text-base text-black dark:text-white"
-                        amount={cart.cost.totalAmount.amount}
-                        currencyCode={cart.cost.totalAmount.currencyCode}
+                        amount={localCart.cost.totalAmount.amount}
+                        currencyCode={localCart.cost.totalAmount.currencyCode}
                       />
                     </div>
                   </div>
                   <a
-                    href={cart.checkoutUrl}
+                    href={localCart.checkoutUrl}
                     className={`block w-full rounded-full p-3 text-center text-sm font-medium text-white ${
                       isCheckoutDisabled
                         ? 'cursor-not-allowed bg-gray-400'

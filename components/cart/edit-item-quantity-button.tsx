@@ -1,5 +1,4 @@
 'use client';
-
 import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import { updateItemQuantity } from 'components/cart/actions';
@@ -14,6 +13,7 @@ function SubmitButton({ type }: { type: 'plus' | 'minus' }) {
     <button
       type="submit"
       onClick={(e: React.FormEvent<HTMLButtonElement>) => {
+        console.log('clicked')
         if (pending) e.preventDefault();
       }}
       aria-label={type === 'plus' ? 'Increase item quantity' : 'Reduce item quantity'}
@@ -38,6 +38,7 @@ function SubmitButton({ type }: { type: 'plus' | 'minus' }) {
 }
 
 export function EditItemQuantityButton({ item, type }: { item: CartItem; type: 'plus' | 'minus' }) {
+  console.log(item, type)
   const [message, formAction] = useFormState(updateItemQuantity, null);
   const payload = {
     lineId: item.id,
@@ -45,6 +46,7 @@ export function EditItemQuantityButton({ item, type }: { item: CartItem; type: '
     quantity: type === 'plus' ? item.quantity + 1 : item.quantity - 1
   };
   const actionWithVariant = formAction.bind(null, payload);
+  console.log('Message:', message); // Add this line
 
   return (
     <form action={actionWithVariant}>
