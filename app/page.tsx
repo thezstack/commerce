@@ -71,8 +71,7 @@ export default async function HomePage() {
                 Simplify Back to School Shopping
               </h1>
               <p className="mb-6 text-gray-600">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                incididunt ut labore et dolore magna aliqua.
+              We partner with schools to create personalized supply kits for each grade. Shop online, skip the store lines, and ensure your child has exactly what they need on day one.
               </p>
               <Link href="/stores" className="rounded-full bg-custom-blue px-6 py-3 font-bold text-white">
                 Shop by school
@@ -159,13 +158,17 @@ export default async function HomePage() {
                     Why Choose SchoolKits?
                   </h2>
                   <p className="mb-6">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-                    nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.
+                  SchoolKits takes the hassle out of back-to-school shopping. We work directly with schools to ensure your child has exactly what they need for a successful year. Our custom-packed kits save you time and stress, while providing high-quality supplies approved by teachers.
                   </p>
                   <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    {[...Array(6)].map((_, index) => (
+                    {[
+                      "Supports teachers by providing high-quality materials",
+                      "Grade-specific supplies curated for your school",
+                      "Direct delivery to your child's classroom",
+                      "Teacher-approved brands and products",
+                      "Time and money savings for busy parents",
+                      "Reduces teachers' administrative workload in managing supplies"
+                    ].map((item, index) => (
                       <li key={index} className="flex items-center">
                         <svg
                           className="mr-2 h-5 w-5 text-[#06D6A0]"
@@ -178,7 +181,7 @@ export default async function HomePage() {
                             clipRule="evenodd"
                           />
                         </svg>
-                        Lorem ipsum dolor sit amet
+                        {item}
                       </li>
                     ))}
                   </ul>
@@ -239,8 +242,7 @@ export default async function HomePage() {
             Shop for a school kit now!
           </h2>
           <p className="text-white text-sm sm:text-base md:text-lg max-w-2xl mb-8">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-            tempor incididunt ut labore et dolore magna aliqua.
+          Get your child ready for success with our curated school kits. Handpicked supplies, teacher-approved, and delivered directly to the classroom. Start the school year right - hassle-free!
           </p>
             <a className="bg-[#0B80A7] hover:bg-[#096c8c] text-white font-bold py-3 px-6 rounded-full transition duration-300">
               Shop by school

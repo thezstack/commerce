@@ -50,7 +50,7 @@ const FAQ: React.FC = () => {
     },
     {
       question: "Can you label my child's school kit?",
-      answer: "Yes, we offer a labeling service for an additional fee. You can select this option during checkout, and we'll label all applicable items with your child's name."
+      answer: "Yes, we label all kits with your child's name."
     },
     {
       question: "When do I need to order by?",
@@ -62,7 +62,7 @@ const FAQ: React.FC = () => {
     },
     {
       question: "Can I customize the kit contents?",
-      answer: "The kit contents are standardized based on your school's requirements. However, you can often add optional items during checkout if you need additional supplies."
+      answer: "The kit contents are standardized based on your school's requirements."
     }
   ];
 
