@@ -25,7 +25,7 @@ export default async function Navbar() {
             >
               <LogoSquare />
               <div className="ml-2 font-['Futura'] text-2xl font-extrabold leading-[110%]">
-                {SITE_NAME}
+                SchoolKits
               </div>
             </Link>
             {menu.length ? (
