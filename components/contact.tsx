@@ -47,7 +47,7 @@ const ContactForm = () => {
             classroom requirements, saving time and reducing stress for everyone involved.
           </p>
           <p className="mb-4 text-sm sm:text-base lg:text-lg">By partnering with SchoolKits, you'll:</p>
-          <ul className="mb-6 space-y-2 text-sm sm:text-base lg:text-lg">
+          <ul className="mb-6 space-y-2">
             {[
               "Streamline the supply procurement process",
               "Ensure all students have the right materials from day one",
@@ -57,9 +57,11 @@ const ContactForm = () => {
             ].map((item, index) => (
               <li key={index} className="flex items-center">
                 <svg
-                  className="mr-2 h-5 w-5 text-[#06D6A0]"
+                  className="mr-2 flex-shrink-0 text-[#06D6A0]"
                   fill="currentColor"
                   viewBox="0 0 20 20"
+                  width="16"
+                  height="16"
                 >
                   <path
                     fillRule="evenodd"
@@ -67,7 +69,7 @@ const ContactForm = () => {
                     clipRule="evenodd"
                   />
                 </svg>
-                {item}
+                <span className="text-xs sm:text-sm">{item}</span>
               </li>
             ))}
           </ul>

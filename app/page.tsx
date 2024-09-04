@@ -41,8 +41,9 @@ export default async function HomePage() {
     },
     {
       name: sharpie
-    },{
-      name:fiskar
+    },
+    {
+      name: fiskar
     }
   ];
   const Blob = () => (
@@ -71,9 +72,14 @@ export default async function HomePage() {
                 Simplify Back to School Shopping
               </h1>
               <p className="mb-6 text-gray-600">
-              We partner with schools to create personalized supply kits for each grade. Shop online, skip the store lines, and ensure your child has exactly what they need on day one.
+                We partner with schools to create personalized supply kits for each grade. Shop
+                online, skip the store lines, and ensure your child has exactly what they need on
+                day one.
               </p>
-              <Link href="/stores" className="rounded-full bg-custom-blue px-6 py-3 font-bold text-white">
+              <Link
+                href="/stores"
+                className="rounded-full bg-custom-blue px-6 py-3 font-bold text-white"
+              >
                 Shop by school
               </Link>
             </div>
@@ -107,17 +113,17 @@ export default async function HomePage() {
                 school kits.
               </p>
             </div>
-            <div className="flex flex-1 flex-col space-y-4 text-center my-7">
+            <div className="my-7 flex flex-1 flex-col space-y-4 text-center">
               <Image src={step2} alt="Step 2" className="mx-auto" />
               <h3 className="font-semibold">Step 2</h3>
               <p>Parents conveniently buy their child a School Kit with a click of a button.</p>
             </div>
-            <div className="flex flex-1 flex-col  space-y-4 text-center my-7">
+            <div className="my-7 flex flex-1  flex-col space-y-4 text-center">
               <Image src={step3} alt="Step 3" className="mx-auto" />
               <h3 className="font-semibold">Step 3</h3>
               <p>Our team delivers directly to your classroom. No need for pickup.</p>
             </div>
-            <div className="flex flex-1 flex-col  space-y-4 text-center my-7">
+            <div className="my-7 flex flex-1  flex-col space-y-4 text-center">
               <Image src={step4} alt="Step 4" className="mx-auto" />
               <h3 className="font-semibold">Step 4</h3>
               <p>
@@ -158,22 +164,27 @@ export default async function HomePage() {
                     Why Choose SchoolKits?
                   </h2>
                   <p className="mb-6">
-                  SchoolKits takes the hassle out of back-to-school shopping. We work directly with schools to ensure your child has exactly what they need for a successful year. Our custom-packed kits save you time and stress, while providing high-quality supplies approved by teachers.
+                    SchoolKits takes the hassle out of back-to-school shopping. We work directly
+                    with schools to ensure your child has exactly what they need for a successful
+                    year. Our custom-packed kits save you time and stress, while providing
+                    high-quality supplies approved by teachers.
                   </p>
                   <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     {[
-                      "Supports teachers by providing high-quality materials",
-                      "Grade-specific supplies curated for your school",
+                      'Supports teachers by providing high-quality materials',
+                      'Grade-specific supplies curated for your school',
                       "Direct delivery to your child's classroom",
-                      "Teacher-approved brands and products",
-                      "Time and money savings for busy parents",
+                      'Teacher-approved brands and products',
+                      'Time and money savings for busy parents',
                       "Reduces teachers' administrative workload in managing supplies"
                     ].map((item, index) => (
                       <li key={index} className="flex items-center">
                         <svg
-                          className="mr-2 h-5 w-5 text-[#06D6A0]"
+                          className="mr-2 flex-shrink-0 text-[#06D6A0]"
                           fill="currentColor"
                           viewBox="0 0 20 20"
+                          width="16"
+                          height="16"
                         >
                           <path
                             fillRule="evenodd"
@@ -181,7 +192,7 @@ export default async function HomePage() {
                             clipRule="evenodd"
                           />
                         </svg>
-                        {item}
+                        <span className="text-xs sm:text-sm">{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -200,7 +211,7 @@ export default async function HomePage() {
           <Carousel />
         </div>
         {/*Brands */}
-        <div className="mx-auto max-w-6xl px-4 py-8 lg:py-16 bg-[#FCFCFD]">
+        <div className="mx-auto max-w-6xl bg-[#FCFCFD] px-4 py-8 lg:py-16">
           <div className="text-center">
             <h1 className="mb-4 text-2xl font-bold sm:text-3xl lg:text-4xl">
               Teacher Approved Brands and Supplies
@@ -224,34 +235,31 @@ export default async function HomePage() {
             ))}
           </div>
         </div>
-        
         <FAQ />
-
-     {/* New Shop Banner Section */}
-     <div className="relative w-full h-[400px] sm:h-[500px] overflow-hidden">
-        <Image
-          src={bottomCTA}
-          alt="School supplies"
-          layout="fill"
-          objectFit="cover"
-          quality={100}
-        />
-        <div className="absolute inset-0 bg-black bg-opacity-30" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
-            Shop for a school kit now!
-          </h2>
-          <p className="text-white text-sm sm:text-base md:text-lg max-w-2xl mb-8">
-          Get your child ready for success with our curated school kits. Handpicked supplies, teacher-approved, and delivered directly to the classroom. Start the school year right - hassle-free!
-          </p>
-            <a className="bg-[#0B80A7] hover:bg-[#096c8c] text-white font-bold py-3 px-6 rounded-full transition duration-300">
+        {/* New Shop Banner Section */}
+        <div className="relative h-[400px] w-full overflow-hidden sm:h-[500px]">
+          <Image
+            src={bottomCTA}
+            alt="School supplies"
+            layout="fill"
+            objectFit="cover"
+            quality={100}
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-30" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8">
+            <h2 className="mb-4 text-3xl font-bold text-white sm:text-4xl md:text-5xl">
+              Shop for a school kit now!
+            </h2>
+            <p className="mb-8 max-w-2xl text-sm text-white sm:text-base md:text-lg">
+              Get your child ready for success with our curated school kits. Handpicked supplies,
+              teacher-approved, and delivered directly to the classroom. Start the school year right
+              - hassle-free!
+            </p>
+            <a className="rounded-full bg-[#0B80A7] px-6 py-3 font-bold text-white transition duration-300 hover:bg-[#096c8c]">
               Shop by school
             </a>
-       
+          </div>
         </div>
-      </div>
-
-
       </Suspense>
     </>
   );
