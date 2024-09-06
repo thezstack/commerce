@@ -255,9 +255,9 @@ export default async function HomePage() {
               teacher-approved, and delivered directly to the classroom. Start the school year right
               - hassle-free!
             </p>
-            <a className="rounded-full bg-[#0B80A7] px-6 py-3 font-bold text-white transition duration-300 hover:bg-[#096c8c]">
+            <Link href="/stores" className="rounded-full bg-[#0B80A7] px-6 py-3 font-bold text-white transition duration-300 hover:bg-[#096c8c]">
               Shop by school
-            </a>
+            </Link>
           </div>
         </div>
       </Suspense>
