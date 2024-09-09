@@ -116,7 +116,7 @@ export default async function HomePage() {
             <div className="my-7 flex flex-1 flex-col space-y-4 text-center">
               <Image src={step2} alt="Step 2" className="mx-auto" />
               <h3 className="font-semibold">Step 2</h3>
-              <p>Parents conveniently buy their child a School Kit with a click of a button.</p>
+              <p>Parents conveniently buy their child a SchoolKit with a click of a button.</p>
             </div>
             <div className="my-7 flex flex-1  flex-col space-y-4 text-center">
               <Image src={step3} alt="Step 3" className="mx-auto" />
