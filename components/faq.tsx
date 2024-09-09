@@ -69,7 +69,7 @@ const FAQ: React.FC = () => {
   const schoolFAQs: FAQItem[] = [
     {
       question: "How does the School Kit program benefit our school?",
-      answer: "Our School Kit program saves time for teachers and administrators, ensures all students have the right supplies, and can be used as a fundraising opportunity for your school."
+      answer: "Our School Kit program saves time for teachers and administrators, ensures all students have the right supplies."
     },
     {
       question: "How do we set up a School Kit program for our school?",
