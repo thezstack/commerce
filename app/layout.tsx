@@ -1,3 +1,4 @@
+import { GoogleAnalytics } from '@next/third-parties/google';
 import Footer from 'components/layout/footer';
 import Navbar from 'components/layout/navbar';
 import { ensureStartsWith } from 'lib/utils';
@@ -40,6 +41,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   return (
     <html lang="en" className={openSans.className}>
       <body className="bg-neutral-50 text-black selection:bg-teal-300">
+      <GoogleAnalytics gaId="G-4SWM464SP9" />
         <Suspense>
           <Navbar />
           <main>{children}</main>
