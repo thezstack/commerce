@@ -113,13 +113,18 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
       .map((item) => {
         const names = childNames[item.id]?.filter((name) => name.trim() !== '');
         if (names && names.length > 0) {
-          return `${item.merchandise.product.title}: ${names.join(', ')}`;
+          return {
+            productId: item.merchandise.product.id,
+            variantId: item.merchandise.id,
+            productTitle: item.merchandise.product.title,
+            names: names
+          };
         }
         return null;
       })
-      .filter((note) => note !== null);
-
-    return notes?.join(' | ') || '';
+      .filter((note): note is NonNullable<typeof note> => note !== null);
+  
+    return JSON.stringify(notes);
   };
 
   const handleCheckout = async (e: React.MouseEvent<HTMLAnchorElement>) => {
