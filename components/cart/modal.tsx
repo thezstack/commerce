@@ -123,7 +123,6 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
         return null;
       })
       .filter((note): note is NonNullable<typeof note> => note !== null);
-  
     return JSON.stringify(notes);
   };
 
@@ -136,7 +135,6 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
     }
   
     const notes = prepareShopifyNotes();
-    console.log('Cart notes:', notes);
   
     try {
       // Call the server action to update cart notes
@@ -192,8 +190,8 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                   <CloseCart />
                 </button>
               </div>
-
-              {!localCart || localCart.lines.length === 0 ? (
+              <button onClick={() => prepareShopifyNotes()}>preparenotes</button>
+                {!localCart || localCart.lines.length === 0 ? (
                 <div className="mt-20 flex w-full flex-col items-center justify-center overflow-hidden">
                   <ShoppingCartIcon className="h-16" />
                   <p className="mt-6 text-center text-2xl font-bold">Your cart is empty.</p>
