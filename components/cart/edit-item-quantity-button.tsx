@@ -46,7 +46,6 @@ export function EditItemQuantityButton({ item, type }: { item: CartItem; type: '
     quantity: type === 'plus' ? item.quantity + 1 : item.quantity - 1
   };
   const actionWithVariant = formAction.bind(null, payload);
-  console.log('Message:', message); // Add this line
 
   return (
     <form action={actionWithVariant}>
