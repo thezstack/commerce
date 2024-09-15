@@ -190,7 +190,6 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                   <CloseCart />
                 </button>
               </div>
-              <button onClick={() => prepareShopifyNotes()}>preparenotes</button>
                 {!localCart || localCart.lines.length === 0 ? (
                 <div className="mt-20 flex w-full flex-col items-center justify-center overflow-hidden">
                   <ShoppingCartIcon className="h-16" />
