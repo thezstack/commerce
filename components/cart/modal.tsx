@@ -5,6 +5,7 @@ import Price from 'components/price';
 import { DEFAULT_OPTION } from 'lib/constants';
 import type { Cart } from 'lib/shopify/types';
 import { createUrl } from 'lib/utils';
+import logo from 'media/logo.png';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { Fragment, useEffect, useRef, useState } from 'react';
@@ -13,7 +14,6 @@ import CloseCart from './close-cart';
 import { DeleteItemButton } from './delete-item-button';
 import { EditItemQuantityButton } from './edit-item-quantity-button';
 import OpenCart from './open-cart';
-
 type MerchandiseSearchParams = {
   [key: string]: string;
 };
@@ -232,10 +232,10 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                                   width={64}
                                   height={64}
                                   alt={
-                                    item.merchandise.product.featuredImage.altText ||
+                                    item.merchandise.product.featuredImage?.altText ||
                                     item.merchandise.product.title
                                   }
-                                  src={item.merchandise.product.featuredImage.url}
+                                  src={item.merchandise.product.featuredImage?.url || logo}
                                 />
                               </div>
 
