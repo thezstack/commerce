@@ -22,7 +22,7 @@ function SubmitButton({
 
   if (!availableForSale) {
     return (
-      <button aria-disabled className={clsx(buttonClasses, disabledClasses)}>
+      <button type="button" disabled className={clsx(buttonClasses, disabledClasses)}>
         Out Of Stock
       </button>
     );
@@ -31,8 +31,9 @@ function SubmitButton({
   if (!selectedVariantId) {
     return (
       <button
+        type="button"
+        disabled
         aria-label="Please select an option"
-        aria-disabled
         className={clsx(buttonClasses, disabledClasses)}
       >
         <div className="absolute left-0 ml-4">
@@ -45,15 +46,15 @@ function SubmitButton({
 
   return (
     <button
+      type="submit"
       onClick={(e: React.FormEvent<HTMLButtonElement>) => {
-        console.log("clicking")
         if (pending) e.preventDefault();
       }}
       aria-label="Add to cart"
-      aria-disabled={pending}
+      disabled={pending}
       className={clsx(buttonClasses, {
         'hover:opacity-90': true,
-        disabledClasses: pending
+        [disabledClasses]: pending
       })}
     >
       <div className="absolute left-0 ml-4">

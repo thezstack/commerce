@@ -7,7 +7,7 @@ import { getPage } from 'lib/shopify';
 import { notFound } from 'next/navigation';
 export const runtime = 'edge';
 
-export const revalidate = 43200; // 12 hours in seconds
+export const revalidate = 432; // 12 hours in seconds
 
 export async function generateMetadata({
   params
@@ -41,7 +41,7 @@ export default async function Page({ params }: { params: { page: string } }) {
       </>
     );
   }
-  if(page.handle === 'stores'){
+  if(page.handle === 'schools'){
     return(
       <>
       <Stores/>
