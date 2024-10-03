@@ -248,7 +248,7 @@ export default async function HomePage() {
           <div className="absolute inset-0 bg-black bg-opacity-30" />
           <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8">
             <h2 className="mb-4 text-3xl font-bold text-white sm:text-4xl md:text-5xl">
-              Shop for a school kit now!
+              Shop for a SchoolKit now!
             </h2>
             <p className="mb-8 max-w-2xl text-sm text-white sm:text-base md:text-lg">
               Get your child ready for success with our curated school kits. Handpicked supplies,
