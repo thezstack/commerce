@@ -77,7 +77,7 @@ export default async function HomePage() {
                 day one.
               </p>
               <Link
-                href="/stores"
+                href="/schools"
                 className="rounded-full bg-custom-blue px-6 py-3 font-bold text-white"
               >
                 Shop by school
@@ -255,7 +255,7 @@ export default async function HomePage() {
               teacher-approved, and delivered directly to the classroom. Start the school year right
               - hassle-free!
             </p>
-            <Link href="/stores" className="rounded-full bg-[#0B80A7] px-6 py-3 font-bold text-white transition duration-300 hover:bg-[#096c8c]">
+            <Link href="/schools" className="rounded-full bg-[#0B80A7] px-6 py-3 font-bold text-white transition duration-300 hover:bg-[#096c8c]">
               Shop by school
             </Link>
           </div>
