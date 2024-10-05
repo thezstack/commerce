@@ -1,4 +1,5 @@
 import { getCollections } from 'lib/shopify';
+export const revalidate = 300;
 
 export default async function Stores() {
   const data = await getCollections();
