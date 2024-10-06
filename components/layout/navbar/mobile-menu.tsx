@@ -14,7 +14,7 @@ export default function MobileMenu({ menu }: { menu: Menu[] }) {
   const [isOpen, setIsOpen] = useState(false);
   const openMobileMenu = () => setIsOpen(true);
   const closeMobileMenu = () => setIsOpen(false);
-
+  console.log(menu);
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 768) {
