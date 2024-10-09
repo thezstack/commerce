@@ -13,7 +13,6 @@ function SubmitButton({ type }: { type: 'plus' | 'minus' }) {
     <button
       type="submit"
       onClick={(e: React.FormEvent<HTMLButtonElement>) => {
-        console.log('clicked')
         if (pending) e.preventDefault();
       }}
       aria-label={type === 'plus' ? 'Increase item quantity' : 'Reduce item quantity'}

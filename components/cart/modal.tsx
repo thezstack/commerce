@@ -145,7 +145,6 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
         alert('There was an error updating your cart. Please try again.');
         return;
       }
-      console.log(localCart?.checkoutUrl)
       // If successful, proceed to checkout
       if (localCart?.checkoutUrl) {
         window.location.href = `${localCart.checkoutUrl}`;

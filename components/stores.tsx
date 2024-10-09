@@ -3,7 +3,7 @@ export const revalidate = 300;
 
 export default async function Stores() {
   const data = await getCollections();
-
+  console.log(data);
   return (
     <>
       <div className="container mx-auto p-4">
