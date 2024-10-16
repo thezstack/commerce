@@ -69,13 +69,10 @@ export default async function HomePage() {
             {/* Text content */}
             <div className="mb-8 px-4 py-8  lg:mb-0 lg:w-1/2 lg:px-12 lg:py-16">
               <h1 className="mb-4 text-3xl font-bold lg:text-4xl">
-                Simplify Back to School Shopping
+                School Ready, Stress Free
               </h1>
               <p className="mb-6 text-gray-600">
-                We partner with schools to create personalized supply kits for each grade. Shop
-                online, skip the store lines, and ensure your child has exactly what they need on
-                day one.
-              </p>
+              We partner with schools to perfect back-to-school shopping.</p>
               <Link
                 href="/schools"
                 className="rounded-full bg-custom-blue px-6 py-3 font-bold text-white"
