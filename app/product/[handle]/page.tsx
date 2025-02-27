@@ -6,8 +6,9 @@ import { ProductDescription } from 'components/product/product-description';
 import Prose from 'components/prose';
 import { HIDDEN_PRODUCT_TAG } from 'lib/constants';
 import { getProduct } from 'lib/shopify';
-//export const runtime = 'edge';
+export const runtime = 'edge';
 
+export const revalidate = 60; 
 export async function generateMetadata({
   params
 }: {
