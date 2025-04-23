@@ -19,12 +19,14 @@ import {
 } from './queries/collection';
 import { getMenuQuery } from './queries/menu';
 import { getPageQuery, getPagesQuery } from './queries/page';
+import { getBlogPostQuery, getBlogPostsQuery } from './queries/blog';
 import {
   getProductQuery,
   getProductRecommendationsQuery,
   getProductsQuery
 } from './queries/product';
 import {
+  BlogPost,
   Cart,
   Collection,
   Connection,
@@ -33,6 +35,8 @@ import {
   Page,
   Product,
   ShopifyAddToCartOperation,
+  ShopifyBlogPostOperation,
+  ShopifyBlogPostsOperation,
   ShopifyCart,
   ShopifyCartOperation,
   ShopifyCollection,
@@ -405,6 +409,34 @@ export async function getPages(): Promise<Page[]> {
   });
 
   return removeEdgesAndNodes(res.body.data.pages);
+}
+
+export async function getBlogPost(handle: string): Promise<BlogPost | undefined> {
+  try {
+    const res = await shopifyFetch<ShopifyBlogPostOperation>({
+      query: getBlogPostQuery,
+      variables: { handle }
+    });
+
+    return res.body.data.blogByHandle.articleByHandle;
+  } catch (error) {
+    console.error('Error fetching blog post:', error);
+    return undefined;
+  }
+}
+
+export async function getBlogPosts(first: number = 10): Promise<BlogPost[]> {
+  try {
+    const res = await shopifyFetch<ShopifyBlogPostsOperation>({
+      query: getBlogPostsQuery,
+      variables: { first }
+    });
+
+    return removeEdgesAndNodes(res.body.data.blogByHandle.articles);
+  } catch (error) {
+    console.error('Error fetching blog posts:', error);
+    return [];
+  }
 }
 
 export async function getProduct(handle: string): Promise<Product | undefined> {
