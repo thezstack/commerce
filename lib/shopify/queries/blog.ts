@@ -1,6 +1,6 @@
 export const getBlogPostQuery = `
-  query getBlogPost($handle: String!) {
-    blogByHandle(handle: "news") {
+  query getBlogPost($handle: String!, $blogHandle: String = "news") {
+    blogByHandle(handle: $blogHandle) {
       articleByHandle(handle: $handle) {
         id
         title
@@ -33,8 +33,8 @@ export const getBlogPostQuery = `
 `;
 
 export const getBlogPostsQuery = `
-  query getBlogPosts($first: Int!) {
-    blogByHandle(handle: "news") {
+  query getBlogPosts($first: Int!, $blogHandle: String = "news") {
+    blogByHandle(handle: $blogHandle) {
       articles(first: $first) {
         edges {
           node {

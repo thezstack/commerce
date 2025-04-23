@@ -5,55 +5,55 @@ import { revalidateTag } from 'next/cache';
 import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import {
-  addToCartMutation,
-  createCartMutation,
-  editCartItemsMutation,
-  removeFromCartMutation,
-  updateCartNoteMutation
+    addToCartMutation,
+    createCartMutation,
+    editCartItemsMutation,
+    removeFromCartMutation,
+    updateCartNoteMutation
 } from './mutations/cart';
+import { getBlogPostQuery, getBlogPostsQuery } from './queries/blog';
 import { getCartQuery } from './queries/cart';
 import {
-  getCollectionProductsQuery,
-  getCollectionQuery,
-  getCollectionsQuery
+    getCollectionProductsQuery,
+    getCollectionQuery,
+    getCollectionsQuery
 } from './queries/collection';
 import { getMenuQuery } from './queries/menu';
 import { getPageQuery, getPagesQuery } from './queries/page';
-import { getBlogPostQuery, getBlogPostsQuery } from './queries/blog';
 import {
-  getProductQuery,
-  getProductRecommendationsQuery,
-  getProductsQuery
+    getProductQuery,
+    getProductRecommendationsQuery,
+    getProductsQuery
 } from './queries/product';
 import {
-  BlogPost,
-  Cart,
-  Collection,
-  Connection,
-  Image,
-  Menu,
-  Page,
-  Product,
-  ShopifyAddToCartOperation,
-  ShopifyBlogPostOperation,
-  ShopifyBlogPostsOperation,
-  ShopifyCart,
-  ShopifyCartOperation,
-  ShopifyCollection,
-  ShopifyCollectionOperation,
-  ShopifyCollectionProductsOperation,
-  ShopifyCollectionsOperation,
-  ShopifyCreateCartOperation,
-  ShopifyMenuOperation,
-  ShopifyPageOperation,
-  ShopifyPagesOperation,
-  ShopifyProduct,
-  ShopifyProductOperation,
-  ShopifyProductRecommendationsOperation,
-  ShopifyProductsOperation,
-  ShopifyRemoveFromCartOperation,
-  ShopifyUpdateCartNoteOperation,
-  ShopifyUpdateCartOperation
+    BlogPost,
+    Cart,
+    Collection,
+    Connection,
+    Image,
+    Menu,
+    Page,
+    Product,
+    ShopifyAddToCartOperation,
+    ShopifyBlogPostOperation,
+    ShopifyBlogPostsOperation,
+    ShopifyCart,
+    ShopifyCartOperation,
+    ShopifyCollection,
+    ShopifyCollectionOperation,
+    ShopifyCollectionProductsOperation,
+    ShopifyCollectionsOperation,
+    ShopifyCreateCartOperation,
+    ShopifyMenuOperation,
+    ShopifyPageOperation,
+    ShopifyPagesOperation,
+    ShopifyProduct,
+    ShopifyProductOperation,
+    ShopifyProductRecommendationsOperation,
+    ShopifyProductsOperation,
+    ShopifyRemoveFromCartOperation,
+    ShopifyUpdateCartNoteOperation,
+    ShopifyUpdateCartOperation
 } from './types';
 
 const domain = process.env.SHOPIFY_STORE_DOMAIN
@@ -411,11 +411,11 @@ export async function getPages(): Promise<Page[]> {
   return removeEdgesAndNodes(res.body.data.pages);
 }
 
-export async function getBlogPost(handle: string): Promise<BlogPost | undefined> {
+export async function getBlogPost(handle: string, blogHandle: string = 'blog'): Promise<BlogPost | undefined> {
   try {
     const res = await shopifyFetch<ShopifyBlogPostOperation>({
       query: getBlogPostQuery,
-      variables: { handle }
+      variables: { handle, blogHandle }
     });
 
     return res.body.data.blogByHandle.articleByHandle;
@@ -425,11 +425,11 @@ export async function getBlogPost(handle: string): Promise<BlogPost | undefined>
   }
 }
 
-export async function getBlogPosts(first: number = 10): Promise<BlogPost[]> {
+export async function getBlogPosts(first: number = 10, blogHandle: string = 'blog'): Promise<BlogPost[]> {
   try {
     const res = await shopifyFetch<ShopifyBlogPostsOperation>({
       query: getBlogPostsQuery,
-      variables: { first }
+      variables: { first, blogHandle }
     });
 
     return removeEdgesAndNodes(res.body.data.blogByHandle.articles);

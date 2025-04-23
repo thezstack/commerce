@@ -1,4 +1,5 @@
 import { getBlogPosts } from 'lib/shopify';
+import { BlogPost } from 'lib/shopify/types';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,7 +10,34 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogPage() {
-  const posts = await getBlogPosts(12);
+  // Try different blog handles that might exist in your Shopify store
+  let posts: BlogPost[] = [];
+  let debugInfo: string[] = [];
+  
+  // Common blog handles in Shopify stores
+  const blogHandles = ['blog', 'news', 'blogs', 'articles', 'journal'];
+  
+  // Try each handle until we find posts
+  for (const handle of blogHandles) {
+    try {
+      const fetchedPosts = await getBlogPosts(12, handle);
+      const message = `Found ${fetchedPosts.length} posts with handle '${handle}'`;
+      console.log(message);
+      debugInfo.push(message);
+      
+      if (fetchedPosts.length > 0) {
+        posts = fetchedPosts;
+        const successMessage = `Using blog handle: ${handle}`;
+        console.log(successMessage);
+        debugInfo.push(successMessage);
+        break;
+      }
+    } catch (error) {
+      const errorMessage = `Error fetching posts with handle '${handle}': ${error instanceof Error ? error.message : String(error)}`;
+      console.error(errorMessage);
+      debugInfo.push(errorMessage);
+    }
+  }
 
   return (
     <div className="max-w-7xl mx-auto py-12 px-4">
@@ -23,9 +51,19 @@ export default async function BlogPage() {
       {posts.length === 0 ? (
         <div className="text-center py-12">
           <h2 className="text-2xl font-semibold mb-4">No posts found</h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 mb-4">
             Check back soon for new content!
           </p>
+          <div className="bg-gray-100 p-4 rounded-lg text-left mx-auto max-w-2xl">
+            <h3 className="text-lg font-semibold mb-2">Debug Information:</h3>
+            <pre className="text-xs overflow-auto p-2 bg-gray-200 rounded">
+              {debugInfo.join('\n')}
+            </pre>
+            <p className="mt-4 text-sm">
+              Note: Make sure your Shopify store has a blog with one of these handles: {blogHandles.join(', ')}.<br/>
+              Also verify that you have published blog posts in that blog.
+            </p>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

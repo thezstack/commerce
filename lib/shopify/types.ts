@@ -287,6 +287,7 @@ export type ShopifyBlogPostOperation = {
   };
   variables: {
     handle: string;
+    blogHandle: string;
   };
 };
 
@@ -298,6 +299,7 @@ export type ShopifyBlogPostsOperation = {
   };
   variables: {
     first: number;
+    blogHandle: string;
   };
 };
 
