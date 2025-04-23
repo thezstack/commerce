@@ -49,7 +49,7 @@ const Footer = () => {
             <span className="text-gray-400">|</span>
             <Link href="/affiliate-disclosure" className="text-[#0B80A7] hover:underline">Affiliate Disclosure</Link>
             <span className="text-gray-400">|</span>
-            <a href="https://blog.schoolkits.org" target="_blank" rel="noopener noreferrer" className="text-[#0B80A7] hover:underline">Blog</a>
+            <Link href="/blog" className="text-[#0B80A7] hover:underline">Blog</Link>
           </div>
         </div>
       </div>
