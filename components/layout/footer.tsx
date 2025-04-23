@@ -39,6 +39,19 @@ const Footer = () => {
             </a> */}
           </div>
         </div>
+        
+        {/* Legal Links */}
+        <div className="mt-6 text-center">
+          <div className="flex flex-wrap justify-center gap-4 text-sm">
+            <Link href="/privacy-policy" className="text-[#0B80A7] hover:underline">Privacy Policy</Link>
+            <span className="text-gray-400">|</span>
+            <Link href="/terms" className="text-[#0B80A7] hover:underline">Terms of Service</Link>
+            <span className="text-gray-400">|</span>
+            <Link href="/affiliate-disclosure" className="text-[#0B80A7] hover:underline">Affiliate Disclosure</Link>
+            <span className="text-gray-400">|</span>
+            <a href="https://blog.schoolkits.org" target="_blank" rel="noopener noreferrer" className="text-[#0B80A7] hover:underline">Blog</a>
+          </div>
+        </div>
       </div>
     </footer>
   );

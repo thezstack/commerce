@@ -5,7 +5,7 @@ import { getProducts } from 'lib/shopify';
 
 export const runtime = 'edge';
 
-export const revalidate = 60; // 12 hours in seconds
+export const revalidate = 60; 
 
 export const metadata = {
   title: 'Search',
