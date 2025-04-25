@@ -65,7 +65,9 @@ const key = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN!;
 type ExtractVariables<T> = T extends { variables: object } ? T['variables'] : never;
 
 export async function shopifyFetch<T>({
-  cache = 'force-cache',
+  // Use 'no-store' during development to prevent caching
+  // Change back to 'force-cache' for production when webhooks are properly set up
+  cache = process.env.NODE_ENV === 'development' ? 'no-store' : 'force-cache',
   headers,
   query,
   tags,
@@ -205,12 +207,13 @@ const reshapeProduct = (product: ShopifyProduct, filterHiddenProducts: boolean =
   };
 };
 
-const reshapeProducts = (products: ShopifyProduct[]) => {
+const reshapeProducts = (products: ShopifyProduct[], filterHiddenProducts: boolean = true) => {
   const reshapedProducts = [];
 
   for (const product of products) {
     if (product) {
-      const reshapedProduct = reshapeProduct(product);
+      // Pass the filterHiddenProducts parameter to control filtering
+      const reshapedProduct = reshapeProduct(product, filterHiddenProducts);
 
       if (reshapedProduct) {
         reshapedProducts.push(reshapedProduct);
@@ -330,8 +333,11 @@ export async function getCollectionProducts({
   reverse?: boolean;
   sortKey?: string;
 }): Promise<Product[]> {
+  // Use a simpler approach with no-store to ensure fresh data
   const res = await shopifyFetch<ShopifyCollectionProductsOperation>({
     query: getCollectionProductsQuery,
+    // Always use no-store to ensure we're getting fresh data
+    cache: 'no-store',
     tags: [TAGS.collections, TAGS.products],
     variables: {
       handle: collection,
@@ -340,13 +346,20 @@ export async function getCollectionProducts({
     }
   });
 
-  console.log('products',res.body.data.collection.products.edges);
   if (!res.body.data.collection) {
     console.log(`No collection found for \`${collection}\``);
     return [];
   }
 
-  return reshapeProducts(removeEdgesAndNodes(res.body.data.collection.products));
+  // Log the raw product data from Shopify for debugging
+  console.log(`Raw products from Shopify for collection ${collection}:`, 
+    res.body.data.collection.products.edges.length);
+  
+  // Get all products without filtering
+  const products = removeEdgesAndNodes(res.body.data.collection.products);
+  
+  // Pass false to reshapeProducts to prevent filtering out hidden products
+  return reshapeProducts(products, false);
 }
 
 export async function getCollections(): Promise<ShopifyCollection[]> {
