@@ -44,6 +44,7 @@ const productFragment = /* GraphQL */ `
             amount
             currencyCode
           }
+          quantityAvailable
         }
       }
     }
