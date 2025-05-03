@@ -23,6 +23,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
   const [childNames, setChildNames] = useState<{ [key: string]: string[] }>({});
   const [isCheckoutDisabled, setIsCheckoutDisabled] = useState(false);
   const [localCart, setLocalCart] = useState(cart);
+  const [isSavingNotes, setIsSavingNotes] = useState(false);
 
   const quantityRef = useRef(cart?.totalQuantity);
   const openCart = () => setIsOpen(true);
@@ -126,33 +127,95 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
     return JSON.stringify(notes);
   };
 
-  const handleCheckout = async (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (isCheckoutDisabled) {
-      e.preventDefault();
-      alert('Please enter names for all children before proceeding to checkout.');
-      return;
+  // Store child names in localStorage as soon as they're entered
+  useEffect(() => {
+    if (Object.keys(childNames).length > 0) {
+      try {
+        localStorage.setItem('childNames', JSON.stringify(childNames));
+      } catch (error) {
+        console.error('Error saving child names to local storage:', error);
+      }
     }
+  }, [childNames]);
 
-    const notes = prepareShopifyNotes();
+  // Save notes to cart when child names change and are valid
+  useEffect(() => {
+    const saveNotesToCart = async () => {
+      // Only save if all names are valid and we have a cart
+      const allNamesValid = Object.values(childNames).every((nameArray) => 
+        nameArray.length > 0 && nameArray.every((name) => name.trim() !== '')
+      );
+      
+      if (allNamesValid && localCart && Object.keys(childNames).length > 0) {
+        try {
+          const notes = prepareShopifyNotes();
+          await updateCartNotes(notes);
+          // We don't need to do anything with the result here
+          // Just silently update the notes in the background
+        } catch (error) {
+          // Just log the error, don't alert the user
+          console.error('Background cart notes update failed:', error);
+        }
+      }
+    };
 
+    // Use a debounce to avoid too many requests
+    const timeoutId = setTimeout(saveNotesToCart, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [childNames, localCart]);
+
+  const updateNotesBeforeCheckout = async () => {
+    if (isCheckoutDisabled) {
+      alert('Please enter names for all children before proceeding to checkout.');
+      return false;
+    }
+    
+    setIsSavingNotes(true);
+    
     try {
-      // Call the server action to update cart notes
+      const notes = prepareShopifyNotes();
       const result = await updateCartNotes(notes);
       
       if (result.error) {
-        e.preventDefault();
         console.error('Error updating cart notes:', result.error);
         alert('There was an error updating your cart. Please try again.');
-        return;
+        setIsSavingNotes(false);
+        return false;
       }
       
-      // For Safari compatibility, we'll only prevent default and redirect
-      // if there's an error. Otherwise, let the natural link click happen.
-      // This avoids the "Load failed" error in Safari.
+      setIsSavingNotes(false);
+      return true;
     } catch (error) {
-      e.preventDefault();
-      console.error('Error calling updateCartNotes:', error);
-      alert('There was an error updating your cart. Please try again.');
+      console.error('Failed to update notes before checkout:', error);
+      setIsSavingNotes(false);
+      return false;
+    }
+  };
+
+  // This function handles the checkout button click
+  const handleCheckout = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    
+    if (isCheckoutDisabled) {
+      alert('Please enter names for all children before proceeding to checkout.');
+      return;
+    }
+    
+    setIsSavingNotes(true);
+    
+    try {
+      // Update cart notes first
+      const notes = prepareShopifyNotes();
+      await updateCartNotes(notes);
+      
+      // Use a simple window.open approach which is more compatible with Safari
+      if (localCart?.checkoutUrl) {
+        window.open(localCart.checkoutUrl, '_self');
+      }
+    } catch (error) {
+      console.error('Error during checkout:', error);
+      alert('There was an error processing your checkout. Please try again.');
+      setIsSavingNotes(false);
     }
   };
 
@@ -303,18 +366,23 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                       />
                     </div>
                   </div>
-                  <a
-                    href={`${localCart.checkoutUrl}`}
+                  <button
+                    type="button"
                     className={`block w-full rounded-full p-3 text-center text-sm font-medium text-white ${
-                      isCheckoutDisabled
+                      isCheckoutDisabled || isSavingNotes
                         ? 'cursor-not-allowed bg-gray-400'
                         : 'bg-blue-600 opacity-90 hover:opacity-100'
                     }`}
                     onClick={handleCheckout}
-                    rel="noopener noreferrer"
+                    disabled={isCheckoutDisabled || isSavingNotes}
+                    aria-label="Proceed to checkout"
                   >
-                    {isCheckoutDisabled ? 'Please Enter All Child Names' : 'Proceed to Checkout'}
-                  </a>
+                    {isCheckoutDisabled
+                      ? 'Please Enter All Child Names'
+                      : isSavingNotes
+                        ? 'Saving...' 
+                        : 'Proceed to Checkout'}
+                  </button>
                 </div>
               )}
             </Dialog.Panel>
