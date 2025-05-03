@@ -127,29 +127,30 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
   };
 
   const handleCheckout = async (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-  
     if (isCheckoutDisabled) {
+      e.preventDefault();
       alert('Please enter names for all children before proceeding to checkout.');
       return;
     }
-  
+
     const notes = prepareShopifyNotes();
-  
+
     try {
       // Call the server action to update cart notes
       const result = await updateCartNotes(notes);
       
       if (result.error) {
+        e.preventDefault();
         console.error('Error updating cart notes:', result.error);
         alert('There was an error updating your cart. Please try again.');
         return;
       }
-      // If successful, proceed to checkout
-      if (localCart?.checkoutUrl) {
-        window.location.href = `${localCart.checkoutUrl}`;
-      }
+      
+      // For Safari compatibility, we'll only prevent default and redirect
+      // if there's an error. Otherwise, let the natural link click happen.
+      // This avoids the "Load failed" error in Safari.
     } catch (error) {
+      e.preventDefault();
       console.error('Error calling updateCartNotes:', error);
       alert('There was an error updating your cart. Please try again.');
     }
@@ -310,6 +311,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                         : 'bg-blue-600 opacity-90 hover:opacity-100'
                     }`}
                     onClick={handleCheckout}
+                    rel="noopener noreferrer"
                   >
                     {isCheckoutDisabled ? 'Please Enter All Child Names' : 'Proceed to Checkout'}
                   </a>
