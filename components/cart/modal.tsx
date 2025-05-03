@@ -354,6 +354,10 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                                 onChange={(e) => handleChildNameChange(item.id, index, e.target.value)}
                                 placeholder={`Child ${index + 1}'s name`}
                                 className="mt-2 w-full rounded-md border border-neutral-200 px-3 py-2 text-sm placeholder-neutral-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-neutral-700 dark:bg-black dark:text-white dark:placeholder-neutral-400"
+                                autoComplete="off"
+                                inputMode="text"
+                                spellCheck="false"
+                                style={{ fontSize: '16px' }} /* Prevents iOS zoom */
                               />
                             ))}
                           </div>

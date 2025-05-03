@@ -47,6 +47,9 @@ const CookieConsentBanner = dynamic(
 export default async function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={openSans.className}>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      </head>
       <body className="bg-neutral-50 text-black selection:bg-teal-300">
       <GoogleAnalytics gaId="G-4SWM464SP9" />
         <Suspense>
