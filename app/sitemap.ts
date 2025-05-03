@@ -1,4 +1,4 @@
-import { getCollections, getPages, getProducts, getBlogPosts } from 'lib/shopify';
+import { getBlogPosts, getCollections, getPages, getProducts } from 'lib/shopify';
 import { validateEnvironmentVariables } from 'lib/utils';
 import { MetadataRoute } from 'next';
 
@@ -20,7 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const collectionsPromise = getCollections().then((collections) =>
     collections.map((collection) => ({
-      url: `${baseUrl}/${collection.handle}`,
+      url: `${baseUrl}/collection/${collection.handle}`,
       lastModified: collection.updatedAt
     }))
   );
