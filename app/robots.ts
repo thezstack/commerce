@@ -1,6 +1,9 @@
+// Ensure proper URL formatting to avoid double https:// issues
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
   ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-  : 'http://localhost:3000';
+  : process.env.NODE_ENV === 'production' 
+    ? 'https://schoolkits.org'
+    : 'http://localhost:3000';
 
 export default function robots() {
   return {

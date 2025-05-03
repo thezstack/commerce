@@ -1,4 +1,4 @@
-import { getCollections, getPages, getProducts } from 'lib/shopify';
+import { getCollections, getPages, getProducts, getBlogPosts } from 'lib/shopify';
 import { validateEnvironmentVariables } from 'lib/utils';
 import { MetadataRoute } from 'next';
 
@@ -7,9 +7,8 @@ type Route = {
   lastModified: string;
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
-  ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-  : 'http://localhost:3000';
+// Fix the URL format to avoid double https://
+const baseUrl = process.env.NODE_ENV === 'production' ? 'https://schoolkits.org' : 'http://localhost:3000';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   validateEnvironmentVariables();
@@ -21,7 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const collectionsPromise = getCollections().then((collections) =>
     collections.map((collection) => ({
-      url: `${baseUrl}${collection.handle}`,
+      url: `${baseUrl}/${collection.handle}`,
       lastModified: collection.updatedAt
     }))
   );
@@ -40,10 +39,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   );
 
+  // Add blog posts to sitemap
+  const blogPostsPromise = getBlogPosts(50).then((posts) =>
+    posts.map((post) => ({
+      url: `${baseUrl}/blog/${post.handle}`,
+      lastModified: post.publishedAt
+    }))
+  ).catch(() => {
+    // Try alternative blog handles if the default fails
+    return getBlogPosts(50, 'news')
+      .then((posts) => posts.map((post) => ({
+        url: `${baseUrl}/blog/${post.handle}`,
+        lastModified: post.publishedAt
+      })))
+      .catch(() => []); // Return empty array if both attempts fail
+  });
+
   let fetchedRoutes: Route[] = [];
 
   try {
-    fetchedRoutes = (await Promise.all([collectionsPromise, productsPromise, pagesPromise])).flat();
+    fetchedRoutes = (await Promise.all([collectionsPromise, productsPromise, pagesPromise, blogPostsPromise])).flat();
   } catch (error) {
     throw JSON.stringify(error, null, 2);
   }
