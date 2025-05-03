@@ -39,20 +39,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   );
 
-  // Add blog posts to sitemap
-  const blogPostsPromise = getBlogPosts(50).then((posts) =>
+  // Add blog posts to sitemap - using 'news' as the blog handle
+  const blogPostsPromise = getBlogPosts(50, 'news').then((posts) =>
     posts.map((post) => ({
       url: `${baseUrl}/blog/${post.handle}`,
       lastModified: post.publishedAt
     }))
-  ).catch(() => {
-    // Try alternative blog handles if the default fails
-    return getBlogPosts(50, 'news')
-      .then((posts) => posts.map((post) => ({
-        url: `${baseUrl}/blog/${post.handle}`,
-        lastModified: post.publishedAt
-      })))
-      .catch(() => []); // Return empty array if both attempts fail
+  ).catch((error) => {
+    console.error('Error fetching blog posts for sitemap:', error);
+    return []; // Return empty array if fetching fails
   });
 
   let fetchedRoutes: Route[] = [];

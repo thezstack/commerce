@@ -10,12 +10,12 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogPage() {
-  // Try different blog handles that might exist in your Shopify store
+  // Prioritize the 'news' blog handle as configured in Shopify
   let posts: BlogPost[] = [];
   let debugInfo: string[] = [];
   
-  // Common blog handles in Shopify stores
-  const blogHandles = ['blog', 'news', 'blogs', 'articles', 'journal'];
+  // Common blog handles in Shopify stores - prioritize 'news' first
+  const blogHandles = ['news', 'blog', 'blogs', 'articles', 'journal'];
   
   // Try each handle until we find posts
   for (const handle of blogHandles) {
