@@ -32,6 +32,22 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
   useEffect(() => {
     setLocalCart(cart);
   }, [cart]);
+  
+  // Handle page visibility changes to ensure clean state when returning from checkout
+  useEffect(() => {    
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        // When returning to the page, ensure cart modal is closed
+        setIsOpen(false);
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
   useEffect(() => {
     if (localCart?.totalQuantity !== quantityRef.current) {
@@ -141,15 +157,24 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
   // Save notes to cart when child names change and are valid
   useEffect(() => {
     const saveNotesToCart = async () => {
-      // Only save if all names are valid and we have a cart
-      const allNamesValid = Object.values(childNames).every((nameArray) => 
-        nameArray.length > 0 && nameArray.every((name) => name.trim() !== '')
-      );
-      
-      if (allNamesValid && localCart && Object.keys(childNames).length > 0) {
+      // Only save if we have a cart and child names
+      if (localCart && Object.keys(childNames).length > 0) {
         try {
           const notes = prepareShopifyNotes();
-          await updateCartNotes(notes);
+          
+          // Use the API endpoint instead of server action
+          const response = await fetch('/api/cart/notes', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ notes }),
+          });
+          
+          if (!response.ok) {
+            throw new Error('Failed to update cart notes');
+          }
+          
           // We don't need to do anything with the result here
           // Just silently update the notes in the background
         } catch (error) {
@@ -193,7 +218,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
   };
 
   // This function handles the checkout button click
-  const handleCheckout = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleCheckout = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     
     if (isCheckoutDisabled) {
@@ -201,21 +226,13 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
       return;
     }
     
-    setIsSavingNotes(true);
+    // Simply close the cart modal and navigate to the checkout URL
+    // The cart notes have already been saved in the background
+    setIsOpen(false);
     
-    try {
-      // Update cart notes first
-      const notes = prepareShopifyNotes();
-      await updateCartNotes(notes);
-      
-      // Use a simple window.open approach which is more compatible with Safari
-      if (localCart?.checkoutUrl) {
-        window.open(localCart.checkoutUrl, '_self');
-      }
-    } catch (error) {
-      console.error('Error during checkout:', error);
-      alert('There was an error processing your checkout. Please try again.');
-      setIsSavingNotes(false);
+    if (localCart?.checkoutUrl) {
+      // For Safari compatibility, use a simple window.location.href
+      window.location.href = localCart.checkoutUrl;
     }
   };
 
