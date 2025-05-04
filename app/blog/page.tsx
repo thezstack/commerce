@@ -10,33 +10,36 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogPage() {
-  // Prioritize the 'news' blog handle as configured in Shopify
+  // Use only the 'news' blog handle as specified
   let posts: BlogPost[] = [];
   let debugInfo: string[] = [];
   
-  // Common blog handles in Shopify stores - prioritize 'news' first
-  const blogHandles = ['news', 'blog', 'blogs', 'articles', 'journal'];
+  // Only use the 'news' blog handle
+  const blogHandle = 'news';
   
-  // Try each handle until we find posts
-  for (const handle of blogHandles) {
-    try {
-      const fetchedPosts = await getBlogPosts(12, handle);
-      const message = `Found ${fetchedPosts.length} posts with handle '${handle}'`;
-      console.log(message);
-      debugInfo.push(message);
-      
-      if (fetchedPosts.length > 0) {
-        posts = fetchedPosts;
-        const successMessage = `Using blog handle: ${handle}`;
-        console.log(successMessage);
-        debugInfo.push(successMessage);
-        break;
-      }
-    } catch (error) {
-      const errorMessage = `Error fetching posts with handle '${handle}': ${error instanceof Error ? error.message : String(error)}`;
-      console.error(errorMessage);
-      debugInfo.push(errorMessage);
+  try {
+    // Fetch posts from the 'news' blog
+    const fetchedPosts = await getBlogPosts(20, blogHandle);
+    const message = `Found ${fetchedPosts.length} posts with handle '${blogHandle}'`;
+    console.log(message);
+    debugInfo.push(message);
+    
+    // Sort by publish date (newest first)
+    posts = fetchedPosts.sort((a, b) => 
+      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+    );
+    
+    // Log the posts we found for debugging
+    if (posts.length > 0) {
+      debugInfo.push('Found posts:');
+      posts.forEach(post => {
+        debugInfo.push(`- ${post.title} (${post.handle}), published: ${new Date(post.publishedAt).toLocaleString()}`);
+      });
     }
+  } catch (error) {
+    const errorMessage = `Error fetching posts with handle '${blogHandle}': ${error instanceof Error ? error.message : String(error)}`;
+    console.error(errorMessage);
+    debugInfo.push(errorMessage);
   }
 
   return (
@@ -60,7 +63,7 @@ export default async function BlogPage() {
               {debugInfo.join('\n')}
             </pre>
             <p className="mt-4 text-sm">
-              Note: Make sure your Shopify store has a blog with one of these handles: {blogHandles.join(', ')}.<br/>
+              Note: Make sure your Shopify store has a blog with handle 'news'.<br/>
               Also verify that you have published blog posts in that blog.
             </p>
           </div>

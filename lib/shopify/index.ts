@@ -442,7 +442,9 @@ export async function getBlogPosts(first: number = 10, blogHandle: string = 'blo
   try {
     const res = await shopifyFetch<ShopifyBlogPostsOperation>({
       query: getBlogPostsQuery,
-      variables: { first, blogHandle }
+      variables: { first, blogHandle },
+      // Always use no-store to ensure we get the latest blog posts
+      cache: 'no-store'
     });
 
     return removeEdgesAndNodes(res.body.data.blogByHandle.articles);
