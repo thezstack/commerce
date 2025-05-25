@@ -18,9 +18,14 @@ const ContactForm = () => {
       if (result.success) {
         setSubmitSuccess(true);
       } else {
-        throw new Error(result.error);
+        // Display the detailed error if available
+        const errorMessage = result.details ? 
+          `Error: ${result.error}. Details: ${result.details}` : 
+          result.error;
+        setError(errorMessage);
       }
     } catch (err) {
+      console.error('Form submission error:', err);
       setError('Failed to submit form. Please try again.');
     } finally {
       setIsSubmitting(false);
