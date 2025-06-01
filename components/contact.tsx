@@ -1,28 +1,107 @@
 // app/components/ContactForm.tsx
 'use client';
 
-import { useState } from 'react';
-import { submitContactForm } from '../app/[page]/actions';
+import { useState, useEffect, useRef } from 'react';
 
 const ContactForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [error, setError] = useState('');
-
-  async function handleSubmit(formData: FormData) {
+  const [validationErrors, setValidationErrors] = useState<{field: string, message: string}[]>([]);
+  
+  // References for form fields
+  const fullNameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const messageRef = useRef<HTMLTextAreaElement>(null);
+  
+  // Load the reCAPTCHA v3 script
+  useEffect(() => {
+    // Only load if not already loaded
+    if (!window.grecaptcha && !document.querySelector('script[src*="recaptcha"]')) {
+      const script = document.createElement('script');
+      script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LcKwFErAAAAALq-9tSJhg_6-RPVD_qhfOUojw1l'}`;
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+    }
+    
+    return () => {
+      // Cleanup if component unmounts
+      const script = document.querySelector('script[src*="recaptcha"]');
+      if (script) {
+        script.remove();
+      }
+    };
+  }, []);
+  
+  // Function to get reCAPTCHA token
+  const getRecaptchaToken = async (): Promise<string> => {
+    if (!window.grecaptcha) {
+      console.error('reCAPTCHA not loaded');
+      return '';
+    }
+    
+    try {
+      const token = await window.grecaptcha.execute(
+        process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LcKwFErAAAAALq-9tSJhg_6-RPVD_qhfOUojw1l', 
+        {action: 'contact_form'}
+      );
+      return token;
+    } catch (error) {
+      console.error('Error getting reCAPTCHA token:', error);
+      return '';
+    }
+  };
+  
+  // Form submission handler with API endpoint
+  const handleFormSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     setIsSubmitting(true);
     setError('');
+    setValidationErrors([]);
 
     try {
-      const result = await submitContactForm(formData);
+      // Get reCAPTCHA token
+      const recaptchaToken = await getRecaptchaToken();
+      if (!recaptchaToken) {
+        setError('reCAPTCHA verification failed. Please try again.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Create request payload
+      const formData = {
+        fullName: fullNameRef.current?.value || '',
+        email: emailRef.current?.value || '',
+        school: '', // Empty string for school field
+        message: messageRef.current?.value || '',
+        recaptchaToken: recaptchaToken
+      };
+
+      // Send data to API endpoint
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+      
       if (result.success) {
         setSubmitSuccess(true);
+      } else if (result.error) {
+        // Display the error message from the server
+        setError(result.error);
+        
+        // Handle validation errors if present
+        if (result.validationErrors) {
+          setValidationErrors(result.validationErrors);
+        }
       } else {
-        // Display the detailed error if available
-        const errorMessage = result.details ? 
-          `Error: ${result.error}. Details: ${result.details}` : 
-          result.error;
-        setError(errorMessage);
+        // Fallback error message
+        setError('Failed to submit form. Please try again.');
       }
     } catch (err) {
       console.error('Form submission error:', err);
@@ -30,7 +109,7 @@ const ContactForm = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }
+  };
 
   if (submitSuccess) {
     return (
@@ -81,24 +160,9 @@ const ContactForm = () => {
           <p className="mb-6 text-sm sm:text-base lg:text-lg">
             Let's work together to create a smoother back-to-school season. Fill out the form below to start the conversation about bringing SchoolKits to your school.
           </p>
-          {/* 
-          <div>
-            <h2 className="text-xl font-bold mb-2">Follow us on Social Media</h2>
-            <div className="flex flex-col space-y-2">
-              <a href="https://www.instagram.com" className="flex items-center text-sm sm:text-base" target="_blank" rel="noopener noreferrer">
-                <img src="/instagram-icon.svg" alt="Instagram" className="w-5 h-5 mr-2" />
-                <span>Instagram</span>
-              </a>
-              <a href="https://www.facebook.com" className="flex items-center text-sm sm:text-base" target="_blank" rel="noopener noreferrer">
-                <img src="/facebook-icon.svg" alt="Facebook" className="w-5 h-5 mr-2" />
-                <span>Facebook</span>
-              </a>
-            </div>
-          </div>
-          */}
         </div>
         <div className="lg:w-1/2">
-          <form action={handleSubmit} className="space-y-4">
+          <div className="space-y-4">
             <div>
               <label htmlFor="fullName" className="mb-1 block text-sm font-medium">
                 Full name
@@ -109,6 +173,7 @@ const ContactForm = () => {
                 name="fullName"
                 className="w-full rounded-md border p-2 text-sm"
                 required
+                ref={fullNameRef}
               />
             </div>
             <div>
@@ -121,19 +186,10 @@ const ContactForm = () => {
                 name="email"
                 className="w-full rounded-md border p-2 text-sm"
                 required
+                ref={emailRef}
               />
             </div>
-            <div>
-              <label htmlFor="school" className="mb-1 block text-sm font-medium">
-                Name of your school
-              </label>
-              <input
-                type="text"
-                id="school"
-                name="school"
-                className="w-full rounded-md border p-2 text-sm"
-              />
-            </div>
+            {/* School field removed as requested */}
             <div>
               <label htmlFor="message" className="mb-1 block text-sm font-medium">
                 Message
@@ -144,17 +200,37 @@ const ContactForm = () => {
                 rows={4}
                 className="w-full rounded-md border p-2 text-sm"
                 required
+                ref={messageRef}
               ></textarea>
             </div>
+            {/* reCAPTCHA v3 is invisible and doesn't need a UI component */}
+            <div className="my-4 text-xs text-gray-500">
+              This form is protected by reCAPTCHA and the Google
+              <a href="https://policies.google.com/privacy" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer"> Privacy Policy</a> and
+              <a href="https://policies.google.com/terms" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer"> Terms of Service</a> apply.
+            </div>
+            
             <button
-              type="submit"
+              type="button"
               className="w-full rounded-full bg-[#0B80A7] px-4 py-3 text-sm font-medium text-white transition-colors duration-300 hover:bg-[#096c8c] sm:text-base"
               disabled={isSubmitting}
+              onClick={handleFormSubmit}
             >
               {isSubmitting ? 'Sending...' : 'Send message'}
             </button>
+            
             {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
-          </form>
+            
+            {validationErrors.length > 0 && (
+              <div className="mt-2 text-sm text-red-500">
+                <ul>
+                  {validationErrors.map((err, index) => (
+                    <li key={index}>{err.field}: {err.message}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

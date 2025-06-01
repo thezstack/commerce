@@ -1,0 +1,326 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("RENDER_DATABASE_URL")
+  directUrl = env("RENDER_DATABASE_URL")
+}
+
+model Brands {
+  brand_id   Int     @id @default(autoincrement())
+  brand_name String?
+}
+
+model Category {
+  category_name  String?
+  category_short String?
+  category_id    Int     @id @default(autoincrement())
+}
+
+model Color {
+  color_id   Int        @id @default(autoincrement())
+  color_name String?
+  Supplies   Supplies[]
+}
+
+model Supplies {
+  supplies_id              Int                       @id(map: "Products_pkey") @default(autoincrement())
+  supplies_description     String?
+  unique_description       String?
+  type_id                  Int?
+  color_id                 Int
+  sku                      String?
+  url                      String?
+  sizing                   String?
+  price                    Decimal?                  @db.Decimal(10, 2)
+  bulk                     Int?
+  image_url                String?                   @db.VarChar(255)
+  source_id                Int?
+  walmart_sku              String?                   @db.VarChar(255)
+  amazon_sku               String?                   @db.VarChar(255)
+  Color                    Color                     @relation(fields: [color_id], references: [color_id], onDelete: NoAction, onUpdate: NoAction, map: "Product_Color")
+  Type                     Type?                     @relation(fields: [type_id], references: [type_id], onDelete: NoAction, onUpdate: NoAction, map: "Product_type")
+  source                   source?                   @relation(fields: [source_id], references: [source_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_source")
+  gradesupplies            gradesupplies[]
+  inventory                inventory?
+  supply_order_item_audits supply_order_item_audit[]
+  supply_order_items       supply_order_items[]
+
+  @@index([color_id], map: "fki_Product_Color")
+}
+
+model Type {
+  type_id   Int        @id @default(autoincrement())
+  type_name String?    @db.VarChar(255)
+  Supplies  Supplies[]
+}
+
+model grades {
+  grade_id      Int             @id @default(autoincrement())
+  grade_name    String          @db.VarChar(255)
+  bulk_orders   bulk_orders[]
+  gradesupplies gradesupplies[]
+  orderestimate orderestimate[]
+  school_grades school_grades[]
+
+  @@index([grade_id], map: "idx_grades_grade_id")
+}
+
+model gradesupplies {
+  grade_id          Int
+  supplies_id       Int
+  quantity_required Int?
+  issupplied        Boolean  @default(true)
+  school_id         Int
+  schools           schools  @relation(fields: [school_id], references: [school_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_gradesupplies_school")
+  grades            grades   @relation(fields: [grade_id], references: [grade_id], onDelete: Cascade, onUpdate: NoAction)
+  Supplies          Supplies @relation(fields: [supplies_id], references: [supplies_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([school_id, grade_id, supplies_id])
+  @@index([school_id], map: "idx_gradesupplies_school_id")
+}
+
+model schools {
+  school_id                  Int             @id @default(autoincrement())
+  school_name                String          @db.VarChar(255)
+  address                    String?         @db.VarChar(255)
+  city                       String?         @db.VarChar(100)
+  country                    String?         @db.VarChar(100)
+  flat_rate                  Decimal?        @db.Decimal(10, 2)
+  rate                       Decimal?        @db.Decimal(5, 4)
+  state                      String?         @db.VarChar(50)
+  zip_code                   String?         @db.VarChar(20)
+  is_fulfilled_by_schoolkits Boolean         @default(false)
+  bulk_orders                bulk_orders[]
+  gradesupplies              gradesupplies[]
+  orderestimate              orderestimate[]
+  school_grades              school_grades[]
+
+  @@index([school_id], map: "idx_schools_school_id")
+}
+
+model contact_submissions {
+  id         Int       @id @default(autoincrement())
+  full_name  String    @db.VarChar(255)
+  email      String    @db.VarChar(255)
+  school     String?   @db.VarChar(255)
+  message    String?
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model pdf_files {
+  id         Int       @id @default(autoincrement())
+  file_name  String    @db.VarChar(255)
+  content    Bytes
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model source {
+  source_id   Int        @id @default(autoincrement())
+  source_name String?
+  Supplies    Supplies[]
+}
+
+model school_grades {
+  school_id          Int
+  grade_id           Int
+  shopify_product_id String? @db.VarChar(255)
+  shopify_variant_id String? @db.VarChar(255)
+  grades             grades  @relation(fields: [grade_id], references: [grade_id], onDelete: NoAction, onUpdate: NoAction)
+  schools            schools @relation(fields: [school_id], references: [school_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([school_id, grade_id])
+  @@index([grade_id], map: "idx_school_grades_grade_id")
+  @@index([school_id], map: "idx_school_grades_school_id")
+}
+
+model api_logs {
+  id            Int       @id @default(autoincrement())
+  timestamp     DateTime? @default(now()) @db.Timestamptz(6)
+  level         String    @db.VarChar(10)
+  message       String
+  method        String?   @db.VarChar(10)
+  path          String?   @db.VarChar(255)
+  status_code   Int?
+  response_time Float?
+  user_id       Int?
+  ip_address    String?   @db.Inet
+  user_agent    String?
+
+  @@index([level], map: "idx_api_logs_level")
+  @@index([timestamp], map: "idx_api_logs_timestamp")
+}
+
+model shopify_orders {
+  id                 Int      @id @default(autoincrement())
+  order_number       String   @db.VarChar(255)
+  first_name         String   @db.VarChar(255)
+  last_name          String   @db.VarChar(255)
+  email              String   @db.VarChar(255)
+  quantity           Int
+  title              String   @db.VarChar(255)
+  notes              String?
+  order_created      DateTime @db.Timestamp(6)
+  line_item_id       BigInt
+  shopify_product_id String?  @db.VarChar(255)
+  shopify_variant_id BigInt?
+  raw_payload        Json?
+  status             String   @default("PENDING") @db.VarChar(50)
+  updated_at         DateTime @updatedAt
+}
+
+model orderestimate {
+  id          Int       @id(map: "OrderEstimate_pkey") @default(autoincrement())
+  school_year String    @db.VarChar(255)
+  grade_id    Int
+  school_id   Int
+  quantity    Int
+  is_active   Boolean   @default(true)
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime? @default(now()) @db.Timestamptz(6)
+  status      String    @default("PENDING") @db.VarChar(50)
+  grades      grades    @relation(fields: [grade_id], references: [grade_id], onDelete: NoAction, onUpdate: NoAction, map: "OrderEstimate_grade_id_fkey")
+  schools     schools   @relation(fields: [school_id], references: [school_id], onDelete: NoAction, onUpdate: NoAction, map: "OrderEstimate_school_id_fkey")
+
+  @@unique([school_year, grade_id, school_id], map: "OrderEstimate_school_year_grade_id_school_id_key")
+  @@index([school_year, grade_id, school_id], map: "idx_orderestimate_school_year_grade_school")
+}
+
+model inventory {
+  id           Int       @id @default(autoincrement())
+  supplies_id  Int       @unique(map: "idx_inventory_supplies_id")
+  quantity     Int
+  received_at  DateTime? @default(now()) @db.Timestamptz(6)
+  last_updated DateTime? @default(now()) @db.Timestamptz(6)
+  Supplies     Supplies  @relation(fields: [supplies_id], references: [supplies_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model supply_orders {
+  id                 Int                  @id @default(autoincrement())
+  order_date         DateTime             @default(now()) @db.Timestamptz(6)
+  expected_arrival   DateTime?            @db.Date
+  status             String               @db.VarChar(50)
+  notes              String?
+  supply_order_items supply_order_items[]
+
+  @@index([status], map: "idx_supply_orders_status")
+}
+
+model bulk_orders {
+  id         Int      @id @default(autoincrement())
+  school_id  Int
+  grade_id   Int
+  quantity   Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  status     String   @default("PENDING")
+  grades     grades   @relation(fields: [grade_id], references: [grade_id])
+  schools    schools  @relation(fields: [school_id], references: [school_id])
+
+  @@index([school_id])
+  @@index([grade_id])
+}
+
+model supply_order_items {
+  id                Int           @id @default(autoincrement())
+  order_id          Int
+  supplies_id       Int
+  quantity_ordered  Int
+  received_quantity Int?
+  received_date     DateTime?     @db.Timestamptz(6)
+  supply_orders     supply_orders @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_supply_order_items_order")
+  Supplies          Supplies      @relation(fields: [supplies_id], references: [supplies_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_supply_order_items_supplies")
+
+  @@index([order_id], map: "idx_supply_order_items_order_id")
+  @@index([supplies_id], map: "idx_supply_order_items_supplies_id")
+}
+
+model supply_order_item_audit {
+  id                         Int       @id @default(autoincrement())
+  supply_order_item_id       Int?
+  previous_received_quantity Int
+  new_received_quantity      Int
+  quantity_change            Int
+  created_at                 DateTime? @default(now()) @db.Timestamptz(6)
+  change_reason              String?   @db.VarChar(255)
+  changed_by                 String?   @db.VarChar(255)
+  grade_id                   Int?
+  school_id                  Int?
+  supplies_id                Int?
+  Supplies                   Supplies? @relation(fields: [supplies_id], references: [supplies_id])
+
+  @@index([supply_order_item_id], map: "idx_supply_order_item_audit_supply_order_item_id")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role      @default(USER)
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model PreAuthorizedUser {
+  email   String   @id
+  addedBy String
+  addedAt DateTime @default(now())
+}
+
+model RawSupplyList {
+  id              Int      @id @default(autoincrement())
+  upload_batch_id String
+  school_name     String
+  grade_name      String
+  supply_item     String
+  quantity        Int
+  file_type       String
+  processed       Boolean  @default(false)
+  created_at      DateTime @default(now())
+
+  @@index([upload_batch_id], map: "idx_raw_supply_list_batch_id")
+}
+
+enum Role {
+  USER
+  ADMIN
+}

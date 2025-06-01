@@ -1,58 +1,153 @@
 "use server"
-import { createPool } from '@vercel/postgres';
 
-// Create a database pool that explicitly references the POSTGRES_URL environment variable
-const db = createPool({
-  connectionString: process.env.POSTGRES_URL,
+// Import the Prisma client
+import { prisma } from '../../lib/prisma';
+
+// Import zod for input validation
+import { z } from 'zod';
+
+// Define a schema for contact form validation
+const ContactFormSchema = z.object({
+  fullName: z.string().min(2, { message: "Full name must be at least 2 characters long" }),
+  email: z.string().email({ message: "Invalid email address" }),
+  school: z.string().optional(),
+  message: z.string().min(5, { message: "Message must be at least 5 characters long" }),
+  recaptchaToken: z.string().min(1, { message: "reCAPTCHA verification failed" })
 });
 
-// Export the sql template tag for use in queries
-const sql = db.sql;
+// Interface for reCAPTCHA v3 response
+interface RecaptchaResponse {
+  success: boolean;
+  score: number;
+  action: string;
+  challenge_ts: string;
+  hostname: string;
+  error_codes?: string[];
+}
+
+// Function to verify reCAPTCHA token
+async function verifyRecaptcha(token: string): Promise<boolean> {
+  try {
+    const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+    
+    if (!secretKey) {
+      console.error('RECAPTCHA_SECRET_KEY is not set');
+      return false;
+    }
+
+    const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `secret=${secretKey}&response=${token}`,
+    });
+
+    const data = await response.json() as RecaptchaResponse;
+
+    return data.success;
+  } catch (error) {
+    console.error('reCAPTCHA verification error:', error);
+    return false;
+  }
+}
 
 export async function submitContactForm(formData: FormData) {
-  // Validate database connection first
-  try {
-    // Test the connection with a simple query
-    const connectionTest = await sql`SELECT 1 AS connection_test`;
-    console.log('Database connection successful:', connectionTest);
-  } catch (connectionError) {
-    console.error('Database connection error:', connectionError);
-    return { 
-      success: false, 
-      error: 'Database connection failed', 
-      details: connectionError instanceof Error ? 
-        connectionError.message : 
-        `Connection error: ${String(connectionError)}. Check your POSTGRES_URL environment variable.`
-    };
-  }
-    
+  console.log('Form submission started');
+  
   // Extract form data
-  const fullName = formData.get('fullName') as string;
-  const email = formData.get('email') as string;
-  const school = formData.get('school') as string;
-  const message = formData.get('message') as string;
+  const rawData = {
+    fullName: formData.get('fullName') as string,
+    email: formData.get('email') as string,
+    school: formData.get('school') as string || '', // Handle empty school field
+    message: formData.get('message') as string,
+    recaptchaToken: formData.get('recaptchaToken') as string
+  };
+
+  console.log('Form data extracted:', { 
+    fullName: rawData.fullName, 
+    email: rawData.email, 
+    school: rawData.school || '[empty]', 
+    messageLength: rawData.message?.length,
+    hasRecaptchaToken: !!rawData.recaptchaToken
+  });
 
   try {
-    console.log('Attempting to insert form data:', { fullName, email, school });
+    // Check if we're in a browser environment (this should never happen with server actions)
+    if (typeof window !== 'undefined') {
+      throw new Error('This function must be executed on the server');
+    }
     
-    // Insert the form data
-    const result = await sql`
-      INSERT INTO contact_submissions (full_name, email, school, message)
-      VALUES (${fullName}, ${email}, ${school}, ${message})
-      RETURNING id
-    `;
+    // Validate input data
+    const validatedData = ContactFormSchema.parse(rawData);
     
-    console.log('Form submission successful, inserted with ID:', result.rows[0]?.id);
+    // Verify reCAPTCHA token (only in production)
+    let isRecaptchaValid = true;
+    if (process.env.NODE_ENV === 'production') {
+      isRecaptchaValid = await verifyRecaptcha(validatedData.recaptchaToken);
+      if (!isRecaptchaValid) {
+        return { 
+          success: false, 
+          error: 'reCAPTCHA verification failed. Please try again.'
+        };
+      }
+    } else {
+      console.log('Skipping reCAPTCHA verification in development');
+    }
+    
+    // Insert the form data using Prisma
+    console.log('Attempting to insert data into contact_submissions table...');
+    
+    // Make sure prisma is defined
+    if (!prisma) {
+      throw new Error('Database client is not initialized');
+    }
+    
+    const result = await prisma.contact_submissions.create({
+      data: {
+        full_name: validatedData.fullName,
+        email: validatedData.email,
+        school: validatedData.school,
+        message: validatedData.message
+      },
+      select: {
+        id: true,
+        full_name: true,
+        email: true
+      }
+    });
+    
+    console.log('Form submission successful! Inserted with ID:', result.id);
+    console.log('Inserted data:', result);
+    
     return { success: true };
   } catch (error) {
     console.error('Failed to submit form:', error);
-    // Return more detailed error information
+    
+    // Check if it's a validation error
+    if (error instanceof z.ZodError) {
+      return { 
+        success: false, 
+        error: 'Invalid form data', 
+        validationErrors: error.errors.map(err => ({
+          field: err.path.join('.'),
+          message: err.message
+        }))
+      };
+    }
+    
+    // Check for Prisma-specific errors
+    if (error instanceof Error && error.message.includes('PrismaClient')) {
+      return {
+        success: false,
+        error: 'Database connection error. Please try again later.'
+      };
+    }
+    
+    // Return a simplified error message for other errors
     return { 
       success: false, 
-      error: 'Failed to submit form', 
-      details: error instanceof Error ? 
-        error.message : 
-        `Error: ${String(error)}. This might be due to a database configuration issue.`
+      error: 'Failed to submit form. Please try again later.'
     };
   }
 }
