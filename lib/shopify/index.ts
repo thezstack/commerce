@@ -428,7 +428,9 @@ export async function getBlogPost(handle: string, blogHandle: string = 'blog'): 
   try {
     const res = await shopifyFetch<ShopifyBlogPostOperation>({
       query: getBlogPostQuery,
-      variables: { handle, blogHandle }
+      variables: { handle, blogHandle },
+      tags: [TAGS.blog],
+      cache: 'no-store'
     });
 
     return res.body.data.blogByHandle.articleByHandle;
@@ -443,6 +445,7 @@ export async function getBlogPosts(first: number = 10, blogHandle: string = 'blo
     const res = await shopifyFetch<ShopifyBlogPostsOperation>({
       query: getBlogPostsQuery,
       variables: { first, blogHandle },
+      tags: [TAGS.blog],
       // Always use no-store to ensure we get the latest blog posts
       cache: 'no-store'
     });
@@ -506,27 +509,38 @@ export async function revalidate(req: NextRequest): Promise<NextResponse> {
   // otherwise it will continue to retry the request.
   const collectionWebhooks = ['collections/create', 'collections/delete', 'collections/update'];
   const productWebhooks = ['products/create', 'products/delete', 'products/update'];
+  const blogWebhooks = ['blogs/create', 'blogs/delete', 'blogs/update', 'articles/create', 'articles/delete', 'articles/update', 'articles/published', 'articles/unpublished'];
   const topic = headers().get('x-shopify-topic') || 'unknown';
   const secret = req.nextUrl.searchParams.get('secret');
   const isCollectionUpdate = collectionWebhooks.includes(topic);
   const isProductUpdate = productWebhooks.includes(topic);
+  const isBlogUpdate = blogWebhooks.includes(topic);
+
+  console.log(`Revalidation webhook received: ${topic}`);
 
   if (!secret || secret !== process.env.SHOPIFY_REVALIDATION_SECRET) {
     console.error('Invalid revalidation secret.');
     return NextResponse.json({ status: 200 });
   }
 
-  if (!isCollectionUpdate && !isProductUpdate) {
-    // We don't need to revalidate anything for any other topics.
+  if (!isCollectionUpdate && !isProductUpdate && !isBlogUpdate) {
+    console.log(`No revalidation needed for topic: ${topic}`);
     return NextResponse.json({ status: 200 });
   }
 
   if (isCollectionUpdate) {
+    console.log('Revalidating collections cache');
     revalidateTag(TAGS.collections);
   }
 
   if (isProductUpdate) {
+    console.log('Revalidating products cache');
     revalidateTag(TAGS.products);
+  }
+
+  if (isBlogUpdate) {
+    console.log('Revalidating blog cache');
+    revalidateTag(TAGS.blog);
   }
 
   return NextResponse.json({ status: 200, revalidated: true, now: Date.now() });

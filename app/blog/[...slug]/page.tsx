@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 
+export const revalidate = 0; // Force dynamic rendering
+
 interface BlogPostPageProps {
   params: {
     slug: string[];

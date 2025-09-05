@@ -4,6 +4,8 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 
+export const revalidate = 0; // Force dynamic rendering
+
 export const metadata: Metadata = {
   title: 'Blog | SchoolKits',
   description: 'Read the latest articles, guides, and news from SchoolKits'
