@@ -1,7 +1,7 @@
 // app/components/ContactForm.tsx
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const ContactForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -126,18 +126,15 @@ const ContactForm = () => {
         <div className="lg:w-1/2">
           <h1 className="mb-4 text-2xl font-bold sm:text-3xl lg:text-4xl">Partner with us</h1>
           <p className="mb-6 text-sm sm:text-base lg:text-lg">
-            Join SchoolKits in simplifying the back-to-school experience for your students, parents,
-            and staff. We work closely with schools to create customized supply kits that meet exact
+          We work closely with schools to create customized supply kits that meet exact
             classroom requirements, saving time and reducing stress for everyone involved.
           </p>
           <p className="mb-4 text-sm sm:text-base lg:text-lg">By partnering with SchoolKits, you'll:</p>
           <ul className="mb-6 space-y-2">
             {[
-              "Streamline the supply procurement process",
               "Ensure all students have the right materials from day one",
               "Reduce administrative workload for teachers and staff",
-              "Offer a convenient, hassle-free option for parents",
-              "Support equal access to quality supplies for all students"
+              "Offer a convenient, hassle-free option for parents"
             ].map((item, index) => (
               <li key={index} className="flex items-center">
                 <svg

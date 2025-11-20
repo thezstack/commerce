@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { formatContactFormEmail, sendEmail } from '../../../lib/email';
 import { prisma } from '../../../lib/prisma';
 
 // Define a schema for contact form validation
@@ -115,26 +116,26 @@ export async function POST(request: NextRequest) {
     
     console.log('Form submission successful! Inserted with ID:', result.id);
     
-    // Send email notification
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@schoolkits.org';
-    // const emailHtml = formatContactFormEmail({
-    //   fullName: validatedData.fullName,
-    //   email: validatedData.email,
-    //   school: validatedData.school,
-    //   message: validatedData.message
-    // });
+    // Send email notification to multiple recipients
+    const adminEmails = process.env.ADMIN_EMAIL || 'zubi@schoolkits.org, osama@schoolkits.org';
+    const emailHtml = formatContactFormEmail({
+      fullName: validatedData.fullName,
+      email: validatedData.email,
+      school: validatedData.school,
+      message: validatedData.message
+    });
     
-    // try {
-    //   await sendEmail({
-    //     to: adminEmail,
-    //     subject: `New Contact Form Submission from ${validatedData.fullName}`,
-    //     html: emailHtml
-    //   });
-    //   console.log(`Email notification sent to ${adminEmail}`);
-    // } catch (emailError) {
-    //   console.error('Failed to send email notification:', emailError);
-    //   // Continue even if email fails - we don't want to block the form submission
-    // }
+    try {
+      await sendEmail({
+        to: adminEmails,
+        subject: `New Contact Form Submission from ${validatedData.fullName}`,
+        html: emailHtml
+      });
+      console.log(`Email notification sent to ${adminEmails}`);
+    } catch (emailError) {
+      console.error('Failed to send email notification:', emailError);
+      // Continue even if email fails - we don't want to block the form submission
+    }
     
     return NextResponse.json({ success: true });
   } catch (error) {
