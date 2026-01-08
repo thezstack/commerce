@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { formatContactFormEmail, sendEmail } from '../../../lib/email';
-import { prisma } from '../../../lib/prisma';
 
 // Define a schema for contact form validation
 const ContactFormSchema = z.object({
@@ -20,6 +18,12 @@ interface RecaptchaResponse {
   challenge_ts?: string;
   hostname?: string;
   'error-codes'?: string[];
+}
+
+function getCoreApiBaseUrl(): string | null {
+  const url = process.env.CORE_API_URL;
+  if (!url) return null;
+  return url.replace(/\/$/, '');
 }
 
 // Function to verify reCAPTCHA token
@@ -96,47 +100,44 @@ export async function POST(request: NextRequest) {
     } else {
       console.log('Skipping reCAPTCHA verification in development');
     }
-    
-    // Insert the form data using Prisma
-    console.log('Attempting to insert data into contact_submissions table...');
-    
-    const result = await prisma.contact_submissions.create({
-      data: {
-        full_name: validatedData.fullName,
+
+    const coreApiBaseUrl = getCoreApiBaseUrl();
+    if (!coreApiBaseUrl) {
+      console.error('CORE_API_URL is not configured');
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Server configuration error. Please try again later.'
+        },
+        { status: 500 }
+      );
+    }
+
+    const coreResponse = await fetch(`${coreApiBaseUrl}/api/contact`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        fullName: validatedData.fullName,
         email: validatedData.email,
         school: validatedData.school,
         message: validatedData.message
-      },
-      select: {
-        id: true,
-        full_name: true,
-        email: true
-      }
+      })
     });
-    
-    console.log('Form submission successful! Inserted with ID:', result.id);
-    
-    // Send email notification to multiple recipients
-    const adminEmails = process.env.ADMIN_EMAIL || 'zubi@schoolkits.org, osama@schoolkits.org';
-    const emailHtml = formatContactFormEmail({
-      fullName: validatedData.fullName,
-      email: validatedData.email,
-      school: validatedData.school,
-      message: validatedData.message
-    });
-    
-    try {
-      await sendEmail({
-        to: adminEmails,
-        subject: `New Contact Form Submission from ${validatedData.fullName}`,
-        html: emailHtml
+
+    if (!coreResponse.ok) {
+      const coreText = await coreResponse.text().catch(() => '');
+      console.error('Core API contact submission failed', {
+        status: coreResponse.status,
+        body: coreText
       });
-      console.log(`Email notification sent to ${adminEmails}`);
-    } catch (emailError) {
-      console.error('Failed to send email notification:', emailError);
-      // Continue even if email fails - we don't want to block the form submission
+      return NextResponse.json(
+        { success: false, error: 'Failed to submit form. Please try again later.' },
+        { status: 502 }
+      );
     }
-    
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Failed to submit form:', error);
@@ -151,14 +152,6 @@ export async function POST(request: NextRequest) {
           message: err.message
         }))
       }, { status: 400 });
-    }
-    
-    // Check for Prisma-specific errors
-    if (error instanceof Error && error.message.includes('PrismaClient')) {
-      return NextResponse.json({
-        success: false,
-        error: 'Database connection error. Please try again later.'
-      }, { status: 500 });
     }
     
     // Return a simplified error message for other errors
