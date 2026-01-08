@@ -20,8 +20,6 @@ import step1 from '../media/step1.svg';
 import step2 from '../media/step2.svg';
 import step3 from '../media/step3.svg';
 import step4 from '../media/step4.svg';
-export const runtime = 'edge';
-
 export const metadata = {
   description: 'School Supplies Shopping',
   openGraph: {

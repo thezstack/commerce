@@ -5,8 +5,17 @@ import { addToCart, createCart, getCart, removeFromCart, updateCart, updateCartN
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 
-export async function addItem(prevState: any, selectedVariantId: string | undefined) {
-  let cartId = cookies().get('cartId')?.value;
+type CartActionState = {
+  error?: string;
+  updatedAt?: number;
+};
+
+export async function addItem(
+  prevState: CartActionState,
+  selectedVariantId: string | undefined
+): Promise<CartActionState> {
+  const cookieStore = await cookies();
+  let cartId = cookieStore.get('cartId')?.value;
   let cart;
 
   if (cartId) {
@@ -16,48 +25,55 @@ export async function addItem(prevState: any, selectedVariantId: string | undefi
   if (!cartId || !cart) {
     cart = await createCart();
     cartId = cart.id;
-    cookies().set('cartId', cartId);
+    cookieStore.set('cartId', cartId);
   }
 
   if (!selectedVariantId) {
-    return 'Missing product variant ID';
+    return { error: 'Missing product variant ID' };
   }
 
   try {
     await addToCart(cartId, [{ merchandiseId: selectedVariantId, quantity: 1 }]);
-    revalidateTag(TAGS.cart);
+    revalidateTag(TAGS.cart, 'max');
+    return { updatedAt: Date.now() };
   } catch (e) {
-    return 'Error adding item to cart';
+    return { error: 'Error adding item to cart' };
   }
 }
 
-export async function removeItem(prevState: any, lineId: string) {
-  const cartId = cookies().get('cartId')?.value;
+export async function removeItem(
+  prevState: CartActionState,
+  lineId: string
+): Promise<CartActionState> {
+  const cookieStore = await cookies();
+  const cartId = cookieStore.get('cartId')?.value;
 
   if (!cartId) {
-    return 'Missing cart ID';
+    return { error: 'Missing cart ID' };
   }
 
   try {
     await removeFromCart(cartId, [lineId]);
-    revalidateTag(TAGS.cart);
+    revalidateTag(TAGS.cart, 'max');
+    return { updatedAt: Date.now() };
   } catch (e) {
-    return 'Error removing item from cart';
+    return { error: 'Error removing item from cart' };
   }
 }
 
 export async function updateItemQuantity(
-  prevState: any,
+  prevState: CartActionState,
   payload: {
     lineId: string;
     variantId: string;
     quantity: number;
   }
-) {
-  const cartId = cookies().get('cartId')?.value;
+): Promise<CartActionState> {
+  const cookieStore = await cookies();
+  const cartId = cookieStore.get('cartId')?.value;
 
   if (!cartId) {
-    return 'Missing cart ID';
+    return { error: 'Missing cart ID' };
   }
 
   const { lineId, variantId, quantity } = payload;
@@ -65,8 +81,8 @@ export async function updateItemQuantity(
   try {
     if (quantity === 0) {
       await removeFromCart(cartId, [lineId]);
-      revalidateTag(TAGS.cart);
-      return;
+      revalidateTag(TAGS.cart, 'max');
+      return { updatedAt: Date.now() };
     }
 
     await updateCart(cartId, [
@@ -76,15 +92,17 @@ export async function updateItemQuantity(
         quantity
       }
     ]);
-    revalidateTag(TAGS.cart);
+    revalidateTag(TAGS.cart, 'max');
+    return { updatedAt: Date.now() };
   } catch (e) {
-    return 'Error updating item quantity';
+    return { error: 'Error updating item quantity' };
   }
 }
 
 
 export async function updateCartNotes(notes: string) {
-  const cartId = cookies().get('cartId')?.value;
+  const cookieStore = await cookies();
+  const cartId = cookieStore.get('cartId')?.value;
 
   if (!cartId) {
     return { error: 'Missing cart ID' };
@@ -92,7 +110,7 @@ export async function updateCartNotes(notes: string) {
 
   try {
     const updatedCart = await updateCartNote(cartId, notes);
-    revalidateTag(TAGS.cart);
+    revalidateTag(TAGS.cart, 'max');
     return { success: true, cart: updatedCart };
   } catch (e) {
     console.error('Error updating cart notes:', e);

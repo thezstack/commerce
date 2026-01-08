@@ -11,9 +11,10 @@ import { defaultSort, sorting } from 'lib/constants';
 export async function generateMetadata({
   params
 }: {
-  params: { collection: string };
+  params: Promise<{ collection: string }>;
 }): Promise<Metadata> {
-  const collection = await getCollection(params.collection);
+  const { collection: collectionHandle } = await params;
+  const collection = await getCollection(collectionHandle);
 
   if (!collection) return notFound();
 
@@ -28,12 +29,14 @@ export default async function CategoryPage({
   params,
   searchParams
 }: {
-  params: { collection: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
+  params: Promise<{ collection: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { sort } = searchParams as { [key: string]: string };
+  const { collection: collectionHandle } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const { sort } = resolvedSearchParams as { [key: string]: string };
   const { sortKey, reverse } = sorting.find((item) => item.slug === sort) || defaultSort;
-  const products = await getCollectionProducts({ collection: params.collection, sortKey, reverse });
+  const products = await getCollectionProducts({ collection: collectionHandle, sortKey, reverse });
 
   return (
     <section>

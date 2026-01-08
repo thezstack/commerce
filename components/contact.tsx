@@ -1,13 +1,25 @@
 // app/components/ContactForm.tsx
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 const ContactForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [error, setError] = useState('');
   const [validationErrors, setValidationErrors] = useState<{field: string, message: string}[]>([]);
+  const searchParams = useSearchParams();
+
+  const schoolFromQuery = useMemo(() => {
+    const value = searchParams.get('school');
+    return value ? value.trim() : '';
+  }, [searchParams]);
+
+  const personaFromQuery = useMemo(() => {
+    const value = searchParams.get('persona');
+    return value ? value.trim() : '';
+  }, [searchParams]);
   
   // References for form fields
   const fullNameRef = useRef<HTMLInputElement>(null);
@@ -73,8 +85,13 @@ const ContactForm = () => {
       const formData = {
         fullName: fullNameRef.current?.value || '',
         email: emailRef.current?.value || '',
-        school: '', // Empty string for school field
-        message: messageRef.current?.value || '',
+        school: schoolFromQuery,
+        message: [
+          personaFromQuery ? `Persona: ${personaFromQuery}` : null,
+          messageRef.current?.value || ''
+        ]
+          .filter(Boolean)
+          .join('\n\n'),
         recaptchaToken: recaptchaToken
       };
 
@@ -125,6 +142,11 @@ const ContactForm = () => {
       <div className="flex flex-col gap-8 lg:flex-row">
         <div className="lg:w-1/2">
           <h1 className="mb-4 text-2xl font-bold sm:text-3xl lg:text-4xl">Partner with us</h1>
+          {schoolFromQuery ? (
+            <p className="mb-3 text-sm text-gray-600">
+              You’re reaching out about: <span className="font-semibold">{schoolFromQuery}</span>
+            </p>
+          ) : null}
           <p className="mb-6 text-sm sm:text-base lg:text-lg">
           We work closely with schools to create customized supply kits that meet exact
             classroom requirements, saving time and reducing stress for everyone involved.

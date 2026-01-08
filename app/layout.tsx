@@ -1,7 +1,7 @@
 import { GoogleAnalytics } from '@next/third-parties/google';
+import CookieConsentBanner from 'components/layout/cookie-consent';
 import Footer from 'components/layout/footer';
 import Navbar from 'components/layout/navbar';
-import dynamic from 'next/dynamic';
 import { ensureStartsWith } from 'lib/utils';
 import { Open_Sans } from 'next/font/google';
 import { ReactNode, Suspense } from 'react';
@@ -37,12 +37,6 @@ export const metadata = {
       }
     })
 };
-
-// Import CookieConsentBanner dynamically to avoid SSR issues
-const CookieConsentBanner = dynamic(
-  () => import('components/layout/cookie-consent'),
-  { ssr: false }
-);
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   return (

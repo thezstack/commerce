@@ -5,55 +5,55 @@ import { revalidateTag } from 'next/cache';
 import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import {
-    addToCartMutation,
-    createCartMutation,
-    editCartItemsMutation,
-    removeFromCartMutation,
-    updateCartNoteMutation
+  addToCartMutation,
+  createCartMutation,
+  editCartItemsMutation,
+  removeFromCartMutation,
+  updateCartNoteMutation
 } from './mutations/cart';
 import { getBlogPostQuery, getBlogPostsQuery } from './queries/blog';
 import { getCartQuery } from './queries/cart';
 import {
-    getCollectionProductsQuery,
-    getCollectionQuery,
-    getCollectionsQuery
+  getCollectionProductsQuery,
+  getCollectionQuery,
+  getCollectionsQuery
 } from './queries/collection';
 import { getMenuQuery } from './queries/menu';
 import { getPageQuery, getPagesQuery } from './queries/page';
 import {
-    getProductQuery,
-    getProductRecommendationsQuery,
-    getProductsQuery
+  getProductQuery,
+  getProductRecommendationsQuery,
+  getProductsQuery
 } from './queries/product';
 import {
-    BlogPost,
-    Cart,
-    Collection,
-    Connection,
-    Image,
-    Menu,
-    Page,
-    Product,
-    ShopifyAddToCartOperation,
-    ShopifyBlogPostOperation,
-    ShopifyBlogPostsOperation,
-    ShopifyCart,
-    ShopifyCartOperation,
-    ShopifyCollection,
-    ShopifyCollectionOperation,
-    ShopifyCollectionProductsOperation,
-    ShopifyCollectionsOperation,
-    ShopifyCreateCartOperation,
-    ShopifyMenuOperation,
-    ShopifyPageOperation,
-    ShopifyPagesOperation,
-    ShopifyProduct,
-    ShopifyProductOperation,
-    ShopifyProductRecommendationsOperation,
-    ShopifyProductsOperation,
-    ShopifyRemoveFromCartOperation,
-    ShopifyUpdateCartNoteOperation,
-    ShopifyUpdateCartOperation
+  BlogPost,
+  Cart,
+  Collection,
+  Connection,
+  Image,
+  Menu,
+  Page,
+  Product,
+  ShopifyAddToCartOperation,
+  ShopifyBlogPostOperation,
+  ShopifyBlogPostsOperation,
+  ShopifyCart,
+  ShopifyCartOperation,
+  ShopifyCollection,
+  ShopifyCollectionOperation,
+  ShopifyCollectionProductsOperation,
+  ShopifyCollectionsOperation,
+  ShopifyCreateCartOperation,
+  ShopifyMenuOperation,
+  ShopifyPageOperation,
+  ShopifyPagesOperation,
+  ShopifyProduct,
+  ShopifyProductOperation,
+  ShopifyProductRecommendationsOperation,
+  ShopifyProductsOperation,
+  ShopifyRemoveFromCartOperation,
+  ShopifyUpdateCartNoteOperation,
+  ShopifyUpdateCartOperation
 } from './types';
 
 const domain = process.env.SHOPIFY_STORE_DOMAIN
@@ -429,8 +429,7 @@ export async function getBlogPost(handle: string, blogHandle: string = 'blog'): 
     const res = await shopifyFetch<ShopifyBlogPostOperation>({
       query: getBlogPostQuery,
       variables: { handle, blogHandle },
-      tags: [TAGS.blog],
-      cache: 'no-store'
+      tags: [TAGS.blog]
     });
 
     return res.body.data.blogByHandle.articleByHandle;
@@ -445,9 +444,7 @@ export async function getBlogPosts(first: number = 10, blogHandle: string = 'blo
     const res = await shopifyFetch<ShopifyBlogPostsOperation>({
       query: getBlogPostsQuery,
       variables: { first, blogHandle },
-      tags: [TAGS.blog],
-      // Always use no-store to ensure we get the latest blog posts
-      cache: 'no-store'
+      tags: [TAGS.blog]
     });
 
     return removeEdgesAndNodes(res.body.data.blogByHandle.articles);
@@ -510,7 +507,8 @@ export async function revalidate(req: NextRequest): Promise<NextResponse> {
   const collectionWebhooks = ['collections/create', 'collections/delete', 'collections/update'];
   const productWebhooks = ['products/create', 'products/delete', 'products/update'];
   const blogWebhooks = ['blogs/create', 'blogs/delete', 'blogs/update', 'articles/create', 'articles/delete', 'articles/update', 'articles/published', 'articles/unpublished'];
-  const topic = headers().get('x-shopify-topic') || 'unknown';
+  const headersList = await headers();
+  const topic = headersList.get('x-shopify-topic') || 'unknown';
   const secret = req.nextUrl.searchParams.get('secret');
   const isCollectionUpdate = collectionWebhooks.includes(topic);
   const isProductUpdate = productWebhooks.includes(topic);
@@ -530,17 +528,17 @@ export async function revalidate(req: NextRequest): Promise<NextResponse> {
 
   if (isCollectionUpdate) {
     console.log('Revalidating collections cache');
-    revalidateTag(TAGS.collections);
+    revalidateTag(TAGS.collections, 'max');
   }
 
   if (isProductUpdate) {
     console.log('Revalidating products cache');
-    revalidateTag(TAGS.products);
+    revalidateTag(TAGS.products, 'max');
   }
 
   if (isBlogUpdate) {
     console.log('Revalidating blog cache');
-    revalidateTag(TAGS.blog);
+    revalidateTag(TAGS.blog, 'max');
   }
 
   return NextResponse.json({ status: 200, revalidated: true, now: Date.now() });

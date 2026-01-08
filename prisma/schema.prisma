@@ -40,6 +40,9 @@ model Supplies {
   source_id                Int?
   walmart_sku              String?                   @db.VarChar(255)
   amazon_sku               String?                   @db.VarChar(255)
+  amazon_asin              String?                   @db.VarChar(255)
+  embedding                Json?
+  InventoryRecountItem     InventoryRecountItem[]
   Color                    Color                     @relation(fields: [color_id], references: [color_id], onDelete: NoAction, onUpdate: NoAction, map: "Product_Color")
   Type                     Type?                     @relation(fields: [type_id], references: [type_id], onDelete: NoAction, onUpdate: NoAction, map: "Product_type")
   source                   source?                   @relation(fields: [source_id], references: [source_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_source")
@@ -58,12 +61,13 @@ model Type {
 }
 
 model grades {
-  grade_id      Int             @id @default(autoincrement())
-  grade_name    String          @db.VarChar(255)
-  bulk_orders   bulk_orders[]
-  gradesupplies gradesupplies[]
-  orderestimate orderestimate[]
-  school_grades school_grades[]
+  grade_id              Int                     @id @default(autoincrement())
+  grade_name            String                  @db.VarChar(255)
+  SchoolToPricingConfig SchoolToPricingConfig[]
+  bulk_orders           bulk_orders[]
+  gradesupplies         gradesupplies[]
+  orderestimate         orderestimate[]
+  school_grades         school_grades[]
 
   @@index([grade_id], map: "idx_grades_grade_id")
 }
@@ -83,20 +87,26 @@ model gradesupplies {
 }
 
 model schools {
-  school_id                  Int             @id @default(autoincrement())
-  school_name                String          @db.VarChar(255)
-  address                    String?         @db.VarChar(255)
-  city                       String?         @db.VarChar(100)
-  country                    String?         @db.VarChar(100)
-  flat_rate                  Decimal?        @db.Decimal(10, 2)
-  rate                       Decimal?        @db.Decimal(5, 4)
-  state                      String?         @db.VarChar(50)
-  zip_code                   String?         @db.VarChar(20)
-  is_fulfilled_by_schoolkits Boolean         @default(false)
+  school_id                  Int                     @id @default(autoincrement())
+  school_name                String                  @db.VarChar(255)
+  address                    String?                 @db.VarChar(255)
+  city                       String?                 @db.VarChar(100)
+  country                    String?                 @db.VarChar(100)
+  flat_rate                  Decimal?                @db.Decimal(10, 2)
+  rate                       Decimal?                @db.Decimal(5, 4)
+  state                      String?                 @db.VarChar(50)
+  zip_code                   String?                 @db.VarChar(20)
+  is_fulfilled_by_schoolkits Boolean                 @default(false)
+  district_id                Int?
+  school_type                SchoolType              @default(PUBLIC)
+  school_level               SchoolLevel             @default(OTHER)
+  SchoolToPricingConfig      SchoolToPricingConfig[]
+  SupplyListFile             SupplyListFile[]
   bulk_orders                bulk_orders[]
   gradesupplies              gradesupplies[]
   orderestimate              orderestimate[]
   school_grades              school_grades[]
+  districts                  districts?              @relation(fields: [district_id], references: [district_id])
 
   @@index([school_id], map: "idx_schools_school_id")
 }
@@ -320,7 +330,119 @@ model RawSupplyList {
   @@index([upload_batch_id], map: "idx_raw_supply_list_batch_id")
 }
 
+model InventoryRecountBatch {
+  id                   Int                    @id @default(autoincrement())
+  batch_code           String                 @unique
+  school_year          String
+  created_by           String
+  created_at           DateTime               @default(now())
+  InventoryRecountItem InventoryRecountItem[]
+
+  @@index([school_year])
+}
+
+model InventoryRecountItem {
+  id                    Int                   @id @default(autoincrement())
+  batch_id              Int
+  supplies_id           Int
+  count                 Int                   @default(0)
+  notes                 String?
+  updated_at            DateTime
+  InventoryRecountBatch InventoryRecountBatch @relation(fields: [batch_id], references: [id], onDelete: Cascade)
+  Supplies              Supplies              @relation(fields: [supplies_id], references: [supplies_id], onDelete: Cascade)
+
+  @@unique([batch_id, supplies_id])
+  @@index([supplies_id])
+}
+
+model SchoolToPricingConfig {
+  id                Int      @id @default(autoincrement())
+  school_id         Int
+  grade_id          Int
+  quote_price_cents BigInt?
+  sale_price_cents  BigInt?
+  created_at        DateTime @default(now())
+  updated_at        DateTime
+  grades            grades   @relation(fields: [grade_id], references: [grade_id], onDelete: Cascade)
+  schools           schools  @relation(fields: [school_id], references: [school_id], onDelete: Cascade)
+
+  @@unique([school_id, grade_id])
+  @@index([grade_id])
+  @@index([school_id])
+}
+
+model SupplyListFile {
+  id              Int                  @id @default(autoincrement())
+  batch_id        String               @unique
+  s3_key          String               @unique
+  file_name       String
+  file_size       Int
+  mime_type       String
+  status          SupplyListFileStatus @default(PENDING)
+  school_id       Int?
+  school_year     String?
+  district_id     Int?
+  created_at      DateTime             @default(now())
+  updated_at      DateTime
+  s3_markdown_key String?
+  districts       districts?           @relation(fields: [district_id], references: [district_id])
+  schools         schools?             @relation(fields: [school_id], references: [school_id])
+
+  @@index([batch_id])
+  @@index([district_id])
+  @@index([school_id])
+}
+
+model districts {
+  district_id    Int              @id @default(autoincrement())
+  district_name  String
+  state          String?          @db.Char(2)
+  nces_id        String?          @unique
+  created_at     DateTime         @default(now())
+  updated_at     DateTime
+  SupplyListFile SupplyListFile[]
+  schools        schools[]
+}
+
+model supply_mapping_memory {
+  id                     Int      @id @default(autoincrement())
+  original_description   String
+  normalized_description String
+  supplies_id            Int
+  school_id              Int?
+  grade_level            String?
+  created_by_user_id     String?
+  source                 String   @default("user")
+  confidence             Int?
+  created_at             DateTime @default(now())
+  updated_at             DateTime
+
+  @@unique([normalized_description, school_id])
+  @@index([normalized_description], map: "idx_supply_mapping_memory_normalized")
+}
+
 enum Role {
   USER
   ADMIN
+}
+
+enum SchoolLevel {
+  ELEMENTARY
+  JUNIOR_HIGH
+  HIGH_SCHOOL
+  OTHER
+}
+
+enum SchoolType {
+  PUBLIC
+  CHARTER
+  PRIVATE
+  OTHER
+}
+
+enum SupplyListFileStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
 }

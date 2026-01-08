@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { updateItemQuantity } from 'components/cart/actions';
 import LoadingDots from 'components/loading-dots';
 import type { CartItem } from 'lib/shopify/types';
+import { useEffect } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 
 function SubmitButton({ type }: { type: 'plus' | 'minus' }) {
@@ -38,7 +39,7 @@ function SubmitButton({ type }: { type: 'plus' | 'minus' }) {
 
 export function EditItemQuantityButton({ item, type }: { item: CartItem; type: 'plus' | 'minus' }) {
   console.log(item, type)
-  const [message, formAction] = useFormState(updateItemQuantity, null);
+  const [state, formAction] = useFormState(updateItemQuantity, {});
   const payload = {
     lineId: item.id,
     variantId: item.merchandise.id,
@@ -46,11 +47,17 @@ export function EditItemQuantityButton({ item, type }: { item: CartItem; type: '
   };
   const actionWithVariant = formAction.bind(null, payload);
 
+  useEffect(() => {
+    if (state?.updatedAt) {
+      window.dispatchEvent(new CustomEvent('cart:updated'));
+    }
+  }, [state?.updatedAt]);
+
   return (
     <form action={actionWithVariant}>
       <SubmitButton type={type} />
       <p aria-live="polite" className="sr-only" role="status">
-        {message}
+        {state?.error}
       </p>
     </form>
   );

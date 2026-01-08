@@ -1,8 +1,7 @@
 import { Suspense } from 'react';
 
 export default function SearchLayout(
-  { children }: { children: React.ReactNode },
-  params: { handle: string }
+  { children }: { children: React.ReactNode }
 ) {
   return (
     <Suspense>

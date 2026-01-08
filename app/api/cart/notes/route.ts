@@ -4,8 +4,9 @@ import { updateCartNote, getCart } from 'lib/shopify';
 
 export async function POST(request: NextRequest) {
   try {
-    const cartId = cookies().get('cartId')?.value;
-    
+    const cookieStore = await cookies();
+    const cartId = cookieStore.get('cartId')?.value;
+
     if (!cartId) {
       return NextResponse.json(
         { error: 'Cart not found' },

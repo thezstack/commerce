@@ -3,8 +3,6 @@ import ProductGridItems from 'components/layout/product-grid-items';
 import { defaultSort, sorting } from 'lib/constants';
 import { getProducts } from 'lib/shopify';
 
-export const runtime = 'edge';
-
 export const revalidate = 60; 
 
 export const metadata = {
@@ -15,9 +13,10 @@ export const metadata = {
 export default async function SearchPage({
   searchParams
 }: {
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { sort, q: searchValue } = searchParams as { [key: string]: string };
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const { sort, q: searchValue } = resolvedSearchParams as { [key: string]: string };
   const { sortKey, reverse } = sorting.find((item) => item.slug === sort) || defaultSort;
 
   const products = await getProducts({ sortKey, reverse, query: searchValue });

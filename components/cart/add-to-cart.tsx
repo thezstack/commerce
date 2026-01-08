@@ -6,6 +6,7 @@ import { addItem } from 'components/cart/actions';
 import LoadingDots from 'components/loading-dots';
 import { ProductVariant } from 'lib/shopify/types';
 import { useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 
 function SubmitButton({
@@ -72,7 +73,7 @@ export function AddToCart({
   variants: ProductVariant[];
   availableForSale: boolean;
 }) {
-  const [message, formAction] = useFormState(addItem, null);
+  const [state, formAction] = useFormState(addItem, {});
   const searchParams = useSearchParams();
   const defaultVariantId = variants.length === 1 ? variants[0]?.id : undefined;
   const variant = variants.find((variant: ProductVariant) =>
@@ -83,11 +84,17 @@ export function AddToCart({
   const selectedVariantId = variant?.id || defaultVariantId;
   const actionWithVariant = formAction.bind(null, selectedVariantId);
 
+  useEffect(() => {
+    if (state?.updatedAt) {
+      window.dispatchEvent(new CustomEvent('cart:updated'));
+    }
+  }, [state?.updatedAt]);
+
   return (
     <form action={actionWithVariant}>
       <SubmitButton availableForSale={availableForSale} selectedVariantId={selectedVariantId} />
       <p aria-live="polite" className="sr-only" role="status">
-        {message}
+        {state?.error}
       </p>
     </form>
   );

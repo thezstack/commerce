@@ -5,16 +5,15 @@ import Prose from 'components/prose';
 import Stores from 'components/stores';
 import { getPage } from 'lib/shopify';
 import { notFound } from 'next/navigation';
-export const runtime = 'edge';
-
 export const revalidate = 60; // 12 hours in seconds
 
 export async function generateMetadata({
   params
 }: {
-  params: { page: string };
+  params: Promise<{ page: string }>;
 }): Promise<Metadata> {
-  const page = await getPage(params.page);
+  const { page: pageHandle } = await params;
+  const page = await getPage(pageHandle);
 
   if (!page) return notFound();
 
@@ -29,8 +28,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function Page({ params }: { params: { page: string } }) {
-  const page = await getPage(params.page);
+export default async function Page({
+  params
+}: {
+  params: Promise<{ page: string }>;
+}) {
+  const { page: pageHandle } = await params;
+  const page = await getPage(pageHandle);
 
   if (!page) return notFound();
 

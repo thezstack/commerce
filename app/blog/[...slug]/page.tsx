@@ -7,9 +7,9 @@ import Link from 'next/link';
 export const revalidate = 0; // Force dynamic rendering
 
 interface BlogPostPageProps {
-  params: {
+  params: Promise<{
     slug: string[];
-  };
+  }>;
 }
 
 export async function generateMetadata({
@@ -17,10 +17,12 @@ export async function generateMetadata({
 }: BlogPostPageProps): Promise<Metadata> {
   // Try different blog handles
   const blogHandles = ['blog', 'news', 'blogs', 'articles', 'journal'];
+  const { slug } = await params;
+  const handle = slug.join('/');
   let post;
   
   for (const blogHandle of blogHandles) {
-    post = await getBlogPost(params.slug.join('/'), blogHandle);
+    post = await getBlogPost(handle, blogHandle);
     if (post) break;
   }
 
@@ -50,7 +52,8 @@ export async function generateMetadata({
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const handle = params.slug.join('/');
+  const { slug } = await params;
+  const handle = slug.join('/');
   
   // Try different blog handles
   const blogHandles = ['blog', 'news', 'blogs', 'articles', 'journal'];
