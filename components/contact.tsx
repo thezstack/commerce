@@ -4,7 +4,19 @@
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-const ContactForm = () => {
+type ContactFormProps = {
+  variant?: 'page' | 'modal';
+  prefillSchool?: string;
+  metadata?: { persona?: string; schoolSlug?: string };
+  onSuccess?: () => void;
+};
+
+const ContactForm = ({
+  variant = 'page',
+  prefillSchool,
+  metadata,
+  onSuccess
+}: ContactFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -20,6 +32,9 @@ const ContactForm = () => {
     const value = searchParams.get('persona');
     return value ? value.trim() : '';
   }, [searchParams]);
+
+  const resolvedSchool = (prefillSchool || schoolFromQuery).trim();
+  const resolvedPersona = (metadata?.persona || personaFromQuery).trim();
   
   // References for form fields
   const fullNameRef = useRef<HTMLInputElement>(null);
@@ -85,9 +100,10 @@ const ContactForm = () => {
       const formData = {
         fullName: fullNameRef.current?.value || '',
         email: emailRef.current?.value || '',
-        school: schoolFromQuery,
+        school: resolvedSchool,
         message: [
-          personaFromQuery ? `Persona: ${personaFromQuery}` : null,
+          resolvedPersona ? `Persona: ${resolvedPersona}` : null,
+          metadata?.schoolSlug ? `School slug: ${metadata.schoolSlug}` : null,
           messageRef.current?.value || ''
         ]
           .filter(Boolean)
@@ -108,6 +124,7 @@ const ContactForm = () => {
       
       if (result.success) {
         setSubmitSuccess(true);
+        onSuccess?.();
       } else if (result.error) {
         // Display the error message from the server
         setError(result.error);
@@ -138,49 +155,60 @@ const ContactForm = () => {
   }
 
   return (
-    <div className="mx-auto max-w-6xl p-4 sm:p-6 lg:p-8 font-['Open Sans']">
-      <div className="flex flex-col gap-8 lg:flex-row">
-        <div className="lg:w-1/2">
-          <h1 className="mb-4 text-2xl font-bold sm:text-3xl lg:text-4xl">Partner with us</h1>
-          {schoolFromQuery ? (
-            <p className="mb-3 text-sm text-gray-600">
-              You’re reaching out about: <span className="font-semibold">{schoolFromQuery}</span>
+    <div className={variant === 'modal' ? "font-['Open Sans']" : "mx-auto max-w-6xl p-4 sm:p-6 lg:p-8 font-['Open Sans']"}>
+      <div className={variant === 'modal' ? 'grid gap-4 sm:grid-cols-2' : 'flex flex-col gap-8 lg:flex-row'}>
+        {variant === 'page' ? (
+          <div className="lg:w-1/2">
+            <h1 className="mb-4 text-2xl font-bold sm:text-3xl lg:text-4xl">Partner with us</h1>
+            {resolvedSchool ? (
+              <p className="mb-3 text-sm text-gray-600">
+                You’re reaching out about: <span className="font-semibold">{resolvedSchool}</span>
+              </p>
+            ) : null}
+            <p className="mb-6 text-sm sm:text-base lg:text-lg">
+            We work closely with schools to create customized supply kits that meet exact
+              classroom requirements, saving time and reducing stress for everyone involved.
             </p>
-          ) : null}
-          <p className="mb-6 text-sm sm:text-base lg:text-lg">
-          We work closely with schools to create customized supply kits that meet exact
-            classroom requirements, saving time and reducing stress for everyone involved.
-          </p>
-          <p className="mb-4 text-sm sm:text-base lg:text-lg">By partnering with SchoolKits, you'll:</p>
-          <ul className="mb-6 space-y-2">
-            {[
-              "Ensure all students have the right materials from day one",
-              "Reduce administrative workload for teachers and staff",
-              "Offer a convenient, hassle-free option for parents"
-            ].map((item, index) => (
-              <li key={index} className="flex items-center">
-                <svg
-                  className="mr-2 flex-shrink-0 text-[#06D6A0]"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  width="16"
-                  height="16"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="text-xs sm:text-sm">{item}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="mb-6 text-sm sm:text-base lg:text-lg">
-            Let's work together to create a smoother back-to-school season. Fill out the form below to start the conversation about bringing SchoolKits to your school.
-          </p>
-        </div>
-        <div className="lg:w-1/2">
+            <p className="mb-4 text-sm sm:text-base lg:text-lg">By partnering with SchoolKits, you'll:</p>
+            <ul className="mb-6 space-y-2">
+              {[
+                "Ensure all students have the right materials from day one",
+                "Reduce administrative workload for teachers and staff",
+                "Offer a convenient, hassle-free option for parents"
+              ].map((item, index) => (
+                <li key={index} className="flex items-center">
+                  <svg
+                    className="mr-2 flex-shrink-0 text-[#06D6A0]"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    width="16"
+                    height="16"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span className="text-xs sm:text-sm">{item}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mb-6 text-sm sm:text-base lg:text-lg">
+              Let's work together to create a smoother back-to-school season. Fill out the form below to start the conversation about bringing SchoolKits to your school.
+            </p>
+          </div>
+        ) : (
+          <div className="sm:col-span-2">
+            {resolvedSchool ? (
+              <p className="mb-4 text-sm text-gray-600">
+                About <span className="font-semibold">{resolvedSchool}</span>
+              </p>
+            ) : null}
+          </div>
+        )}
+
+        <div className={variant === 'modal' ? 'sm:col-span-2' : 'lg:w-1/2'}>
           <div className="space-y-4">
             <div>
               <label htmlFor="fullName" className="mb-1 block text-sm font-medium">
@@ -208,7 +236,6 @@ const ContactForm = () => {
                 ref={emailRef}
               />
             </div>
-            {/* School field removed as requested */}
             <div>
               <label htmlFor="message" className="mb-1 block text-sm font-medium">
                 Message
@@ -216,19 +243,18 @@ const ContactForm = () => {
               <textarea
                 id="message"
                 name="message"
-                rows={4}
+                rows={variant === 'modal' ? 5 : 4}
                 className="w-full rounded-md border p-2 text-sm"
                 required
                 ref={messageRef}
               ></textarea>
             </div>
-            {/* reCAPTCHA v3 is invisible and doesn't need a UI component */}
             <div className="my-4 text-xs text-gray-500">
               This form is protected by reCAPTCHA and the Google
               <a href="https://policies.google.com/privacy" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer"> Privacy Policy</a> and
               <a href="https://policies.google.com/terms" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer"> Terms of Service</a> apply.
             </div>
-            
+
             <button
               type="button"
               className="w-full rounded-full bg-[#0B80A7] px-4 py-3 text-sm font-medium text-white transition-colors duration-300 hover:bg-[#096c8c] sm:text-base"
@@ -237,9 +263,9 @@ const ContactForm = () => {
             >
               {isSubmitting ? 'Sending...' : 'Send message'}
             </button>
-            
+
             {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
-            
+
             {validationErrors.length > 0 && (
               <div className="mt-2 text-sm text-red-500">
                 <ul>

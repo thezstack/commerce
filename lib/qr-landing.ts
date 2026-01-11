@@ -9,17 +9,34 @@ export type HowItWorksStep = {
   body: string;
 };
 
+export type SocialProofLogo = {
+  label: string;
+  src?: string;
+};
+
+export type SocialProofTestimonial = {
+  quote: string;
+  name: string;
+  role: string;
+  school: string;
+};
+
 export type QrLandingData = {
   schoolName: string;
   schoolSlug: string;
   heroTitle: string;
   heroDescription: string;
   heroChecklist: string[];
+  socialProofTitle: string;
+  socialProofSubtitle: string;
+  socialProofLogos: SocialProofLogo[];
+  socialProofTestimonials: SocialProofTestimonial[];
   howItWorksTitle: string;
   howItWorksDescription: string;
   howItWorksSteps: HowItWorksStep[];
   pricingTitle: string;
   pricingDescription: string;
+  competitorName: string;
   pricingItems: PricingComparisonItem[];
   pricingNote: string;
   reportingTitle: string;
@@ -51,6 +68,29 @@ const fallbackHowItWorksSteps: HowItWorksStep[] = [
   {
     title: 'Fulfillment handled end-to-end',
     body: 'School Kits manages sourcing, packing, and delivery before the school year begins.'
+  }
+];
+
+const fallbackSocialProofLogos: SocialProofLogo[] = [
+  { label: 'Partner school' },
+  { label: 'Partner school' },
+  { label: 'Partner school' }
+];
+
+const fallbackTestimonials: SocialProofTestimonial[] = [
+  {
+    quote:
+      'SchoolKits made supply season smoother for our staff and easier for families. The program felt low-lift from day one.',
+    name: 'Amina R.',
+    role: 'PTA President',
+    school: 'Partner School'
+  },
+  {
+    quote:
+      'We kept full control of our lists and still reduced the back-and-forth with parents. Delivery was organized and on time.',
+    name: 'David K.',
+    role: 'School Operations',
+    school: 'Partner School'
   }
 ];
 
@@ -125,18 +165,19 @@ const normalizePayload = (payload: unknown, schoolSlug: string): QrLandingData =
     formatSchoolName(schoolSlug);
 
   const heroTitle =
-    (record.heroTitle as string) || `A quick walkthrough for ${schoolName} admins & PTAs`;
+    (record.heroTitle as string) ||
+    `Reduce back-to-school supply chaos at ${schoolName} — without extra staff work.`;
   const heroDescription =
     (record.heroDescription as string) ||
-    'In ~2 minutes, see how School Kits keeps supply lists school-approved, keeps kits optional for families, and removes fulfillment work from your staff.';
+    'In ~2 minutes, see how School Kits keeps lists school-approved, offers optional kits for families, and handles fulfillment end-to-end.';
   const heroChecklist = Array.isArray(record.heroChecklist)
     ? ((record.heroChecklist as unknown[]).filter((item) => typeof item === 'string') as string[])
     : [
-        'What is School Kits?',
-        `How does this work for ${schoolName}?`,
-        'Is pricing competitive and transparent?',
-        'Do we get reporting and visibility?',
-        'What is the next low-pressure step?'
+        'How much staff time does this save?',
+        'Do we keep full control of our lists?',
+        'Is pricing transparent for families?',
+        'What reporting do we get?',
+        'What is the lowest-effort next step?'
       ];
 
   return {
@@ -145,35 +186,47 @@ const normalizePayload = (payload: unknown, schoolSlug: string): QrLandingData =
     heroTitle,
     heroDescription,
     heroChecklist: heroChecklist.length ? heroChecklist : [
-      'What is School Kits?',
-      `How does this work for ${schoolName}?`,
-      'Is pricing competitive and transparent?',
-      'Do we get reporting and visibility?',
-      'What is the next low-pressure step?'
+      'How much staff time does this save?',
+      'Do we keep full control of our lists?',
+      'Is pricing transparent for families?',
+      'What reporting do we get?',
+      'What is the lowest-effort next step?'
     ],
-    howItWorksTitle: (record.howItWorksTitle as string) || 'How the program works',
+    socialProofTitle:
+      (record.socialProofTitle as string) || 'Trusted by school leaders and PTAs',
+    socialProofSubtitle:
+      (record.socialProofSubtitle as string) ||
+      'Partners choose SchoolKits for transparency, low lift, and reliable fulfillment.',
+    socialProofLogos: Array.isArray(record.socialProofLogos)
+      ? (record.socialProofLogos as SocialProofLogo[])
+      : fallbackSocialProofLogos,
+    socialProofTestimonials: Array.isArray(record.socialProofTestimonials)
+      ? (record.socialProofTestimonials as SocialProofTestimonial[])
+      : fallbackTestimonials,
+    howItWorksTitle: (record.howItWorksTitle as string) || 'How it works',
     howItWorksDescription:
       (record.howItWorksDescription as string) ||
       'Simple, school-controlled, and designed to remove administrative burden.',
     howItWorksSteps: toHowItWorksSteps(record.howItWorksSteps ?? record.steps),
-    pricingTitle: (record.pricingTitle as string) || 'Pricing transparency',
+    pricingTitle: (record.pricingTitle as string) || 'Per-grade pricing transparency',
     pricingDescription:
       (record.pricingDescription as string) ||
-      'Families can view an item-by-item breakdown and compare pricing against major retailers.',
+      'Families see per-grade kit pricing and an apples-to-apples comparison against one competitor.',
+    competitorName: (record.competitorName as string) || 'Your current provider',
     pricingItems: toPricingItems(record.pricingItems ?? record.pricing ?? record.comparison),
     pricingNote:
       (record.pricingNote as string) ||
-      'Example format shown. Exact pricing is tied to your school-approved supply lists.',
+      'Based on school-approved lists. Item-level details remain available to families.',
     reportingTitle:
-      (record.reportingTitle as string) || 'Administrative visibility and reporting',
+      (record.reportingTitle as string) || 'Visibility for admins and PTAs',
     reportingDescription:
       (record.reportingDescription as string) ||
-      'Schools and PTAs can get visibility into participation and ordering activity (access depends on how you choose to participate).',
+      'Get visibility into participation and ordering activity (access depends on how you participate).',
     reportingItems: toReportingItems(record.reportingItems ?? record.reporting),
-    nextStepTitle: (record.nextStepTitle as string) || 'Interested in learning more?',
+    nextStepTitle: (record.nextStepTitle as string) || 'Ready for a quick overview?',
     nextStepDescription:
       (record.nextStepDescription as string) ||
-      'If this looks like a fit for your school or parent organization, we are happy to answer questions or walk through details.',
+      'If this looks like a fit for your school or parent organization, we can walk through details and answer questions.',
     nextStepNote:
       (record.nextStepNote as string) || 'No obligation. No commitment required.',
     ctaPrimary:
@@ -184,11 +237,37 @@ const normalizePayload = (payload: unknown, schoolSlug: string): QrLandingData =
 };
 
 export async function getQrLandingData(schoolSlug: string): Promise<QrLandingData | null> {
-  const apiBase = process.env.SCHOOL_KITS_QR_LANDING_API;
+  const apiBase = process.env.CORE_API_URL
+    ? `${process.env.CORE_API_URL.replace(/\/$/, '')}/api/qr-landing`
+    : undefined;
   if (!apiBase) {
     const mockPayloads: Record<string, Record<string, unknown>> = {
       'houston-quran-academy': {
         schoolName: 'Houston Quran Academy',
+        competitorName: 'Local retailer',
+        socialProofLogos: [
+          { label: 'Houston Quran Academy' },
+          { label: 'ILM Academy' },
+          { label: 'Iman Academy' },
+          { label: 'Partner school' },
+          { label: 'Partner school' }
+        ],
+        socialProofTestimonials: [
+          {
+            quote:
+              'The program kept our lists intact and saved hours of follow-up with families. We loved the low-lift rollout.',
+            name: 'Amina R.',
+            role: 'PTA President',
+            school: 'Houston Quran Academy'
+          },
+          {
+            quote:
+              'Clear pricing and on-time delivery made this an easy yes for our staff and parents.',
+            name: 'David K.',
+            role: 'School Operations',
+            school: 'Houston Quran Academy'
+          }
+        ],
         pricingItems: [
           { item: 'Grade 3 core supplies', schoolKits: '$45', retail: '$52' },
           { item: 'Grade 5 core supplies', schoolKits: '$57', retail: '$64' },
@@ -199,6 +278,13 @@ export async function getQrLandingData(schoolSlug: string): Promise<QrLandingDat
       'ilm-academy': {
         schoolName: 'ILM Academy',
         heroBadge: 'Admin / PTA walkthrough',
+        competitorName: 'Big box retailer',
+        socialProofLogos: [
+          { label: 'ILM Academy' },
+          { label: 'Houston Quran Academy' },
+          { label: 'Iman Academy' },
+          { label: 'Partner school' }
+        ],
         pricingItems: [
           { item: 'Elementary core supplies', schoolKits: '$49', retail: '$56' },
           { item: 'Upper elementary essentials', schoolKits: '$59', retail: '$67' },
@@ -208,6 +294,13 @@ export async function getQrLandingData(schoolSlug: string): Promise<QrLandingDat
       },
       'iman-academy': {
         schoolName: 'Iman Academy',
+        competitorName: 'Current vendor',
+        socialProofLogos: [
+          { label: 'Iman Academy' },
+          { label: 'Houston Quran Academy' },
+          { label: 'ILM Academy' },
+          { label: 'Partner school' }
+        ],
         pricingItems: [
           { item: 'Grade 1 core supplies', schoolKits: '$39', retail: '$46' },
           { item: 'Grade 3 core supplies', schoolKits: '$45', retail: '$52' },
