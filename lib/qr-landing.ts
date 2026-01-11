@@ -72,9 +72,9 @@ const fallbackHowItWorksSteps: HowItWorksStep[] = [
 ];
 
 const fallbackSocialProofLogos: SocialProofLogo[] = [
-  { label: 'Partner school' },
-  { label: 'Partner school' },
-  { label: 'Partner school' }
+  { label: 'Iman Academy' },
+  { label: 'Houston Quran Academy' },
+  { label: 'ILM Academy' }
 ];
 
 const fallbackTestimonials: SocialProofTestimonial[] = [
@@ -166,7 +166,7 @@ const normalizePayload = (payload: unknown, schoolSlug: string): QrLandingData =
 
   const heroTitle =
     (record.heroTitle as string) ||
-    `Reduce back-to-school supply chaos at ${schoolName} — without extra staff work.`;
+    'Reduce back-to-school supply chaos — without extra staff work.';
   const heroDescription =
     (record.heroDescription as string) ||
     'In ~2 minutes, see how School Kits keeps lists school-approved, offers optional kits for families, and handles fulfillment end-to-end.';
@@ -208,20 +208,20 @@ const normalizePayload = (payload: unknown, schoolSlug: string): QrLandingData =
       (record.howItWorksDescription as string) ||
       'Simple, school-controlled, and designed to remove administrative burden.',
     howItWorksSteps: toHowItWorksSteps(record.howItWorksSteps ?? record.steps),
-    pricingTitle: (record.pricingTitle as string) || 'Per-grade pricing transparency',
+    pricingTitle: (record.pricingTitle as string) || 'Per-grade pricing comparison',
     pricingDescription:
       (record.pricingDescription as string) ||
-      'Families see per-grade kit pricing and an apples-to-apples comparison against one competitor.',
+      'We reviewed your current list and benchmarked it against other providers to show clear, admin-only pricing.',
     competitorName: (record.competitorName as string) || 'Your current provider',
     pricingItems: toPricingItems(record.pricingItems ?? record.pricing ?? record.comparison),
     pricingNote:
       (record.pricingNote as string) ||
-      'Based on school-approved lists. Item-level details remain available to families.',
+      'Admin-only comparison based on school-approved lists and real kit totals.',
     reportingTitle:
       (record.reportingTitle as string) || 'Visibility for admins and PTAs',
     reportingDescription:
       (record.reportingDescription as string) ||
-      'Get visibility into participation and ordering activity (access depends on how you participate).',
+      'A custom dashboard is already set up to surface the metrics you care about, with no extra setup required.',
     reportingItems: toReportingItems(record.reportingItems ?? record.reporting),
     nextStepTitle: (record.nextStepTitle as string) || 'Ready for a quick overview?',
     nextStepDescription:
@@ -246,11 +246,9 @@ export async function getQrLandingData(schoolSlug: string): Promise<QrLandingDat
         schoolName: 'Houston Quran Academy',
         competitorName: 'Local retailer',
         socialProofLogos: [
-          { label: 'Houston Quran Academy' },
-          { label: 'ILM Academy' },
           { label: 'Iman Academy' },
-          { label: 'Partner school' },
-          { label: 'Partner school' }
+          { label: 'Houston Quran Academy' },
+          { label: 'ILM Academy' }
         ],
         socialProofTestimonials: [
           {
@@ -280,10 +278,9 @@ export async function getQrLandingData(schoolSlug: string): Promise<QrLandingDat
         heroBadge: 'Admin / PTA walkthrough',
         competitorName: 'Big box retailer',
         socialProofLogos: [
-          { label: 'ILM Academy' },
-          { label: 'Houston Quran Academy' },
           { label: 'Iman Academy' },
-          { label: 'Partner school' }
+          { label: 'Houston Quran Academy' },
+          { label: 'ILM Academy' }
         ],
         pricingItems: [
           { item: 'Elementary core supplies', schoolKits: '$49', retail: '$56' },
@@ -298,8 +295,7 @@ export async function getQrLandingData(schoolSlug: string): Promise<QrLandingDat
         socialProofLogos: [
           { label: 'Iman Academy' },
           { label: 'Houston Quran Academy' },
-          { label: 'ILM Academy' },
-          { label: 'Partner school' }
+          { label: 'ILM Academy' }
         ],
         pricingItems: [
           { item: 'Grade 1 core supplies', schoolKits: '$39', retail: '$46' },
