@@ -24,6 +24,7 @@ export type SocialProofTestimonial = {
 export type QrLandingData = {
   schoolName: string;
   schoolSlug: string;
+  schoolLogoUrl?: string | null;
   heroTitle: string;
   heroDescription: string;
   heroChecklist: string[];
@@ -163,13 +164,19 @@ const normalizePayload = (payload: unknown, schoolSlug: string): QrLandingData =
     (record.schoolName as string) ||
     (schoolRecord.name as string) ||
     formatSchoolName(schoolSlug);
+  const schoolLogoUrl =
+    (record.schoolLogoUrl as string) ||
+    (record.logoUrl as string) ||
+    (schoolRecord.logoUrl as string) ||
+    (schoolRecord.logo_url as string) ||
+    null;
 
   const heroTitle =
     (record.heroTitle as string) ||
-    'Reduce back-to-school supply chaos — without extra staff work.';
+    'Reduce back-to-school supply chaos.';
   const heroDescription =
     (record.heroDescription as string) ||
-    'In ~2 minutes, see how School Kits keeps lists school-approved, offers optional kits for families, and handles fulfillment end-to-end.';
+    'A 2-minute walkthrough of SchoolKits: school-approved lists, optional kits, and end-to-end fulfillment.';
   const heroChecklist = Array.isArray(record.heroChecklist)
     ? ((record.heroChecklist as unknown[]).filter((item) => typeof item === 'string') as string[])
     : [
@@ -183,6 +190,7 @@ const normalizePayload = (payload: unknown, schoolSlug: string): QrLandingData =
   return {
     schoolName,
     schoolSlug,
+    schoolLogoUrl,
     heroTitle,
     heroDescription,
     heroChecklist: heroChecklist.length ? heroChecklist : [

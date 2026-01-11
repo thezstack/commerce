@@ -8,6 +8,7 @@ import { getQrLandingData } from 'lib/qr-landing';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import PricingMobileList from 'components/qr-landing/pricing-mobile-list';
 import ReportingViewMore from 'components/qr-landing/reporting-view-more';
+import ScrollReveal from 'components/qr-landing/scroll-reveal';
 
 export const revalidate = 300;
 
@@ -61,7 +62,7 @@ export default async function QrLandingPage({
 
   return (
     <div
-      className="bg-[#F7FBFD] text-[#0B2C3F]"
+      className="bg-[#F7FBFD] text-[#0B2C3F] scroll-smooth"
       style={
         {
           '--qr-sun': '#F9D27D',
@@ -85,9 +86,21 @@ export default async function QrLandingPage({
             <span className="inline-flex items-center rounded-full bg-white/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#0B80A7] shadow-sm">
               {data.heroBadge}
             </span>
+            {data.schoolLogoUrl ? (
+              <div className="mt-4 flex items-center gap-3">
+                <img
+                  src={data.schoolLogoUrl}
+                  alt={`${data.schoolName} logo`}
+                  className="h-12 w-12 rounded-full bg-white/80 p-2 shadow-sm object-contain"
+                />
+                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#79909E]">
+                  {data.schoolName}
+                </span>
+              </div>
+            ) : null}
             <h1 className="mt-6 text-4xl font-bold leading-tight md:text-5xl">{data.heroTitle}</h1>
             <p className="mt-3 text-sm text-[#4C616E]">
-              See how schools like Houston Quran Academy simplify supply season in ~2 minutes.
+              Created for {data.schoolName} administrators and PTAs.
             </p>
             <p className="mt-4 text-base text-[#345060] md:text-lg">{data.heroDescription}</p>
             <div className="mt-8 flex flex-wrap gap-4">
@@ -102,23 +115,26 @@ export default async function QrLandingPage({
         </div>
       </section>
 
-      <section id="walkthrough-start" className="mx-auto max-w-6xl px-6 py-14">
-        <div className="rounded-3xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#79909E]">
-            What admins evaluate
-          </p>
-          <ul className="mt-4 space-y-3 text-sm text-[#344D5A]">
-            {data.heroChecklist.map((item) => (
-              <li key={item} className="flex items-start gap-3">
-                <span className="mt-1 inline-flex h-2.5 w-2.5 flex-shrink-0 rounded-full bg-[#0B80A7]" />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
+      <ScrollReveal>
+        <section id="walkthrough-start" className="mx-auto max-w-6xl px-6 py-14">
+          <div className="rounded-3xl border border-white/70 bg-white/80 p-6 shadow-xl backdrop-blur">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#79909E]">
+              What admins evaluate
+            </p>
+            <ul className="mt-4 space-y-3 text-sm text-[#344D5A]">
+              {data.heroChecklist.map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <span className="mt-1 inline-flex h-2.5 w-2.5 flex-shrink-0 rounded-full bg-[#0B80A7]" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      </ScrollReveal>
 
-      <section id="how-it-works" className="mx-auto max-w-6xl px-6 py-14">
+      <ScrollReveal>
+        <section id="how-it-works" className="mx-auto max-w-6xl px-6 py-14">
         <div className="flex flex-col items-start gap-6 md:flex-row md:items-end md:justify-between">
           <div>
             <h2 className="mt-2 text-3xl font-semibold">{data.howItWorksTitle}</h2>
@@ -141,9 +157,11 @@ export default async function QrLandingPage({
             </div>
           ))}
         </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
-      <section id="pricing" className="relative overflow-hidden bg-white/60 px-6 py-16">
+      <ScrollReveal>
+        <section id="pricing" className="relative overflow-hidden bg-white/60 px-6 py-16">
         <div className="absolute inset-0 -z-10">
           <div className="absolute left-10 top-10 h-32 w-32 rounded-full bg-[#0B80A7] opacity-10 blur-2xl" />
           <div className="absolute right-10 bottom-10 h-40 w-40 rounded-full bg-[#F9D27D] opacity-20 blur-2xl" />
@@ -186,9 +204,11 @@ export default async function QrLandingPage({
             No hidden fees. No markups added without visibility.
           </p>
         </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
-      <section id="reporting" className="mx-auto max-w-6xl px-6 py-16">
+      <ScrollReveal>
+        <section id="reporting" className="mx-auto max-w-6xl px-6 py-16">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
             <h2 className="mt-2 text-3xl font-semibold">{data.reportingTitle}</h2>
@@ -293,19 +313,23 @@ export default async function QrLandingPage({
         <p className="mt-4 text-xs text-[#6B7E8A]">
           No additional setup is required on your end.
         </p>
-      </section>
+        </section>
+      </ScrollReveal>
 
-      <SocialProof
-        title={data.socialProofTitle}
-        subtitle={data.socialProofSubtitle}
-        logos={data.socialProofLogos}
-        testimonials={data.socialProofTestimonials}
-      />
+      <ScrollReveal>
+        <SocialProof
+          title={data.socialProofTitle}
+          subtitle={data.socialProofSubtitle}
+          logos={data.socialProofLogos}
+          testimonials={data.socialProofTestimonials}
+        />
+      </ScrollReveal>
 
-      <section
-        id="next-step"
-        className="relative overflow-hidden bg-[#0B2C3F] px-6 py-16 text-white"
-      >
+      <ScrollReveal>
+        <section
+          id="next-step"
+          className="relative overflow-hidden bg-[#0B2C3F] px-6 py-16 text-white"
+        >
         <div className="absolute inset-0 opacity-30">
           <div className="absolute -left-10 -top-10 h-32 w-32 rounded-full bg-[#F9D27D] blur-2xl" />
           <div className="absolute bottom-0 right-0 h-48 w-48 rounded-full bg-[#0B80A7] blur-3xl" />
@@ -332,7 +356,8 @@ export default async function QrLandingPage({
             </a>
           </div>
         </div>
-      </section>
+        </section>
+      </ScrollReveal>
     </div>
   );
 }
