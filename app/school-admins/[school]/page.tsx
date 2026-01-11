@@ -87,11 +87,11 @@ export default async function QrLandingPage({
               {data.heroBadge}
             </span>
             {data.schoolLogoUrl ? (
-              <div className="mt-4 flex items-center gap-3">
+              <div className="mt-5 flex items-center gap-4">
                 <img
                   src={data.schoolLogoUrl}
                   alt={`${data.schoolName} logo`}
-                  className="h-12 w-12 rounded-full bg-white/80 p-2 shadow-sm object-contain"
+                  className="h-16 w-16 rounded-full bg-white/90 p-2 shadow-md ring-1 ring-white/70 object-contain"
                 />
                 <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#79909E]">
                   {data.schoolName}
