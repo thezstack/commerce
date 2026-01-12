@@ -33,7 +33,7 @@ export default function SocialProof({
           <p className="mt-3 max-w-2xl text-sm text-[#4C616E]">{subtitle}</p>
         </div>
         <span className="rounded-full bg-[#E7F7FF] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#0B80A7]">
-          Partner schools
+          Early partners
         </span>
       </div>
 
@@ -77,4 +77,3 @@ export default function SocialProof({
     </section>
   );
 }
-

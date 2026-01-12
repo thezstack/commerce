@@ -73,9 +73,9 @@ const fallbackHowItWorksSteps: HowItWorksStep[] = [
 ];
 
 const fallbackSocialProofLogos: SocialProofLogo[] = [
-  { label: 'Iman Academy' },
-  { label: 'Houston Quran Academy' },
-  { label: 'ILM Academy' }
+  { label: 'Katy ISD' },
+  { label: 'Houston ISD' },
+  { label: 'Spring ISD' }
 ];
 
 const fallbackTestimonials: SocialProofTestimonial[] = [
@@ -254,9 +254,9 @@ export async function getQrLandingData(schoolSlug: string): Promise<QrLandingDat
         schoolName: 'Houston Quran Academy',
         competitorName: 'Local retailer',
         socialProofLogos: [
-          { label: 'Iman Academy' },
-          { label: 'Houston Quran Academy' },
-          { label: 'ILM Academy' }
+          { label: 'Katy ISD' },
+          { label: 'Houston ISD' },
+          { label: 'Spring ISD' }
         ],
         socialProofTestimonials: [
           {
@@ -286,9 +286,9 @@ export async function getQrLandingData(schoolSlug: string): Promise<QrLandingDat
         heroBadge: 'Admin / PTA walkthrough',
         competitorName: 'Big box retailer',
         socialProofLogos: [
-          { label: 'Iman Academy' },
-          { label: 'Houston Quran Academy' },
-          { label: 'ILM Academy' }
+          { label: 'Katy ISD' },
+          { label: 'Houston ISD' },
+          { label: 'Spring ISD' }
         ],
         pricingItems: [
           { item: 'Elementary core supplies', schoolKits: '$49', retail: '$56' },
@@ -301,9 +301,9 @@ export async function getQrLandingData(schoolSlug: string): Promise<QrLandingDat
         schoolName: 'Iman Academy',
         competitorName: 'Current vendor',
         socialProofLogos: [
-          { label: 'Iman Academy' },
-          { label: 'Houston Quran Academy' },
-          { label: 'ILM Academy' }
+          { label: 'Katy ISD' },
+          { label: 'Houston ISD' },
+          { label: 'Spring ISD' }
         ],
         pricingItems: [
           { item: 'Grade 1 core supplies', schoolKits: '$39', retail: '$46' },
