@@ -2,13 +2,13 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import ContactModalCta from 'components/qr-landing/contact-modal-cta';
-import SocialProof from 'components/qr-landing/social-proof';
-import { getQrLandingData } from 'lib/qr-landing';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import ContactModalCta from 'components/qr-landing/contact-modal-cta';
 import PricingMobileList from 'components/qr-landing/pricing-mobile-list';
 import ReportingViewMore from 'components/qr-landing/reporting-view-more';
 import ScrollReveal from 'components/qr-landing/scroll-reveal';
+import SocialProof from 'components/qr-landing/social-proof';
+import { getQrLandingData } from 'lib/qr-landing';
 
 export const revalidate = 300;
 
@@ -27,12 +27,31 @@ const formatDifferencePercent = (schoolKits: string, retail: string) => {
   return `${rounded}%`;
 };
 
+const formatCurrency = (value: number | null, options?: { showSign?: boolean }) => {
+  if (value === null) return '—';
+  const base = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2
+  }).format(value);
+  if (!options?.showSign) return base;
+  return value === 0 ? base : `+${base}`;
+};
+
+const computeNetToSchool = (paid: string, quote: string, fee: string) => {
+  const paidValue = parsePrice(paid);
+  const quoteValue = parsePrice(quote);
+  const feeValue = parsePrice(fee);
+  if (paidValue === null || quoteValue === null || feeValue === null) return null;
+  return Math.max(0, paidValue - quoteValue - feeValue);
+};
+
 const reportPreviewOrders = [
-  { id: '1924', date: '8/5/2025', student: 'Natalie Smith', paid: '$240.00', quote: '$179.00', qty: '1', fee: '7.83', net: '$54.17' },
-  { id: '1923', date: '8/5/2025', student: 'Ethan Johnson', paid: '$179.00', quote: '$87.00', qty: '1', fee: '3.75', net: '$19.80' },
-  { id: '1918', date: '8/5/2025', student: 'Ava Brooks', paid: '$129.00', quote: '$128.00', qty: '1', fee: '4.32', net: '$27.68' },
-  { id: '1913', date: '8/3/2025', student: 'Mason Thompson', paid: '$169.00', quote: '$94.00', qty: '1', fee: '4.22', net: '$27.88' },
-  { id: '1908', date: '8/1/2025', student: 'Logan White', paid: '$126.00', quote: '$89.00', qty: '1', fee: '3.91', net: '$27.82' }
+  { id: '1924', date: '8/5/2025', student: 'Natalie Smith', paid: '$240.00', quote: '$179.00', qty: '2', fee: '$6.83' },
+  { id: '1923', date: '8/5/2025', student: 'Ethan Johnson', paid: '$179.00', quote: '$150.00', qty: '1', fee: '$4.75' },
+  { id: '1918', date: '8/5/2025', student: 'Ava Brooks', paid: '$129.00', quote: '$108.00', qty: '1', fee: '$3.32' },
+  { id: '1913', date: '8/3/2025', student: 'Mason Thompson', paid: '$169.00', quote: '$132.00', qty: '1', fee: '$4.12' },
+  { id: '1908', date: '8/1/2025', student: 'Logan White', paid: '$126.00', quote: '$99.00', qty: '1', fee: '$3.18' }
 ];
 
 
@@ -221,34 +240,34 @@ export default async function QrLandingPage({
           <Card className="border-[#E3EEF4] bg-white shadow-sm">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg text-[#0B2C3F]">Profit snapshot</CardTitle>
-              <p className="text-xs text-[#4C616E]">Net-to-school highlights with no extra reporting work.</p>
+              <p className="text-xs text-[#4C616E]">Profit-to-school highlights.</p>
             </CardHeader>
             <CardContent className="pt-2">
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="rounded-2xl border border-[#EEF3F6] bg-[#F7FBFD] p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7A8D99]">Net to school</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7A8D99]">Profit to school</p>
                   <p className="mt-2 text-2xl font-semibold text-[#0B2C3F]">$12,480</p>
                   <p className="mt-1 text-xs text-[#4C616E]">After fees, last 30 days</p>
                 </div>
                 <div className="rounded-2xl border border-[#EEF3F6] bg-white p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7A8D99]">Avg. net per kit</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7A8D99]">Avg. profit per kit</p>
                   <p className="mt-2 text-2xl font-semibold text-[#0B2C3F]">$18.70</p>
                   <p className="mt-1 text-xs text-[#4C616E]">Across active grades</p>
                 </div>
                 <div className="rounded-2xl border border-[#EEF3F6] bg-white p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7A8D99]">Top grade</p>
                   <p className="mt-2 text-2xl font-semibold text-[#0B2C3F]">Grade 5</p>
-                  <p className="mt-1 text-xs text-[#4C616E]">$2,940 net to school</p>
+                  <p className="mt-1 text-xs text-[#4C616E]">$2,940 profit to school</p>
                 </div>
               </div>
-              <p className="mt-3 text-xs text-[#6B7E8A]">Snapshot cards summarize profit without extra reporting work.</p>
+              <p className="mt-3 text-xs text-[#6B7E8A]">Snapshot cards summarize profit.</p>
             </CardContent>
           </Card>
 
           <Card className="border-[#E3EEF4] bg-white shadow-sm">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg text-[#0B2C3F]">Recent orders</CardTitle>
-              <p className="text-xs text-[#4C616E]">Track participation, order value, and net-to-school totals.</p>
+              <p className="text-xs text-[#4C616E]">Track participation, order value, and profit-to-school totals.</p>
             </CardHeader>
             <CardContent className="pt-2">
               <div className="hidden overflow-hidden rounded-2xl border border-[#EEF3F6] md:block">
@@ -259,53 +278,65 @@ export default async function QrLandingPage({
                   <div>Price paid</div>
                   <div>Quote price</div>
                   <div>Qty</div>
-                  <div>Net</div>
+                  <div>Profit to school</div>
                 </div>
-                {reportPreviewOrders.map((row) => (
-                  <div
-                    key={row.id}
-                    className="grid grid-cols-7 gap-4 border-b border-[#F4F7F9] px-4 py-3 text-sm text-[#344D5A]"
-                  >
-                    <div className="font-semibold text-[#0B2C3F]">{row.id}</div>
-                    <div className="text-[#6B7E8A]">{row.date}</div>
-                    <div>{row.student}</div>
-                    <div>{row.paid}</div>
-                    <div className="text-[#6B7E8A]">{row.quote}</div>
-                    <div>{row.qty}</div>
-                    <div className="font-semibold text-[#1F6D57]">{row.net}</div>
-                  </div>
-                ))}
+                {reportPreviewOrders.map((row) => {
+                  const netToSchool = formatCurrency(
+                    computeNetToSchool(row.paid, row.quote, row.fee),
+                    { showSign: true }
+                  );
+                  return (
+                    <div
+                      key={row.id}
+                      className="grid grid-cols-7 gap-4 border-b border-[#F4F7F9] px-4 py-3 text-sm text-[#344D5A]"
+                    >
+                      <div className="font-semibold text-[#0B2C3F]">{row.id}</div>
+                      <div className="text-[#6B7E8A]">{row.date}</div>
+                      <div>{row.student}</div>
+                      <div>{row.paid}</div>
+                      <div className="text-[#6B7E8A]">{row.quote}</div>
+                      <div>{row.qty}</div>
+                      <div className="font-semibold text-[#1F6D57]">{netToSchool}</div>
+                    </div>
+                  );
+                })}
               </div>
               <div className="grid gap-3 md:hidden">
-                {reportPreviewOrders.slice(0, 3).map((row) => (
-                  <div key={row.id} className="rounded-2xl border border-[#EEF3F6] bg-[#F7FBFD] p-4">
-                    <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-[#7A8D99]">
-                      <span>Order #{row.id}</span>
-                      <span>{row.date}</span>
+                {reportPreviewOrders.slice(0, 3).map((row) => {
+                  const netToSchool = formatCurrency(
+                    computeNetToSchool(row.paid, row.quote, row.fee),
+                    { showSign: true }
+                  );
+                  return (
+                    <div key={row.id} className="rounded-2xl border border-[#EEF3F6] bg-[#F7FBFD] p-4">
+                      <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-[#7A8D99]">
+                        <span>Order #{row.id}</span>
+                        <span>{row.date}</span>
+                      </div>
+                      <div className="mt-2 text-sm font-semibold text-[#0B2C3F]">{row.student}</div>
+                      <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-[#344D5A]">
+                        <div className="rounded-lg bg-white px-2 py-1">
+                          <span className="text-[#7A8D99]">Paid</span>
+                          <span className="ml-2 font-semibold">{row.paid}</span>
+                        </div>
+                        <div className="rounded-lg bg-white px-2 py-1">
+                          <span className="text-[#7A8D99]">Quote</span>
+                          <span className="ml-2 font-semibold">{row.quote}</span>
+                        </div>
+                        <div className="rounded-lg bg-white px-2 py-1">
+                          <span className="text-[#7A8D99]">Qty</span>
+                          <span className="ml-2 font-semibold">{row.qty}</span>
+                        </div>
+                        <div className="rounded-lg bg-white px-2 py-1">
+                        <span className="text-[#7A8D99]">Profit to school</span>
+                          <span className="ml-2 font-semibold text-[#1F6D57]">{netToSchool}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="mt-2 text-sm font-semibold text-[#0B2C3F]">{row.student}</div>
-                    <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-[#344D5A]">
-                      <div className="rounded-lg bg-white px-2 py-1">
-                        <span className="text-[#7A8D99]">Paid</span>
-                        <span className="ml-2 font-semibold">{row.paid}</span>
-                      </div>
-                      <div className="rounded-lg bg-white px-2 py-1">
-                        <span className="text-[#7A8D99]">Quote</span>
-                        <span className="ml-2 font-semibold">{row.quote}</span>
-                      </div>
-                      <div className="rounded-lg bg-white px-2 py-1">
-                        <span className="text-[#7A8D99]">Qty</span>
-                        <span className="ml-2 font-semibold">{row.qty}</span>
-                      </div>
-                      <div className="rounded-lg bg-white px-2 py-1">
-                        <span className="text-[#7A8D99]">Net</span>
-                        <span className="ml-2 font-semibold text-[#1F6D57]">{row.net}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
-              <p className="mt-3 text-xs text-[#6B7E8A]">Showing recent records with fee and net-to-school breakdown.</p>
+              <p className="mt-3 text-xs text-[#6B7E8A]">Showing recent records with fee and profit-to-school breakdown.</p>
               <ReportingViewMore totalOrders="5,359" monthlySales="$4.2k" />
             </CardContent>
           </Card>
