@@ -21,8 +21,8 @@ const formatDifferencePercent = (schoolKits: string, retail: string) => {
   const schoolPrice = parsePrice(schoolKits);
   const retailPrice = parsePrice(retail);
   if (!schoolPrice || !retailPrice) return '—';
-  if (retailPrice <= 0) return '—';
-  const diff = ((retailPrice - schoolPrice) / retailPrice) * 100;
+  if (schoolPrice <= 0) return '—';
+  const diff = ((retailPrice - schoolPrice) / schoolPrice) * 100;
   const rounded = Math.round(diff);
   return `${rounded}%`;
 };
