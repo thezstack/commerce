@@ -40,6 +40,7 @@ export type QrLandingData = {
   competitorName: string;
   pricingItems: PricingComparisonItem[];
   pricingNote: string;
+  hasPricingComparison: boolean;
   reportingTitle: string;
   reportingDescription: string;
   reportingItems: string[];
@@ -50,12 +51,6 @@ export type QrLandingData = {
   ctaSecondary: { label: string; href: string };
   heroBadge: string;
 };
-
-const fallbackPricing: PricingComparisonItem[] = [
-  { item: 'Grade 3 core supplies', schoolKits: '$45', retail: '$52' },
-  { item: 'Grade 5 core supplies', schoolKits: '$57', retail: '$64' },
-  { item: 'Middle school essentials', schoolKits: '$73', retail: '$81' }
-];
 
 const fallbackHowItWorksSteps: HowItWorksStep[] = [
   {
@@ -116,8 +111,13 @@ const titleCase = (value: string) =>
 
 const formatSchoolName = (slug: string) => titleCase(slug.replace(/[-_]+/g, ' '));
 
-const toPricingItems = (items: unknown): PricingComparisonItem[] => {
-  if (!Array.isArray(items)) return fallbackPricing;
+const parsePrice = (value: string) => {
+  const numeric = Number(value.replace(/[^0-9.]/g, ''));
+  return Number.isNaN(numeric) ? null : numeric;
+};
+
+const toPricingItems = (items: unknown): { items: PricingComparisonItem[]; hasValid: boolean } => {
+  if (!Array.isArray(items)) return { items: [], hasValid: false };
   const mapped = items
     .map((item) => {
       if (!item || typeof item !== 'object') return null;
@@ -128,10 +128,11 @@ const toPricingItems = (items: unknown): PricingComparisonItem[] => {
         retail: record.retail || record.competitor || record.market || ''
       };
       if (!entry.item || !entry.schoolKits || !entry.retail) return null;
+      if (parsePrice(entry.schoolKits) === null || parsePrice(entry.retail) === null) return null;
       return entry;
     })
     .filter(Boolean) as PricingComparisonItem[];
-  return mapped.length ? mapped : fallbackPricing;
+  return { items: mapped, hasValid: mapped.length > 0 };
 };
 
 const toReportingItems = (items: unknown): string[] => {
@@ -216,12 +217,17 @@ const normalizePayload = (payload: unknown, schoolSlug: string): QrLandingData =
       (record.howItWorksDescription as string) ||
       'Simple, school-controlled, and designed to remove administrative burden.',
     howItWorksSteps: toHowItWorksSteps(record.howItWorksSteps ?? record.steps),
+    ...(() => {
+      const { items, hasValid } = toPricingItems(
+        record.pricingItems ?? record.pricing ?? record.comparison
+      );
+      return { pricingItems: items, hasPricingComparison: hasValid };
+    })(),
     pricingTitle: (record.pricingTitle as string) || 'Per-grade pricing comparison',
     pricingDescription:
       (record.pricingDescription as string) ||
       'We reviewed your current list and benchmarked it against other providers to show clear, admin-only pricing.',
     competitorName: (record.competitorName as string) || 'Your current provider',
-    pricingItems: toPricingItems(record.pricingItems ?? record.pricing ?? record.comparison),
     pricingNote:
       (record.pricingNote as string) ||
       'Admin-only comparison based on school-approved lists and real kit totals.',

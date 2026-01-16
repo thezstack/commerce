@@ -179,52 +179,54 @@ export default async function QrLandingPage({
         </section>
       </ScrollReveal>
 
-      <ScrollReveal>
-        <section id="pricing" className="relative overflow-hidden bg-white/60 px-6 py-16">
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute left-10 top-10 h-32 w-32 rounded-full bg-[#0B80A7] opacity-10 blur-2xl" />
-          <div className="absolute right-10 bottom-10 h-40 w-40 rounded-full bg-[#F9D27D] opacity-20 blur-2xl" />
-        </div>
-        <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-            <div>
-              <h2 className="mt-2 text-3xl font-semibold">{data.pricingTitle}</h2>
-              <p className="mt-3 max-w-2xl text-sm text-[#4C616E]">
-                {data.pricingDescription}
-              </p>
-            </div>
-            <div className="rounded-full bg-[#E7F7FF] px-4 py-2 text-xs font-semibold text-[#0B80A7]">
-              {data.pricingNote}
-            </div>
+      {data.hasPricingComparison ? (
+        <ScrollReveal>
+          <section id="pricing" className="relative overflow-hidden bg-white/60 px-6 py-16">
+          <div className="absolute inset-0 -z-10">
+            <div className="absolute left-10 top-10 h-32 w-32 rounded-full bg-[#0B80A7] opacity-10 blur-2xl" />
+            <div className="absolute right-10 bottom-10 h-40 w-40 rounded-full bg-[#F9D27D] opacity-20 blur-2xl" />
           </div>
-          <div className="mt-10 hidden overflow-hidden rounded-3xl border border-[#E3EEF4] bg-white shadow-lg md:block">
-            <div className="grid grid-cols-4 gap-4 border-b border-[#E3EEF4] bg-[#F4FBFF] px-6 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#79909E]">
-              <div>Grade bundle</div>
-              <div>School Kits</div>
-              <div>{data.competitorName}</div>
-              <div>Savings</div>
-            </div>
-            {data.pricingItems.map((item) => (
-              <div
-                key={item.item}
-                className="grid grid-cols-4 gap-4 px-6 py-4 text-sm text-[#344D5A]"
-              >
-                <div className="font-semibold text-[#0B2C3F]">{item.item}</div>
-                <div className="font-semibold text-[#0B80A7]">{item.schoolKits}</div>
-                <div>{item.retail}</div>
-                <div className="font-semibold text-[#1F6D57]">
-                  {formatDifferencePercent(item.schoolKits, item.retail)}
-                </div>
+          <div className="mx-auto max-w-6xl">
+            <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+              <div>
+                <h2 className="mt-2 text-3xl font-semibold">{data.pricingTitle}</h2>
+                <p className="mt-3 max-w-2xl text-sm text-[#4C616E]">
+                  {data.pricingDescription}
+                </p>
               </div>
-            ))}
+              <div className="rounded-full bg-[#E7F7FF] px-4 py-2 text-xs font-semibold text-[#0B80A7]">
+                {data.pricingNote}
+              </div>
+            </div>
+            <div className="mt-10 hidden overflow-hidden rounded-3xl border border-[#E3EEF4] bg-white shadow-lg md:block">
+              <div className="grid grid-cols-4 gap-4 border-b border-[#E3EEF4] bg-[#F4FBFF] px-6 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#79909E]">
+                <div>Grade bundle</div>
+                <div>School Kits</div>
+                <div>{data.competitorName}</div>
+                <div>Savings</div>
+              </div>
+              {data.pricingItems.map((item) => (
+                <div
+                  key={item.item}
+                  className="grid grid-cols-4 gap-4 px-6 py-4 text-sm text-[#344D5A]"
+                >
+                  <div className="font-semibold text-[#0B2C3F]">{item.item}</div>
+                  <div className="font-semibold text-[#0B80A7]">{item.schoolKits}</div>
+                  <div>{item.retail}</div>
+                  <div className="font-semibold text-[#1F6D57]">
+                    {formatDifferencePercent(item.schoolKits, item.retail)}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <PricingMobileList items={data.pricingItems} competitorName={data.competitorName} />
+            <p className="mt-4 text-xs text-[#6B7E8A]">
+              No hidden fees. No markups added without visibility.
+            </p>
           </div>
-          <PricingMobileList items={data.pricingItems} competitorName={data.competitorName} />
-          <p className="mt-4 text-xs text-[#6B7E8A]">
-            No hidden fees. No markups added without visibility.
-          </p>
-        </div>
-        </section>
-      </ScrollReveal>
+          </section>
+        </ScrollReveal>
+      ) : null}
 
       <ScrollReveal>
         <section id="reporting" className="mx-auto max-w-6xl px-6 py-16">
