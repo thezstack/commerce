@@ -25,14 +25,21 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
   const [localCart, setLocalCart] = useState(cart);
   const [isSavingNotes, setIsSavingNotes] = useState(false);
 
-  const quantityRef = useRef(cart?.totalQuantity);
-  const hasInitializedQuantity = useRef(false);
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
 
   useEffect(() => {
     setLocalCart(cart);
   }, [cart]);
+
+  useEffect(() => {
+    const handleCartOpen = () => {
+      setIsOpen(true);
+    };
+
+    window.addEventListener('cart:open', handleCartOpen);
+    return () => window.removeEventListener('cart:open', handleCartOpen);
+  }, []);
   
   // Handle page visibility changes to ensure clean state when returning from checkout
   useEffect(() => {    
@@ -49,21 +56,6 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
-
-  useEffect(() => {
-    if (!hasInitializedQuantity.current) {
-      quantityRef.current = localCart?.totalQuantity;
-      hasInitializedQuantity.current = true;
-      return;
-    }
-
-    if (localCart?.totalQuantity !== quantityRef.current) {
-      if (!isOpen) {
-        setIsOpen(true);
-      }
-      quantityRef.current = localCart?.totalQuantity;
-    }
-  }, [isOpen, localCart?.totalQuantity]);
 
   useEffect(() => {
     const loadChildNames = () => {

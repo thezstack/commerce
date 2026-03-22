@@ -92,7 +92,7 @@ export function AddToCart({
 
   useEffect(() => {
     if (state?.updatedAt) {
-      window.dispatchEvent(new CustomEvent('cart:updated'));
+      window.dispatchEvent(new CustomEvent('cart:updated', { detail: { open: true } }));
     }
   }, [state?.updatedAt]);
 

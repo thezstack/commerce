@@ -25,8 +25,14 @@ export default function Cart() {
   }, [fetchCart]);
 
   useEffect(() => {
-    const handleCartUpdated = () => {
-      fetchCart();
+    const handleCartUpdated = async (event: Event) => {
+      const shouldOpen = event instanceof CustomEvent && event.detail?.open === true;
+
+      await fetchCart();
+
+      if (shouldOpen) {
+        window.dispatchEvent(new CustomEvent('cart:open'));
+      }
     };
 
     window.addEventListener('cart:updated', handleCartUpdated);
