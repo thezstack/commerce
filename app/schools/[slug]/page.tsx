@@ -66,9 +66,7 @@ export default async function SchoolDetailPage({ params }: SchoolPageParams) {
                 {school.name}
               </h1>
             </div>
-            <p className="mt-4 text-base leading-7 text-gray-600">
-              {location || 'School record found in the School Kits catalog.'}
-            </p>
+            <p className="mt-4 text-base leading-7 text-gray-600">{location || 'School Kits'}</p>
           </div>
         </section>
 
@@ -79,8 +77,8 @@ export default async function SchoolDetailPage({ params }: SchoolPageParams) {
             <div className="rounded-[1.75rem] border border-dashed border-[#D9EEF4] bg-white px-6 py-10 text-center">
               <h2 className="text-2xl font-semibold text-black">Kits are not online yet</h2>
               <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-gray-600">
-                We found this school in our database, but kits are not currently available to order online.
-                If you want us to review this school, send a request with one click below.
+                Kits for this school are not available to order online right now. If you would like this school reviewed,
+                send a quick request below.
               </p>
               <SchoolRequestActions
                 schoolName={school.name}

@@ -1,5 +1,7 @@
 import { Carousel } from 'components/carousel';
 import FAQ from 'components/faq';
+import { WhyChooseSection } from 'components/home/why-choose-section';
+import ScrollReveal from 'components/qr-landing/scroll-reveal';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -44,6 +46,44 @@ export default async function HomePage() {
       name: fiskar
     }
   ];
+  const whyChooseSchoolKits = [
+    {
+      title: 'Built for your school',
+      description: "Grade-specific supplies matched to your child's classroom requirements."
+    },
+    {
+      title: 'Delivered to the classroom',
+      description: 'No store runs, no sorting supplies, and no pickup coordination.'
+    },
+    {
+      title: 'Easier for parents & teachers',
+      description: 'Less shopping for families and fewer missing-item headaches for staff.'
+    }
+  ];
+  const steps = [
+    {
+      title: 'Step 1',
+      image: step1,
+      description:
+        'We collect grade-specific supply lists from schools and create custom pre-packaged school kits.'
+    },
+    {
+      title: 'Step 2',
+      image: step2,
+      description: 'Parents conveniently buy their child a SchoolKit with a click of a button.'
+    },
+    {
+      title: 'Step 3',
+      image: step3,
+      description: 'Our team delivers directly to your classroom. No need for pickup.'
+    },
+    {
+      title: 'Step 4',
+      image: step4,
+      description:
+        'Send your child to school confidently knowing they have everything needed for learning.'
+    }
+  ];
   const Blob = () => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -65,22 +105,23 @@ export default async function HomePage() {
         <div className="bg-[#F4FDFF]">
           <div className="mx-auto flex  flex-col items-center lg:flex-row">
             {/* Text content */}
-            <div className="mb-8 px-4 py-8  lg:mb-0 lg:w-1/2 lg:px-12 lg:py-16">
+            <ScrollReveal className="mb-8 px-4 py-8 lg:mb-0 lg:w-1/2 lg:px-12 lg:py-16">
               <h1 className="mb-4 text-3xl font-bold lg:text-4xl">
                 School Ready, Stress Free
               </h1>
               <p className="mb-6 text-gray-600">
-              We partner with schools to perfect back-to-school shopping.</p>
+                We partner with schools to perfect back-to-school shopping.
+              </p>
               <Link
                 href="/schools"
                 className="rounded-full bg-custom-blue px-6 py-3 font-bold text-white"
               >
                 Shop by school
               </Link>
-            </div>
+            </ScrollReveal>
 
             {/* Image section with blue blob */}
-            <div className="relative lg:w-1/2">
+            <ScrollReveal delayMs={120} className="relative lg:w-1/2">
               {/* <div className="absolute inset-0 bg-light-blue rounded-full" style={{ clipPath: 'circle(70% at 70% 50%)' }}></div> */}
               <Blob />
 
@@ -93,132 +134,57 @@ export default async function HomePage() {
                   className="mx-auto"
                 />
               </div>
-            </div>
+            </ScrollReveal>
           </div>
         </div>
         {/*How It Works */}{' '}
         <div className="mx-auto mb-8   px-4 py-10 lg:px-12 lg:py-16  ">
-          <h2 className="mb-8 text-center text-4xl font-semibold">How it works</h2>
+          <ScrollReveal className="mb-8 text-center">
+            <h2 className="text-4xl font-semibold">How it works</h2>
+          </ScrollReveal>
           <div className="flex  flex-col   gap-4 space-y-4 pl-4 pr-4 md:flex-row md:justify-between md:space-x-4 md:space-y-0">
-            <div className=" flex flex-1 flex-col  space-y-4 text-center">
-              <Image src={step1} alt="Step 1" className="mx-auto" />
-              <h3 className="font-semibold">Step 1</h3>
-              <p>
-                We collect grade-specific supply lists from schools and create custom pre-packaged
-                school kits.
-              </p>
-            </div>
-            <div className="my-7 flex flex-1 flex-col space-y-4 text-center">
-              <Image src={step2} alt="Step 2" className="mx-auto" />
-              <h3 className="font-semibold">Step 2</h3>
-              <p>Parents conveniently buy their child a SchoolKit with a click of a button.</p>
-            </div>
-            <div className="my-7 flex flex-1  flex-col space-y-4 text-center">
-              <Image src={step3} alt="Step 3" className="mx-auto" />
-              <h3 className="font-semibold">Step 3</h3>
-              <p>Our team delivers directly to your classroom. No need for pickup.</p>
-            </div>
-            <div className="my-7 flex flex-1  flex-col space-y-4 text-center">
-              <Image src={step4} alt="Step 4" className="mx-auto" />
-              <h3 className="font-semibold">Step 4</h3>
-              <p>
-                Send your child to school confidently knowing they have everything needed for
-                learning.
-              </p>
-            </div>
+            {steps.map((step, index) => (
+              <ScrollReveal
+                key={step.title}
+                delayMs={index * 90}
+                className={`flex flex-1 flex-col space-y-4 text-center ${index === 0 ? '' : 'my-7'}`}
+              >
+                <Image src={step.image} alt={step.title} className="mx-auto" />
+                <h3 className="font-semibold">{step.title}</h3>
+                <p>{step.description}</p>
+              </ScrollReveal>
+            ))}
           </div>
         </div>
-        {/* Why Choose SchoolKits section */}
-        <div className="mb-8 bg-[#F8FCFD] py-10 ">
-          <div className="mx-auto ">
-            <div className="flex flex-col lg:flex-row">
-              <div className="mb-8 w-full lg:mb-0 lg:w-1/2">
-                <div className="relative mx-auto h-64 max-w-[300px] sm:h-80 lg:h-full lg:max-w-none">
-                  <div className="absolute left-0 top-0 h-2/5 w-2/5 overflow-hidden rounded-full">
-                    <Image src={circle1} alt="Image 1" layout="fill" objectFit="cover" />
-                  </div>
-                  <div className="absolute bottom-0 right-0 h-2/5 w-2/5 overflow-hidden rounded-full">
-                    <Image src={circle2} alt="Image 2" layout="fill" objectFit="cover" />
-                  </div>
-                  <div className="absolute right-1/4 top-1/4 h-2/5 w-2/5 overflow-hidden rounded-full">
-                    <Image src={circle3} alt="Image 3" layout="fill" objectFit="cover" />
-                  </div>
-
-                  <div className="absolute left-1/4 top-1/4 h-8 w-8 rounded-full bg-[#70C8E5]"></div>
-                  <div className="absolute bottom-1/4 left-1/4 h-12 w-12 rounded-full bg-[#CCEBF5]"></div>
-                  <div className="absolute bottom-1/4 right-1/4 h-12 w-12 rounded-full bg-[#06D6A0]"></div>
-                  <div className="absolute right-1/4 top-1/4 h-6 w-6 rounded-full bg-[#FFD166]"></div>
-                </div>
-              </div>
-
-              <div className="relative w-full overflow-hidden lg:w-1/2 lg:pl-12 ">
-                <div className="px-4 py-12">
-                  <div className="absolute -bottom-8 -right-8 -z-10 h-64 w-64 rounded-full bg-[#FFE7AF] opacity-30"></div>
-
-                  <h2 className="mb-4 text-3xl font-semibold lg:text-4xl">
-                    Why Choose SchoolKits?
-                  </h2>
-                  <p className="mb-6">
-                    SchoolKits takes the hassle out of back-to-school shopping. We work directly
-                    with schools to ensure your child has exactly what they need for a successful
-                    year. Our custom-packed kits save you time and stress, while providing
-                    high-quality supplies approved by teachers.
-                  </p>
-                  <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    {[
-                      'Supports teachers by providing high-quality materials',
-                      'Grade-specific supplies curated for your school',
-                      "Direct delivery to your child's classroom",
-                      'Teacher-approved brands and products',
-                      'Time and money savings for busy parents',
-                      "Reduces teachers' administrative workload in managing supplies"
-                    ].map((item, index) => (
-                      <li key={index} className="flex items-center">
-                        <svg
-                          className="mr-2 flex-shrink-0 text-[#06D6A0]"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                          width="16"
-                          height="16"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        <span className="text-xs sm:text-sm">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div
-                  className="absolute bottom-0 right-0 h-[600px] w-[600px] rounded-full bg-[#FFE7AF] opacity-30"
-                  style={{ transform: 'translate(30%, 50%)' }}
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <WhyChooseSection
+          images={{ first: circle1, second: circle3, third: circle2 }}
+          items={whyChooseSchoolKits}
+        />
         {/*Testimonial */}
         <div className="mx-auto ">
-          <h2 className="mb-8 text-center text-4xl font-semibold">Parents love us</h2>
+          <ScrollReveal className="mb-8 text-center">
+            <h2 className="text-4xl font-semibold">Parents love us</h2>
+          </ScrollReveal>
           <Carousel />
         </div>
         {/*Brands */}
         <div className="mx-auto max-w-6xl bg-[#FCFCFD] px-4 py-8 lg:py-16">
-          <div className="text-center">
-            <h1 className="mb-4 text-2xl font-bold sm:text-3xl lg:text-4xl">
+          <ScrollReveal className="text-center">
+            <h2 className="mb-4 text-2xl font-bold sm:text-3xl lg:text-4xl">
               Teacher Approved Brands and Supplies
-            </h1>
+            </h2>
             <p className="mx-auto mb-6 max-w-2xl">
               SchoolKits provides reliable, top-notch products, exclusively using well-known brands
               and teacher-endorsed house brands, catering to a variety of needs.
             </p>
-          </div>
+          </ScrollReveal>
           <div className="grid grid-cols-2 justify-items-center gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {Brands.map((item, index) => (
-              <div key={index} className="flex items-center justify-center">
+              <ScrollReveal
+                key={index}
+                delayMs={index * 50}
+                className="flex items-center justify-center"
+              >
                 <Image
                   src={item.name}
                   width={100}
@@ -226,34 +192,37 @@ export default async function HomePage() {
                   alt={`brand-${index}`}
                   className="h-auto w-full max-w-[100px]"
                 />
-              </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
-        <FAQ />
+        <ScrollReveal className="mx-auto">
+          <FAQ />
+        </ScrollReveal>
         {/* New Shop Banner Section */}
         <div className="relative h-[400px] w-full overflow-hidden sm:h-[500px]">
           <Image
             src={bottomCTA}
             alt="School supplies"
-            layout="fill"
-            objectFit="cover"
+            fill
+            className="object-cover"
             quality={100}
           />
           <div className="absolute inset-0 bg-black bg-opacity-30" />
-          <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8">
+          <ScrollReveal
+            className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8"
+          >
             <h2 className="mb-4 text-3xl font-bold text-white sm:text-4xl md:text-5xl">
               Shop for a SchoolKit now!
             </h2>
             <p className="mb-8 max-w-2xl text-sm text-white sm:text-base md:text-lg">
-              Get your child ready for success with our curated school kits. Handpicked supplies,
-              teacher-approved, and delivered directly to the classroom. Start the school year right
-              - hassle-free!
+              Get the exact supplies your school requested, packed and delivered to the classroom
+              before the first day.
             </p>
             <Link href="/schools" className="rounded-full bg-[#0B80A7] px-6 py-3 font-bold text-white transition duration-300 hover:bg-[#096c8c]">
               Shop by school
             </Link>
-          </div>
+          </ScrollReveal>
         </div>
       </Suspense>
     </>

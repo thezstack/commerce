@@ -38,7 +38,6 @@ export default async function CategoryPage({
   const { sortKey, reverse } = sorting.find((item) => item.slug === sort) || defaultSort;
   
   const collection = await getCollection(collectionHandle);
-  console.log('collection', collectionHandle);
   let products = await getCollectionProducts({ collection: collectionHandle, sortKey, reverse });
   
   if (!collection) return notFound();

@@ -5,8 +5,8 @@ import clsx from 'clsx';
 import { removeItem } from 'components/cart/actions';
 import LoadingDots from 'components/loading-dots';
 import type { CartItem } from 'lib/shopify/types';
-import { useEffect } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState, useEffect } from 'react';
+import { useFormStatus } from 'react-dom';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -36,7 +36,7 @@ function SubmitButton() {
 }
 
 export function DeleteItemButton({ item }: { item: CartItem }) {
-  const [state, formAction] = useFormState(removeItem, {});
+  const [state, formAction] = useActionState(removeItem, {});
   const itemId = item.id;
   const actionWithVariant = formAction.bind(null, itemId);
 

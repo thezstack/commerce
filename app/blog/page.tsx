@@ -23,7 +23,6 @@ export default async function BlogPage() {
     // Fetch posts from the 'news' blog
     const fetchedPosts = await getBlogPosts(20, blogHandle);
     const message = `Found ${fetchedPosts.length} posts with handle '${blogHandle}'`;
-    console.log(message);
     debugInfo.push(message);
     
     // Sort by publish date (newest first)

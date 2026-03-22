@@ -26,6 +26,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
   const [isSavingNotes, setIsSavingNotes] = useState(false);
 
   const quantityRef = useRef(cart?.totalQuantity);
+  const hasInitializedQuantity = useRef(false);
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
 
@@ -50,6 +51,12 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
   }, []);
 
   useEffect(() => {
+    if (!hasInitializedQuantity.current) {
+      quantityRef.current = localCart?.totalQuantity;
+      hasInitializedQuantity.current = true;
+      return;
+    }
+
     if (localCart?.totalQuantity !== quantityRef.current) {
       if (!isOpen) {
         setIsOpen(true);

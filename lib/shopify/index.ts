@@ -349,14 +349,9 @@ export async function getCollectionProducts({
   });
 
   if (!res.body.data.collection) {
-    console.log(`No collection found for \`${collection}\``);
     return [];
   }
 
-  // Log the raw product data from Shopify for debugging
-  console.log(`Raw products from Shopify for collection ${collection}:`, 
-    res.body.data.collection.products.edges.length);
-  
   // Get all products without filtering
   const products = removeEdgesAndNodes(res.body.data.collection.products);
   

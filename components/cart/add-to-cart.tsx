@@ -5,9 +5,9 @@ import clsx from 'clsx';
 import { addItem } from 'components/cart/actions';
 import LoadingDots from 'components/loading-dots';
 import { ProductVariant } from 'lib/shopify/types';
-import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useActionState, useEffect, useState } from 'react';
+import { useFormStatus } from 'react-dom';
 
 function SubmitButton({
   availableForSale,
@@ -22,11 +22,7 @@ function SubmitButton({
   const disabledClasses = 'cursor-not-allowed opacity-60 hover:opacity-60';
 
   if (!availableForSale) {
-    return (
-      <button type="button" disabled className={clsx(buttonClasses, disabledClasses)}>
-        Out Of Stock
-      </button>
-    );
+    return null;
   }
 
   if (!selectedVariantId) {
@@ -68,13 +64,23 @@ function SubmitButton({
 
 export function AddToCart({
   variants,
-  availableForSale
+  availableForSale,
+  productTitle,
+  productHandle,
+  schoolName
 }: {
   variants: ProductVariant[];
   availableForSale: boolean;
+  productTitle: string;
+  productHandle: string;
+  schoolName?: string;
 }) {
-  const [state, formAction] = useFormState(addItem, {});
+  const [state, formAction] = useActionState(addItem, {});
+  const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
+  const [requestSubmitted, setRequestSubmitted] = useState(false);
+  const [requestError, setRequestError] = useState('');
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const defaultVariantId = variants.length === 1 ? variants[0]?.id : undefined;
   const variant = variants.find((variant: ProductVariant) =>
     variant.selectedOptions.every(
@@ -89,6 +95,66 @@ export function AddToCart({
       window.dispatchEvent(new CustomEvent('cart:updated'));
     }
   }, [state?.updatedAt]);
+
+  const submitRestockRequest = async () => {
+    setIsSubmittingRequest(true);
+    setRequestError('');
+
+    try {
+      const response = await fetch('/api/restock-request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          productName: productTitle,
+          productHandle,
+          schoolName: schoolName ?? '',
+          variantTitle: variant?.title === 'Default Title' ? '' : variant?.title ?? '',
+          pagePath: pathname
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        setRequestError(result.error || 'Failed to submit request. Please try again.');
+        return;
+      }
+
+      setRequestSubmitted(true);
+    } catch (error) {
+      console.error('Restock request failed:', error);
+      setRequestError('Failed to submit request. Please try again.');
+    } finally {
+      setIsSubmittingRequest(false);
+    }
+  };
+
+  if (!availableForSale) {
+    return (
+      <div className="space-y-3">
+        <button
+          type="button"
+          onClick={submitRestockRequest}
+          disabled={isSubmittingRequest || requestSubmitted}
+          className={clsx(
+            'relative flex w-full items-center justify-center rounded-full bg-[#0B80A7] p-4 tracking-wide text-white transition',
+            {
+              'hover:opacity-90': !isSubmittingRequest && !requestSubmitted,
+              'cursor-not-allowed opacity-70': isSubmittingRequest || requestSubmitted
+            }
+          )}
+        >
+          {isSubmittingRequest ? 'Sending request...' : requestSubmitted ? 'Request sent' : 'Request more inventory'}
+        </button>
+        <p className="text-sm leading-6 text-gray-600">
+          Out of stock right now. Send a quick request and we&apos;ll let our team know this kit needs attention.
+        </p>
+        {requestError ? <p className="text-sm text-[#B42318]">{requestError}</p> : null}
+      </div>
+    );
+  }
 
   return (
     <form action={actionWithVariant}>

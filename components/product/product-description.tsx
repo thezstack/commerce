@@ -76,7 +76,13 @@ export function ProductDescription({ product }: { product: Product }) {
 
       <VariantSelector options={product.options} variants={product.variants} />
       <Suspense>
-        <AddToCart variants={product.variants} availableForSale={totalInventory > 0 && product.availableForSale} />
+        <AddToCart
+          variants={product.variants}
+          availableForSale={totalInventory > 0 && product.availableForSale}
+          productTitle={product.title}
+          productHandle={product.handle}
+          schoolName={product.collection}
+        />
       </Suspense>
     </div>
   );
