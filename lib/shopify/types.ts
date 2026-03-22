@@ -325,6 +325,15 @@ export type ShopifyProductRecommendationsOperation = {
   };
 };
 
+export type ShopifyProductsByIdsOperation = {
+  data: {
+    nodes: Array<ShopifyProduct | null>;
+  };
+  variables: {
+    ids: string[];
+  };
+};
+
 export type ShopifyProductsOperation = {
   data: {
     products: Connection<ShopifyProduct>;

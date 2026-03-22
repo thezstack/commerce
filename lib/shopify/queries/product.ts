@@ -37,3 +37,14 @@ export const getProductRecommendationsQuery = /* GraphQL */ `
   }
   ${productFragment}
 `;
+
+export const getProductsByIdsQuery = /* GraphQL */ `
+  query getProductsByIds($ids: [ID!]!) {
+    nodes(ids: $ids) {
+      ... on Product {
+        ...product
+      }
+    }
+  }
+  ${productFragment}
+`;

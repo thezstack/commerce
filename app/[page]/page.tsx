@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 
 import ContactForm from 'components/contact';
 import Prose from 'components/prose';
-import Stores from 'components/stores';
 import { getPage } from 'lib/shopify';
 import { notFound } from 'next/navigation';
 export const revalidate = 60; // 12 hours in seconds
@@ -44,13 +43,6 @@ export default async function Page({
         <ContactForm />
       </>
     );
-  }
-  if(page.handle === 'schools'){
-    return(
-      <>
-      <Stores/>
-      </>
-    )
   }
   return (
     <>
