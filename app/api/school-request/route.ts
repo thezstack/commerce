@@ -1,12 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
-const SchoolRequestSchema = z.object({
-  schoolName: z.string().min(1),
-  schoolSlug: z.string().optional().default(''),
-  persona: z.enum(['parent', 'school_admin']),
-  context: z.enum(['kits_unavailable', 'school_not_found'])
-});
+const optionalTrimmedString = z.preprocess(
+  (value) => (typeof value === 'string' ? value.trim() : ''),
+  z.string()
+);
+
+const SchoolRequestSchema = z
+  .object({
+    schoolName: optionalTrimmedString.transform((value) => value || 'Unknown school request'),
+    schoolSlug: optionalTrimmedString.optional().default(''),
+    persona: z.enum(['parent', 'school_admin']),
+    context: z.enum(['kits_unavailable', 'school_not_found']).catch('school_not_found'),
+    contactName: optionalTrimmedString.pipe(z.string().min(1).max(120)),
+    contactEmail: z
+      .union([optionalTrimmedString.pipe(z.string().email()), z.literal('')])
+      .optional()
+      .default(''),
+    contactMessage: optionalTrimmedString.pipe(z.string().max(1000)).optional().default('')
+  })
+  .superRefine((data, context) => {
+    if (!data.contactEmail) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Contact email is required.',
+        path: ['contactEmail']
+      });
+    }
+  });
 
 function getCoreApiBaseUrl(): string | null {
   const url = process.env.CORE_API_URL;
@@ -29,7 +50,11 @@ export async function POST(request: NextRequest) {
 
     const personaLabel = validated.persona === 'parent' ? 'Parent' : 'Teacher/Admin';
     const contextLabel =
-      validated.context === 'kits_unavailable' ? 'Kits unavailable on school page' : 'School not found in search';
+      validated.context === 'kits_unavailable'
+        ? 'Kits unavailable on school page'
+        : 'School not found in search';
+    const fullName = validated.contactName;
+    const email = validated.contactEmail;
 
     const coreResponse = await fetch(`${coreApiBaseUrl}/api/contact`, {
       method: 'POST',
@@ -37,14 +62,15 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        fullName: `${personaLabel} school request`,
-        email: 'school-request@schoolkits.org',
+        fullName,
+        email,
         school: validated.schoolName,
         message: [
           `Type: School request`,
           `Persona: ${personaLabel}`,
           `Context: ${contextLabel}`,
-          validated.schoolSlug ? `School slug: ${validated.schoolSlug}` : null
+          validated.schoolSlug ? `School slug: ${validated.schoolSlug}` : null,
+          validated.contactMessage ? `Contact note: ${validated.contactMessage}` : null
         ]
           .filter(Boolean)
           .join('\n')
@@ -61,7 +87,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ success: false, error: 'Invalid request.' }, { status: 400 });
+      console.error('Invalid school request submission:', error.errors);
+      return NextResponse.json(
+        { success: false, error: 'Please enter your name and email, then try again.' },
+        { status: 400 }
+      );
     }
 
     console.error('School request submission failed:', error);
