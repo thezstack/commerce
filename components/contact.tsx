@@ -20,7 +20,9 @@ const ContactForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [error, setError] = useState('');
-  const [validationErrors, setValidationErrors] = useState<{field: string, message: string}[]>([]);
+  const [validationErrors, setValidationErrors] = useState<{ field: string; message: string }[]>(
+    []
+  );
   const searchParams = useSearchParams();
 
   const schoolFromQuery = useMemo(() => {
@@ -35,23 +37,32 @@ const ContactForm = ({
 
   const resolvedSchool = (prefillSchool || schoolFromQuery).trim();
   const resolvedPersona = (metadata?.persona || personaFromQuery).trim();
-  
+
+  const fieldErrors = useMemo(() => {
+    return validationErrors.reduce<Record<string, string>>((errors, validationError) => {
+      errors[validationError.field] = validationError.message;
+      return errors;
+    }, {});
+  }, [validationErrors]);
+
   // References for form fields
   const fullNameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const messageRef = useRef<HTMLTextAreaElement>(null);
-  
+
   // Load the reCAPTCHA v3 script
   useEffect(() => {
     // Only load if not already loaded
     if (!window.grecaptcha && !document.querySelector('script[src*="recaptcha"]')) {
       const script = document.createElement('script');
-      script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LcKwFErAAAAALq-9tSJhg_6-RPVD_qhfOUojw1l'}`;
+      script.src = `https://www.google.com/recaptcha/api.js?render=${
+        process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LcKwFErAAAAALq-9tSJhg_6-RPVD_qhfOUojw1l'
+      }`;
       script.async = true;
       script.defer = true;
       document.head.appendChild(script);
     }
-    
+
     return () => {
       // Cleanup if component unmounts
       const script = document.querySelector('script[src*="recaptcha"]');
@@ -60,18 +71,18 @@ const ContactForm = ({
       }
     };
   }, []);
-  
+
   // Function to get reCAPTCHA token
   const getRecaptchaToken = async (): Promise<string> => {
     if (!window.grecaptcha) {
       console.error('reCAPTCHA not loaded');
       return '';
     }
-    
+
     try {
       const token = await window.grecaptcha.execute(
-        process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LcKwFErAAAAALq-9tSJhg_6-RPVD_qhfOUojw1l', 
-        {action: 'contact_form'}
+        process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LcKwFErAAAAALq-9tSJhg_6-RPVD_qhfOUojw1l',
+        { action: 'contact_form' }
       );
       return token;
     } catch (error) {
@@ -79,7 +90,7 @@ const ContactForm = ({
       return '';
     }
   };
-  
+
   // Form submission handler with API endpoint
   const handleFormSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -115,20 +126,20 @@ const ContactForm = ({
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData)
       });
 
       const result = await response.json();
-      
+
       if (result.success) {
         setSubmitSuccess(true);
         onSuccess?.();
       } else if (result.error) {
         // Display the error message from the server
-        setError(result.error);
-        
+        setError(result.validationErrors ? '' : result.error);
+
         // Handle validation errors if present
         if (result.validationErrors) {
           setValidationErrors(result.validationErrors);
@@ -154,9 +165,33 @@ const ContactForm = ({
     );
   }
 
+  const inputClassName = (fieldName: string) =>
+    `w-full rounded-md border p-2 text-sm ${
+      fieldErrors[fieldName]
+        ? 'border-red-500 bg-red-50 focus:border-red-500 focus:outline-red-500'
+        : ''
+    }`;
+
+  const fieldErrorMessage = (fieldName: string) =>
+    fieldErrors[fieldName] ? (
+      <p id={`${fieldName}-error`} className="mt-1 text-sm text-red-600">
+        {fieldErrors[fieldName]}
+      </p>
+    ) : null;
+
   return (
-    <div className={variant === 'modal' ? "font-['Open Sans']" : "mx-auto max-w-6xl p-4 sm:p-6 lg:p-8 font-['Open Sans']"}>
-      <div className={variant === 'modal' ? 'grid gap-4 sm:grid-cols-2' : 'flex flex-col gap-8 lg:flex-row'}>
+    <div
+      className={
+        variant === 'modal'
+          ? "font-['Open Sans']"
+          : "font-['Open Sans'] mx-auto max-w-6xl p-4 sm:p-6 lg:p-8"
+      }
+    >
+      <div
+        className={
+          variant === 'modal' ? 'grid gap-4 sm:grid-cols-2' : 'flex flex-col gap-8 lg:flex-row'
+        }
+      >
         {variant === 'page' ? (
           <div className="lg:w-1/2">
             <h1 className="mb-4 text-2xl font-bold sm:text-3xl lg:text-4xl">Partner with us</h1>
@@ -166,15 +201,17 @@ const ContactForm = ({
               </p>
             ) : null}
             <p className="mb-6 text-sm sm:text-base lg:text-lg">
-            We work closely with schools to create customized supply kits that meet exact
+              We work closely with schools to create customized supply kits that meet exact
               classroom requirements, saving time and reducing stress for everyone involved.
             </p>
-            <p className="mb-4 text-sm sm:text-base lg:text-lg">By partnering with SchoolKits, you'll:</p>
+            <p className="mb-4 text-sm sm:text-base lg:text-lg">
+              By partnering with SchoolKits, you'll:
+            </p>
             <ul className="mb-6 space-y-2">
               {[
-                "Ensure all students have the right materials from day one",
-                "Reduce administrative workload for teachers and staff",
-                "Offer a convenient, hassle-free option for parents"
+                'Ensure all students have the right materials from day one',
+                'Reduce administrative workload for teachers and staff',
+                'Offer a convenient, hassle-free option for parents'
               ].map((item, index) => (
                 <li key={index} className="flex items-center">
                   <svg
@@ -195,7 +232,8 @@ const ContactForm = ({
               ))}
             </ul>
             <p className="mb-6 text-sm sm:text-base lg:text-lg">
-              Let's work together to create a smoother back-to-school season. Fill out the form below to start the conversation about bringing SchoolKits to your school.
+              Let's work together to create a smoother back-to-school season. Fill out the form
+              below to start the conversation about bringing SchoolKits to your school.
             </p>
           </div>
         ) : (
@@ -211,48 +249,75 @@ const ContactForm = ({
         <div className={variant === 'modal' ? 'sm:col-span-2' : 'lg:w-1/2'}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="fullName" className="mb-1 block text-sm font-medium">
+              <label htmlFor="fullName" className="mb-1 block text-sm font-medium text-[#073B4C]">
                 Full name
               </label>
               <input
                 type="text"
                 id="fullName"
                 name="fullName"
-                className="w-full rounded-md border p-2 text-sm"
+                className={inputClassName('fullName')}
                 required
                 ref={fullNameRef}
+                aria-invalid={Boolean(fieldErrors.fullName)}
+                aria-describedby={fieldErrors.fullName ? 'fullName-error' : undefined}
               />
+              {fieldErrorMessage('fullName')}
             </div>
             <div>
-              <label htmlFor="email" className="mb-1 block text-sm font-medium">
+              <label htmlFor="email" className="mb-1 block text-sm font-medium text-[#073B4C]">
                 Email address
               </label>
               <input
                 type="email"
                 id="email"
                 name="email"
-                className="w-full rounded-md border p-2 text-sm"
+                className={inputClassName('email')}
                 required
                 ref={emailRef}
+                aria-invalid={Boolean(fieldErrors.email)}
+                aria-describedby={fieldErrors.email ? 'email-error' : undefined}
               />
+              {fieldErrorMessage('email')}
             </div>
             <div>
-              <label htmlFor="message" className="mb-1 block text-sm font-medium">
+              <label htmlFor="message" className="mb-1 block text-sm font-medium text-[#073B4C]">
                 Message
               </label>
               <textarea
                 id="message"
                 name="message"
                 rows={variant === 'modal' ? 5 : 4}
-                className="w-full rounded-md border p-2 text-sm"
+                className={inputClassName('message')}
                 required
                 ref={messageRef}
-              ></textarea>
+                aria-invalid={Boolean(fieldErrors.message)}
+                aria-describedby={fieldErrors.message ? 'message-error' : undefined}
+              />
+              {fieldErrorMessage('message')}
             </div>
             <div className="my-4 text-xs text-gray-500">
               This form is protected by reCAPTCHA and the Google
-              <a href="https://policies.google.com/privacy" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer"> Privacy Policy</a> and
-              <a href="https://policies.google.com/terms" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer"> Terms of Service</a> apply.
+              <a
+                href="https://policies.google.com/privacy"
+                className="text-blue-500 hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {' '}
+                Privacy Policy
+              </a>{' '}
+              and
+              <a
+                href="https://policies.google.com/terms"
+                className="text-blue-500 hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {' '}
+                Terms of Service
+              </a>{' '}
+              apply.
             </div>
 
             <button
@@ -265,16 +330,6 @@ const ContactForm = ({
             </button>
 
             {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
-
-            {validationErrors.length > 0 && (
-              <div className="mt-2 text-sm text-red-500">
-                <ul>
-                  {validationErrors.map((err, index) => (
-                    <li key={index}>{err.field}: {err.message}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
           </div>
         </div>
       </div>

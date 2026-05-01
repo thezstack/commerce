@@ -2,6 +2,7 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 import CookieConsentBanner from 'components/layout/cookie-consent';
 import Footer from 'components/layout/footer';
 import Navbar from 'components/layout/navbar';
+import TefaSchoolBanner from 'components/layout/tefa-school-banner';
 import { ensureStartsWith } from 'lib/utils';
 import { Open_Sans } from 'next/font/google';
 import { ReactNode, Suspense } from 'react';
@@ -40,14 +41,18 @@ export const metadata = {
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={openSans.className}>
+    <html lang="en" className={`${openSans.className} scroll-smooth`}>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
       </head>
       <body className="flex min-h-svh flex-col bg-neutral-50 text-black selection:bg-teal-300">
         <GoogleAnalytics gaId="G-4SWM464SP9" />
         <Suspense>
           <Navbar />
+          <TefaSchoolBanner />
           <main className="flex-1">{children}</main>
           <Footer />
           <CookieConsentBanner />
