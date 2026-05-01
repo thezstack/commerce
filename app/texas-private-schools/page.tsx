@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import bottomCta from '../../media/Frame 37280bottom_cta.png';
 import littlePerson from '../../media/little_person_homePage.png';
+import classroomStudents from '../../media/tefa-classroom-students.png';
 
 export const metadata: Metadata = {
   title: 'TEFA Approved School Supply Kits for Texas Private Schools',
@@ -126,6 +127,21 @@ export default function TexasPrivateSchoolsPage() {
                 <p className="mt-2 text-sm leading-6 text-[#315565]">{step.description}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-6xl overflow-hidden rounded-3xl border border-[#D9EEF4] bg-[#F8FCFD] shadow-[0_14px_34px_rgba(11,128,167,0.08)]">
+          <div className="relative aspect-[16/7] min-h-[240px]">
+            <Image
+              src={classroomStudents}
+              alt="Students working with classroom supplies"
+              fill
+              sizes="(min-width: 1024px) 1152px, 100vw"
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#073B4C]/35 via-transparent to-transparent" />
           </div>
         </div>
       </section>
