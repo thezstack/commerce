@@ -1,0 +1,37 @@
+'use client';
+
+import { X } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
+
+export default function TefaSchoolBanner() {
+  const pathname = usePathname();
+  const [isVisible, setIsVisible] = useState(true);
+
+  if (!isVisible || pathname === '/texas-private-schools') {
+    return null;
+  }
+
+  return (
+    <div className="border-b border-[#B7E5F2] bg-[#EAF8FC]">
+      <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 text-sm text-[#073B4C] sm:px-6 lg:px-8">
+        <Link
+          href="/texas-private-schools"
+          className="min-w-0 flex-1 font-semibold underline-offset-4 hover:underline"
+        >
+          Texas private schools: SchoolKits is TEFA approved for school supply kits.
+          <span className="ml-1 whitespace-nowrap text-[#0B80A7]">Contact us</span>
+        </Link>
+        <button
+          type="button"
+          aria-label="Dismiss TEFA banner"
+          onClick={() => setIsVisible(false)}
+          className="flex h-8 w-8 flex-none items-center justify-center rounded-full text-[#0B80A7] hover:bg-white"
+        >
+          <X className="h-4 w-4" aria-hidden="true" />
+        </button>
+      </div>
+    </div>
+  );
+}
