@@ -10,10 +10,23 @@ type SchoolSearchApiRecord = {
   status: 'available' | 'limited' | 'coming_soon';
 };
 
+type SchoolOffering = {
+  id: number;
+  name: string;
+  listType: string;
+  gradeId: number | null;
+  gradeName: string | null;
+  shopifyProductId: string | null;
+  shopifyVariantId: string | null;
+  finalPrice: number | null;
+  isParentFacing: boolean;
+};
+
 type SchoolDetailApiRecord = SchoolSearchApiRecord & {
   address: string | null;
   zipCode: string | null;
   isFulfilledBySchoolKits: boolean;
+  offerings: SchoolOffering[];
   grades: Array<{
     id: number;
     name: string;
@@ -35,6 +48,7 @@ type SchoolDetailApiResponse = {
 
 export type SchoolSearchResult = SchoolSearchApiRecord;
 export type SchoolDetail = SchoolDetailApiRecord;
+export type { SchoolOffering };
 
 const getCoreApiBase = () => process.env.CORE_API_URL?.replace(/\/$/, '') ?? '';
 
