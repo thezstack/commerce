@@ -134,6 +134,10 @@ const ContactForm = ({
       const result = await response.json();
 
       if (result.success) {
+        window.gtag?.('event', 'school_contact_form_submit', {
+          event_category: 'lead',
+          event_label: resolvedPersona || 'contact_form'
+        });
         setSubmitSuccess(true);
         onSuccess?.();
       } else if (result.error) {
