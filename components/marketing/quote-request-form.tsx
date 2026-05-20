@@ -25,6 +25,7 @@ export default function QuoteRequestForm() {
   const fileInputId = useId();
   const [fullName, setFullName] = useState('');
   const [contactInfo, setContactInfo] = useState('');
+  const [notes, setNotes] = useState('');
   const [supplyListFile, setSupplyListFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -117,9 +118,11 @@ export default function QuoteRequestForm() {
 
     try {
       const uploadedFile = await uploadSupplyListFile();
+      const trimmedNotes = notes.trim();
       const messageWithFile = [
         'Quote request landing page',
         `Preferred contact: ${trimmedContactInfo}`,
+        trimmedNotes ? `Notes: ${trimmedNotes}` : null,
         uploadedFile
           ? [
               'Supply list upload:',
@@ -225,6 +228,16 @@ export default function QuoteRequestForm() {
             PDF, Word, Excel, CSV, JPG, or PNG. Max 10 MB.
           </span>
         </div>
+        <label className="text-sm font-semibold text-[#073B4C]">
+          Notes <span className="font-normal text-[#647985]">(optional)</span>
+          <textarea
+            value={notes}
+            onChange={(event) => setNotes(event.target.value)}
+            rows={3}
+            placeholder="Add school name, grade range, timing, or anything we should know."
+            className="mt-1 w-full resize-none rounded-md border border-[#D7EEF5] px-3 py-2 text-sm font-normal outline-none focus:border-[#0B80A7]"
+          />
+        </label>
       </div>
       <p className="mt-4 text-xs leading-5 text-[#647985]">
         This form is protected by reCAPTCHA. Please do not include student personal information.
