@@ -18,6 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '',
     '/for-schools',
     '/for-schools-quote',
+    '/texas-private-schools',
     '/privacy-policy',
     '/terms',
     '/affiliate-disclosure'
