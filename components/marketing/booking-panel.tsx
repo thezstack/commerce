@@ -15,6 +15,7 @@ type WindowWithGoogleScheduling = Window & {
   calendar?: {
     schedulingButton?: GoogleSchedulingButton;
   };
+  gtag?: (command: 'event', eventName: string, params?: Record<string, string>) => void;
 };
 
 const scriptSrc = 'https://calendar.google.com/calendar/scheduling-button-script.js';
@@ -22,6 +23,13 @@ const stylesheetHref = 'https://calendar.google.com/calendar/scheduling-button-s
 
 export default function BookingPanel({ bookingUrl }: BookingPanelProps) {
   const buttonTargetRef = useRef<HTMLDivElement>(null);
+
+  const trackBookingClick = () => {
+    (window as WindowWithGoogleScheduling).gtag?.('event', 'for_schools_booking_click', {
+      event_category: 'lead',
+      event_label: 'google_calendar_booking_button'
+    });
+  };
 
   useEffect(() => {
     if (!bookingUrl || !buttonTargetRef.current) return;
@@ -101,7 +109,7 @@ export default function BookingPanel({ bookingUrl }: BookingPanelProps) {
           </p>
         </div>
       </div>
-      <div ref={buttonTargetRef} className="mt-5" />
+      <div ref={buttonTargetRef} onClickCapture={trackBookingClick} className="mt-5" />
     </div>
   );
 }

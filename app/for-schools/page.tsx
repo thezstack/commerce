@@ -68,7 +68,7 @@ export default function ForSchoolsPage() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <TrackedLink
                 href="#book-call"
-                eventName="for_schools_cta_click"
+                eventName="for_schools_booking_click"
                 eventLabel="hero_book_call_primary"
                 className="inline-flex items-center justify-center rounded-full bg-[#0B80A7] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#096c8c]"
               >
