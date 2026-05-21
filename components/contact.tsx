@@ -138,6 +138,10 @@ const ContactForm = ({
           event_category: 'lead',
           event_label: resolvedPersona || 'contact_form'
         });
+        window.gtag?.('event', 'ads_conversion_submit_lead_form', {
+          event_category: 'lead',
+          event_label: resolvedPersona || 'contact_form'
+        });
         setSubmitSuccess(true);
         onSuccess?.();
       } else if (result.error) {

@@ -159,6 +159,10 @@ export default function QuoteRequestForm() {
         event_category: 'lead',
         event_label: 'one_hour_quote_page'
       });
+      (window as WindowWithGtag).gtag?.('event', 'ads_conversion_submit_lead_form', {
+        event_category: 'lead',
+        event_label: 'one_hour_quote_page'
+      });
       setSuccess(true);
     } catch {
       setError('Could not send the request. Please try again.');
