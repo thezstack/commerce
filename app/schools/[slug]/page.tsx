@@ -38,8 +38,9 @@ export default async function SchoolDetailPage({ params }: SchoolPageParams) {
     notFound();
   }
 
+  const source = school.offerings?.length > 0 ? school.offerings : school.grades;
   const productIds = Array.from(
-    new Set(school.grades.flatMap((grade) => (grade.shopifyProductId ? [grade.shopifyProductId] : [])))
+    new Set(source.flatMap((item) => (item.shopifyProductId ? [item.shopifyProductId] : [])))
   );
   const products = productIds.length > 0 ? await getProductsByIds(productIds) : [];
   const location = [school.city, school.state].filter(Boolean).join(', ');
