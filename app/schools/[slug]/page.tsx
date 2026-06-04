@@ -1,7 +1,7 @@
-import ProductGridItems from 'components/layout/product-grid-items';
 import SchoolRequestActions from 'components/schools/school-request-actions';
 import { getProductsByIds } from 'lib/shopify';
 import { getSchoolBySlug } from 'lib/schools';
+import { ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -9,6 +9,12 @@ import { notFound } from 'next/navigation';
 type SchoolPageParams = {
   params: Promise<{ slug: string }>;
 };
+
+const formatPrice = (amount: string) =>
+  new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  }).format(Number(amount));
 
 export async function generateMetadata({ params }: SchoolPageParams): Promise<Metadata> {
   const { slug } = await params;
@@ -44,42 +50,140 @@ export default async function SchoolDetailPage({ params }: SchoolPageParams) {
   );
   const products = productIds.length > 0 ? await getProductsByIds(productIds) : [];
   const location = [school.city, school.state].filter(Boolean).join(', ');
+  const isOfficialSchoolKit = school.isFulfilledBySchoolKits;
+  const heroTitle = `${school.name} kits`;
+  const heroDescription = isOfficialSchoolKit
+    ? `We use ${school.name}'s official supply lists, then pack each grade as one kit. Pick your child's grade below.`
+    : `Pick an available grade kit below. You can review the supplies before adding it to your cart.`;
 
   return (
-    <div className="container mx-auto px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
-      <div className="mx-auto max-w-6xl">
-        <Link href="/schools" className="text-sm font-medium text-[#0B80A7] hover:underline">
+    <div className="bg-white">
+      <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 lg:px-8 lg:py-5">
+        <Link
+          href="/schools"
+          className="inline-flex text-sm font-semibold text-[#0B80A7] hover:underline"
+        >
           Back to school search
         </Link>
+      </div>
 
-        <section className="mt-5 rounded-[2rem] bg-[#F4FDFF] px-6 py-8 sm:px-8 lg:px-10">
-          <div className="max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#0B80A7]">School</p>
-            <div className="mt-3 flex items-start gap-3 sm:items-center sm:gap-4">
+      <section className="border-y border-[#D9EEF4] bg-[#F4FDFF]">
+        <div className="mx-auto grid max-w-6xl gap-5 px-4 py-5 sm:px-6 sm:py-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-start lg:px-8 lg:py-8">
+          <div>
+            <div className="flex items-start gap-3 sm:gap-4">
               {school.logoUrl ? (
                 <img
                   src={school.logoUrl}
                   alt={`${school.name} logo`}
-                  className="h-14 w-14 shrink-0 rounded-full border border-[#D9EEF4] bg-white object-contain p-2 sm:h-20 sm:w-20"
+                  className="h-12 w-12 shrink-0 rounded-lg border border-[#D9EEF4] bg-white object-contain p-1.5 sm:h-16 sm:w-16 sm:p-2"
                 />
               ) : null}
-              <h1 className="min-w-0 break-words text-3xl font-bold leading-tight tracking-tight text-black sm:text-5xl">
-                {school.name}
-              </h1>
+              <div className="min-w-0">
+                <p className="text-[11px] font-bold uppercase text-[#0B80A7] sm:text-xs">
+                  {isOfficialSchoolKit ? 'Fulfilled by School Kits' : 'School kit page'}
+                </p>
+                <h1 className="mt-1.5 break-words text-2xl font-bold leading-tight text-black sm:text-4xl lg:text-[42px]">
+                  {heroTitle}
+                </h1>
+                <p className="mt-2 text-sm font-semibold text-[#315565] sm:text-base">
+                  {location || 'School Kits'}
+                </p>
+              </div>
             </div>
-            <p className="mt-4 text-base leading-7 text-gray-600">{location || 'School Kits'}</p>
-          </div>
-        </section>
 
-        <section className="mt-10">
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-[#315565] sm:text-base sm:leading-7">
+              {heroDescription}
+            </p>
+
+            <p className="mt-4 text-sm font-semibold text-[#102A33]">
+              One kit covers one student for one grade.
+            </p>
+          </div>
+
           {products.length > 0 ? (
-            <ProductGridItems products={products} />
+            <div className="hidden self-start rounded-lg border border-[#B8DDE7] bg-white p-4 shadow-sm sm:p-5 md:block">
+              <p className="text-sm font-bold uppercase text-[#0B80A7]">Ordering note</p>
+              <h2 className="mt-1.5 text-xl font-bold text-black sm:text-2xl">
+                Buying for siblings?
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-gray-600">
+                Add each child&apos;s grade kit to the same cart before checkout.
+              </p>
+              <a
+                href="#grade-kits"
+                className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-[#0B80A7] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#096B8C]"
+              >
+                View grade kits
+                <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+              </a>
+            </div>
+          ) : null}
+        </div>
+      </section>
+
+      <div className="mx-auto max-w-6xl px-4 py-7 sm:px-6 lg:px-8 lg:py-9">
+        <section id="grade-kits">
+          <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-black">Choose a grade</h2>
+              <p className="mt-1 text-sm leading-6 text-gray-600">
+                Tap a kit to see the supplies and order.
+              </p>
+            </div>
+          </div>
+
+          {products.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {products.map((product) => {
+                const price = product.priceRange.minVariantPrice.amount;
+                const compareAtPrice = product.compareAtPriceRange?.minVariantPrice?.amount;
+                const isOnSale = compareAtPrice && Number(compareAtPrice) > Number(price);
+
+                return (
+                  <Link
+                    key={product.id}
+                    href={`/product/${product.handle}`}
+                    className="group flex min-h-32 flex-col justify-between rounded-lg border border-[#D9EEF4] bg-white p-4 shadow-sm transition hover:border-[#0B80A7] hover:shadow-md sm:min-h-36 sm:p-5"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        {isOnSale ? (
+                          <p className="mb-2 inline-flex rounded-full bg-[#E6F6FB] px-3 py-1 text-xs font-bold text-[#0B80A7]">
+                            Sale
+                          </p>
+                        ) : null}
+                        <h3 className="text-lg font-bold leading-tight text-black sm:text-xl">
+                          {product.title}
+                        </h3>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <p className="text-xl font-bold text-[#0B80A7] sm:text-2xl">
+                          {formatPrice(price)}
+                        </p>
+                        {isOnSale ? (
+                          <p className="text-sm text-gray-400 line-through">
+                            {formatPrice(compareAtPrice)}
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+                    <div className="mt-5 inline-flex items-center text-sm font-bold text-[#0B80A7]">
+                      Order this kit
+                      <ArrowRight
+                        className="ml-2 h-4 w-4 transition group-hover:translate-x-1"
+                        aria-hidden="true"
+                      />
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
           ) : (
-            <div className="rounded-[1.75rem] border border-dashed border-[#D9EEF4] bg-white px-6 py-10 text-center">
+            <div className="rounded-lg border border-dashed border-[#D9EEF4] bg-white px-6 py-10 text-center">
               <h2 className="text-2xl font-semibold text-black">Kits are not online yet</h2>
               <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-gray-600">
-                Kits for this school are not available to order online right now. If you would like this school reviewed,
-                send a quick request below.
+                Kits for this school are not available to order online right now. If you would like
+                this school reviewed, send a quick request below.
               </p>
               <SchoolRequestActions
                 schoolName={school.name}

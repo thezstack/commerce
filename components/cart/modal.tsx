@@ -18,6 +18,28 @@ type MerchandiseSearchParams = {
   [key: string]: string;
 };
 
+type WindowWithGtag = Window & {
+  gtag?: (
+    command: 'event',
+    eventName: string,
+    params?: {
+      currency?: string;
+      value?: number;
+      page_location?: string;
+      event_callback?: () => void;
+      event_timeout?: number;
+      items?: Array<{
+        item_id: string;
+        item_name: string;
+        item_variant?: string;
+        item_category?: string;
+        price?: number;
+        quantity?: number;
+      }>;
+    }
+  ) => void;
+};
+
 export default function CartModal({ cart }: { cart: Cart | undefined }) {
   const [isOpen, setIsOpen] = useState(false);
   const [childNames, setChildNames] = useState<{ [key: string]: string[] }>({});
@@ -40,18 +62,18 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
     window.addEventListener('cart:open', handleCartOpen);
     return () => window.removeEventListener('cart:open', handleCartOpen);
   }, []);
-  
+
   // Handle page visibility changes to ensure clean state when returning from checkout
-  useEffect(() => {    
+  useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         // When returning to the page, ensure cart modal is closed
         setIsOpen(false);
       }
     };
-    
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    
+
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
@@ -96,7 +118,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
       console.error('Error saving child names to local storage:', error);
     }
 
-     validateChildNames(updatedChildNames);
+    validateChildNames(updatedChildNames);
   }, [localCart?.lines]);
 
   const handleChildNameChange = (lineId: string, index: number, value: string) => {
@@ -118,8 +140,8 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
   };
 
   const validateChildNames = (names: { [key: string]: string[] }) => {
-    const isValid = Object.values(names).every((nameArray) => 
-      nameArray.length > 0 && nameArray.every((name) => name.trim() !== '')
+    const isValid = Object.values(names).every(
+      (nameArray) => nameArray.length > 0 && nameArray.every((name) => name.trim() !== '')
     );
     setIsCheckoutDisabled(!isValid);
   };
@@ -160,20 +182,20 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
       if (localCart && Object.keys(childNames).length > 0) {
         try {
           const notes = prepareShopifyNotes();
-          
+
           // Use the API endpoint instead of server action
           const response = await fetch('/api/cart/notes', {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json',
+              'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ notes }),
+            body: JSON.stringify({ notes })
           });
-          
+
           if (!response.ok) {
             throw new Error('Failed to update cart notes');
           }
-          
+
           // We don't need to do anything with the result here
           // Just silently update the notes in the background
         } catch (error) {
@@ -193,20 +215,20 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
       alert('Please enter names for all children before proceeding to checkout.');
       return false;
     }
-    
+
     setIsSavingNotes(true);
-    
+
     try {
       const notes = prepareShopifyNotes();
       const result = await updateCartNotes(notes);
-      
+
       if (result.error) {
         console.error('Error updating cart notes:', result.error);
         alert('There was an error updating your cart. Please try again.');
         setIsSavingNotes(false);
         return false;
       }
-      
+
       setIsSavingNotes(false);
       return true;
     } catch (error) {
@@ -216,22 +238,71 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
     }
   };
 
+  const trackBeginCheckout = (checkoutUrl: string) => {
+    if (!localCart || localCart.lines.length === 0) {
+      window.location.href = checkoutUrl;
+      return;
+    }
+
+    const value = Number(localCart.cost.totalAmount.amount);
+    const currency = localCart.cost.totalAmount.currencyCode;
+    const gtag = (window as WindowWithGtag).gtag;
+    let didRedirect = false;
+    const redirectToCheckout = () => {
+      if (didRedirect) {
+        return;
+      }
+
+      didRedirect = true;
+      window.location.href = checkoutUrl;
+    };
+
+    if (!gtag) {
+      redirectToCheckout();
+      return;
+    }
+
+    gtag('event', 'begin_checkout', {
+      currency,
+      value,
+      page_location: window.location.href,
+      event_callback: redirectToCheckout,
+      event_timeout: 800,
+      items: localCart.lines.map((item) => {
+        const quantity = item.quantity;
+        const totalAmount = Number(item.cost.totalAmount.amount);
+        const price = quantity > 0 ? totalAmount / quantity : totalAmount;
+
+        return {
+          item_id: item.merchandise.product.handle || item.merchandise.product.id,
+          item_name: item.merchandise.product.title,
+          item_variant:
+            item.merchandise.title === DEFAULT_OPTION ? undefined : item.merchandise.title,
+          item_category: item.merchandise.product.collection,
+          price,
+          quantity
+        };
+      })
+    });
+
+    window.setTimeout(redirectToCheckout, 900);
+  };
+
   // This function handles the checkout button click
   const handleCheckout = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    
+
     if (isCheckoutDisabled) {
       alert('Please enter names for all children before proceeding to checkout.');
       return;
     }
-    
+
     // Simply close the cart modal and navigate to the checkout URL
     // The cart notes have already been saved in the background
     setIsOpen(false);
-    
+
     if (localCart?.checkoutUrl) {
-      // For Safari compatibility, use a simple window.location.href
-      window.location.href = localCart.checkoutUrl;
+      trackBeginCheckout(localCart.checkoutUrl);
     }
   };
 
@@ -262,14 +333,14 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
             leaveFrom="translate-x-0"
             leaveTo="translate-x-full"
           >
-            <Dialog.Panel className="fixed bottom-0 right-0 top-0 flex h-full w-full flex-col border-l border-neutral-200 bg-white/80 p-6 text-black backdrop-blur-xl dark:border-neutral-700 dark:bg-black/80 dark:text-white md:w-[390px]">
+            <Dialog.Panel className="fixed bottom-0 right-0 top-0 flex h-full w-full flex-col border-l border-neutral-200 bg-white/80 p-6 text-black backdrop-blur-xl md:w-[390px] dark:border-neutral-700 dark:bg-black/80 dark:text-white">
               <div className="flex items-center justify-between">
                 <p className="text-lg font-semibold">My Cart</p>
                 <button aria-label="Close cart" onClick={closeCart}>
                   <CloseCart />
                 </button>
               </div>
-                {!localCart || localCart.lines.length === 0 ? (
+              {!localCart || localCart.lines.length === 0 ? (
                 <div className="mt-20 flex w-full flex-col items-center justify-center overflow-hidden">
                   <ShoppingCartIcon className="h-16" />
                   <p className="mt-6 text-center text-2xl font-bold">Your cart is empty.</p>
@@ -350,7 +421,9 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                                 key={`${item.id}-${index}`}
                                 type="text"
                                 value={childNames[item.id]?.[index] || ''}
-                                onChange={(e) => handleChildNameChange(item.id, index, e.target.value)}
+                                onChange={(e) =>
+                                  handleChildNameChange(item.id, index, e.target.value)
+                                }
                                 placeholder={`Child ${index + 1}'s name`}
                                 className="mt-2 w-full rounded-md border border-neutral-200 px-3 py-2 text-sm placeholder-neutral-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-neutral-700 dark:bg-black dark:text-white dark:placeholder-neutral-400"
                                 autoComplete="off"
@@ -400,8 +473,8 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                     {isCheckoutDisabled
                       ? 'Please Enter All Child Names'
                       : isSavingNotes
-                        ? 'Saving...' 
-                        : 'Proceed to Checkout'}
+                      ? 'Saving...'
+                      : 'Proceed to Checkout'}
                   </button>
                 </div>
               )}
