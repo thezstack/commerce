@@ -6,8 +6,27 @@ import { addItem } from 'components/cart/actions';
 import LoadingDots from 'components/loading-dots';
 import { ProductVariant } from 'lib/shopify/types';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState, useEffect, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
+
+type WindowWithGtag = Window & {
+  gtag?: (
+    command: 'event',
+    eventName: string,
+    params?: {
+      currency?: string;
+      value?: number;
+      items?: Array<{
+        item_id: string;
+        item_name: string;
+        item_variant?: string;
+        item_category?: string;
+        price?: number;
+        quantity?: number;
+      }>;
+    }
+  ) => void;
+};
 
 function SubmitButton({
   availableForSale,
@@ -76,6 +95,7 @@ export function AddToCart({
   schoolName?: string;
 }) {
   const [state, formAction] = useActionState(addItem, {});
+  const lastTrackedUpdate = useRef<number | undefined>(undefined);
   const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
   const [requestSubmitted, setRequestSubmitted] = useState(false);
   const [requestError, setRequestError] = useState('');
@@ -88,13 +108,48 @@ export function AddToCart({
     )
   );
   const selectedVariantId = variant?.id || defaultVariantId;
+  const selectedVariant =
+    variant || variants.find((variant: ProductVariant) => variant.id === defaultVariantId);
   const actionWithVariant = formAction.bind(null, selectedVariantId);
 
   useEffect(() => {
     if (state?.updatedAt) {
       window.dispatchEvent(new CustomEvent('cart:updated', { detail: { open: true } }));
+
+      if (lastTrackedUpdate.current === state.updatedAt) {
+        return;
+      }
+
+      lastTrackedUpdate.current = state.updatedAt;
+
+      const price = Number(selectedVariant?.price.amount ?? 0);
+      const currency = selectedVariant?.price.currencyCode ?? 'USD';
+
+      (window as WindowWithGtag).gtag?.('event', 'add_to_cart', {
+        currency,
+        value: price,
+        items: [
+          {
+            item_id: productHandle,
+            item_name: productTitle,
+            item_variant:
+              selectedVariant?.title === 'Default Title' ? undefined : selectedVariant?.title,
+            item_category: schoolName,
+            price,
+            quantity: 1
+          }
+        ]
+      });
     }
-  }, [state?.updatedAt]);
+  }, [
+    productHandle,
+    productTitle,
+    schoolName,
+    selectedVariant?.price.amount,
+    selectedVariant?.price.currencyCode,
+    selectedVariant?.title,
+    state?.updatedAt
+  ]);
 
   const submitRestockRequest = async () => {
     setIsSubmittingRequest(true);
@@ -146,10 +201,15 @@ export function AddToCart({
             }
           )}
         >
-          {isSubmittingRequest ? 'Sending request...' : requestSubmitted ? 'Request sent' : 'Request more inventory'}
+          {isSubmittingRequest
+            ? 'Sending request...'
+            : requestSubmitted
+            ? 'Request sent'
+            : 'Request more inventory'}
         </button>
         <p className="text-sm leading-6 text-gray-600">
-          Out of stock right now. Send a quick request and we&apos;ll let our team know this kit needs attention.
+          Out of stock right now. Send a quick request and we&apos;ll let our team know this kit
+          needs attention.
         </p>
         {requestError ? <p className="text-sm text-[#B42318]">{requestError}</p> : null}
       </div>
