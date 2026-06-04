@@ -70,19 +70,23 @@ export default async function SchoolDetailPage({ params }: SchoolPageParams) {
       <section className="border-y border-[#D9EEF4] bg-[#F4FDFF]">
         <div className="mx-auto grid max-w-6xl gap-5 px-4 py-5 sm:px-6 sm:py-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-start lg:px-8 lg:py-8">
           <div>
-            <div className="flex items-start gap-3 sm:gap-4">
-              {school.logoUrl ? (
-                <img
-                  src={school.logoUrl}
-                  alt={`${school.name} logo`}
-                  className="h-12 w-12 shrink-0 rounded-lg border border-[#D9EEF4] bg-white object-contain p-1.5 sm:h-16 sm:w-16 sm:p-2"
-                />
-              ) : null}
-              <div className="min-w-0">
-                <p className="text-[11px] font-bold uppercase text-[#0B80A7] sm:text-xs">
+            <div className="space-y-3 sm:flex sm:items-start sm:gap-4 sm:space-y-0">
+              <div className="flex items-center gap-3">
+                {school.logoUrl ? (
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border border-[#D9EEF4] bg-white p-2 shadow-sm sm:h-16 sm:w-16">
+                    <img
+                      src={school.logoUrl}
+                      alt={`${school.name} logo`}
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  </div>
+                ) : null}
+                <p className="text-xs font-bold uppercase text-[#0B80A7]">
                   {isOfficialSchoolKit ? 'Fulfilled by School Kits' : 'School kit page'}
                 </p>
-                <h1 className="mt-1.5 break-words text-2xl font-bold leading-tight text-black sm:text-4xl lg:text-[42px]">
+              </div>
+              <div className="min-w-0">
+                <h1 className="break-words text-3xl font-bold leading-tight text-black sm:text-4xl lg:text-[42px]">
                   {heroTitle}
                 </h1>
                 <p className="mt-2 text-sm font-semibold text-[#315565] sm:text-base">
