@@ -49,12 +49,15 @@ export default async function SchoolDetailPage({ params }: SchoolPageParams) {
     new Set(source.flatMap((item) => (item.shopifyProductId ? [item.shopifyProductId] : [])))
   );
   const products = productIds.length > 0 ? await getProductsByIds(productIds) : [];
+  const hasProducts = products.length > 0;
   const location = [school.city, school.state].filter(Boolean).join(', ');
   const isOfficialSchoolKit = school.isFulfilledBySchoolKits;
   const heroTitle = `${school.name} kits`;
-  const heroDescription = isOfficialSchoolKit
-    ? `We use ${school.name}'s official supply lists, then pack each grade as one kit. Pick your child's grade below.`
-    : `Pick an available grade kit below. You can review the supplies before adding it to your cart.`;
+  const heroDescription = hasProducts
+    ? isOfficialSchoolKit
+      ? `We use ${school.name}'s official supply lists, then pack each grade as one kit. Pick your child's grade below.`
+      : `Pick an available grade kit below. You can review the supplies before adding it to your cart.`
+    : `Kits for this school are not available to order online yet. Send a quick request and we'll review this school.`;
 
   return (
     <div className="bg-white">
@@ -69,20 +72,24 @@ export default async function SchoolDetailPage({ params }: SchoolPageParams) {
 
       <section className="border-y border-[#D9EEF4] bg-[#F4FDFF]">
         <div className="mx-auto grid max-w-6xl gap-5 px-4 py-5 sm:px-6 sm:py-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-start lg:px-8 lg:py-8">
-          <div>
-            <div className="flex items-start gap-3 sm:gap-4">
-              {school.logoUrl ? (
-                <img
-                  src={school.logoUrl}
-                  alt={`${school.name} logo`}
-                  className="h-12 w-12 shrink-0 rounded-lg border border-[#D9EEF4] bg-white object-contain p-1.5 sm:h-16 sm:w-16 sm:p-2"
-                />
-              ) : null}
-              <div className="min-w-0">
-                <p className="text-[11px] font-bold uppercase text-[#0B80A7] sm:text-xs">
+          <div className="max-w-3xl">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                {school.logoUrl ? (
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border border-[#D9EEF4] bg-white p-2 shadow-sm sm:h-16 sm:w-16">
+                    <img
+                      src={school.logoUrl}
+                      alt={`${school.name} logo`}
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  </div>
+                ) : null}
+                <p className="text-xs font-bold uppercase text-[#0B80A7]">
                   {isOfficialSchoolKit ? 'Fulfilled by School Kits' : 'School kit page'}
                 </p>
-                <h1 className="mt-1.5 break-words text-2xl font-bold leading-tight text-black sm:text-4xl lg:text-[42px]">
+              </div>
+              <div className="min-w-0">
+                <h1 className="break-words text-3xl font-bold leading-tight text-black sm:text-4xl lg:text-[42px]">
                   {heroTitle}
                 </h1>
                 <p className="mt-2 text-sm font-semibold text-[#315565] sm:text-base">
@@ -100,7 +107,7 @@ export default async function SchoolDetailPage({ params }: SchoolPageParams) {
             </p>
           </div>
 
-          {products.length > 0 ? (
+          {hasProducts ? (
             <div className="hidden self-start rounded-lg border border-[#B8DDE7] bg-white p-4 shadow-sm sm:p-5 md:block">
               <p className="text-sm font-bold uppercase text-[#0B80A7]">Ordering note</p>
               <h2 className="mt-1.5 text-xl font-bold text-black sm:text-2xl">
@@ -125,14 +132,18 @@ export default async function SchoolDetailPage({ params }: SchoolPageParams) {
         <section id="grade-kits">
           <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-black">Choose a grade</h2>
+              <h2 className="text-2xl font-bold text-black">
+                {hasProducts ? 'Choose a grade' : 'Request this school'}
+              </h2>
               <p className="mt-1 text-sm leading-6 text-gray-600">
-                Tap a kit to see the supplies and order.
+                {hasProducts
+                  ? 'Tap a kit to see the supplies and order.'
+                  : 'Tell us who you are and we will send this request to our team.'}
               </p>
             </div>
           </div>
 
-          {products.length > 0 ? (
+          {hasProducts ? (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {products.map((product) => {
                 const price = product.priceRange.minVariantPrice.amount;
