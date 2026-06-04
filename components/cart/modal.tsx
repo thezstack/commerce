@@ -18,6 +18,20 @@ type MerchandiseSearchParams = {
   [key: string]: string;
 };
 
+const gradeHandlePattern =
+  /-(kindergarten|first-grade|second-grade|third-grade|fourth-grade|fifth-grade|sixth-grade|seventh-grade|eighth-grade)-school-kit$/;
+
+function getSchoolPathFromCart(cart: Cart | undefined) {
+  const firstHandle = cart?.lines[0]?.merchandise.product.handle;
+
+  if (!firstHandle) {
+    return '/schools';
+  }
+
+  const schoolSlug = firstHandle.replace(gradeHandlePattern, '');
+  return schoolSlug && schoolSlug !== firstHandle ? `/schools/${schoolSlug}` : '/schools';
+}
+
 type WindowWithGtag = Window & {
   gtag?: (
     command: 'event',
@@ -46,6 +60,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
   const [isCheckoutDisabled, setIsCheckoutDisabled] = useState(false);
   const [localCart, setLocalCart] = useState(cart);
   const [isSavingNotes, setIsSavingNotes] = useState(false);
+  const schoolKitsPath = getSchoolPathFromCart(localCart);
 
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
@@ -333,9 +348,16 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
             leaveFrom="translate-x-0"
             leaveTo="translate-x-full"
           >
-            <Dialog.Panel className="fixed bottom-0 right-0 top-0 flex h-full w-full flex-col border-l border-neutral-200 bg-white/80 p-6 text-black backdrop-blur-xl md:w-[390px] dark:border-neutral-700 dark:bg-black/80 dark:text-white">
-              <div className="flex items-center justify-between">
-                <p className="text-lg font-semibold">My Cart</p>
+            <Dialog.Panel className="fixed bottom-0 right-0 top-0 flex h-dvh w-full flex-col overflow-y-auto border-l border-neutral-200 bg-white/95 p-4 text-black backdrop-blur-xl sm:p-6 md:w-[430px] dark:border-neutral-700 dark:bg-black/90 dark:text-white">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xl font-bold">Added to cart</p>
+                  {localCart && localCart.lines.length > 0 ? (
+                    <p className="mt-1 text-sm leading-5 text-neutral-600 dark:text-neutral-400">
+                      Buying for siblings? Add each grade kit before checkout.
+                    </p>
+                  ) : null}
+                </div>
                 <button aria-label="Close cart" onClick={closeCart}>
                   <CloseCart />
                 </button>
@@ -346,8 +368,25 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                   <p className="mt-6 text-center text-2xl font-bold">Your cart is empty.</p>
                 </div>
               ) : (
-                <div className="flex h-full flex-col justify-between overflow-hidden p-1">
-                  <ul className="flex-grow overflow-auto py-4">
+                <div className="flex flex-1 flex-col p-1">
+                  <div className="grid grid-cols-2 gap-2 py-4">
+                    <Link
+                      href={schoolKitsPath}
+                      onClick={closeCart}
+                      className="rounded-full border border-[#0B80A7] px-4 py-3 text-center text-sm font-bold text-[#0B80A7] transition hover:bg-[#E6F7FC]"
+                    >
+                      Add another kit
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={closeCart}
+                      className="rounded-full border border-neutral-300 px-4 py-3 text-center text-sm font-semibold text-neutral-700 transition hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-900"
+                    >
+                      Keep shopping
+                    </button>
+                  </div>
+
+                  <ul className="border-y border-neutral-200 py-2 dark:border-neutral-700">
                     {localCart.lines.map((item, i) => {
                       const merchandiseSearchParams = {} as MerchandiseSearchParams;
 
@@ -365,22 +404,18 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                       return (
                         <li
                           key={i}
-                          className="flex w-full flex-col border-b border-neutral-300 dark:border-neutral-700"
+                          className="flex w-full flex-col border-b border-neutral-200 last:border-b-0 dark:border-neutral-700"
                         >
-                          <div className="relative flex w-full flex-row justify-between px-1 py-4">
-                            <div className="absolute z-40 -mt-2 ml-[55px]">
+                          <div className="relative grid w-full grid-cols-[56px_1fr_auto] gap-3 px-1 py-4">
+                            <div className="absolute left-10 top-2 z-40">
                               <DeleteItemButton item={item} />
                             </div>
-                            <Link
-                              href={merchandiseUrl}
-                              onClick={closeCart}
-                              className="z-30 flex flex-row space-x-4"
-                            >
-                              <div className="relative h-16 w-16 cursor-pointer overflow-hidden rounded-md border border-neutral-300 bg-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800">
+                            <Link href={merchandiseUrl} onClick={closeCart} className="z-30">
+                              <div className="relative h-14 w-14 cursor-pointer overflow-hidden rounded-md border border-neutral-300 bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800">
                                 <Image
                                   className="h-full w-full object-cover"
-                                  width={64}
-                                  height={64}
+                                  width={56}
+                                  height={56}
                                   alt={
                                     item.merchandise.product.featuredImage?.altText ||
                                     item.merchandise.product.title
@@ -388,23 +423,27 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                                   src={item.merchandise.product.featuredImage?.url || logo}
                                 />
                               </div>
-
-                              <div className="flex flex-1 flex-col text-base">
-                                <span className="leading-tight">
-                                  {item.merchandise.product.title}
-                                </span>
-                                {item.merchandise.title !== DEFAULT_OPTION ? (
-                                  <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                                    {item.merchandise.title}
-                                  </p>
-                                ) : null}
-                              </div>
                             </Link>
-                            <div className="flex h-16 flex-col justify-between">
+                            <Link
+                              href={merchandiseUrl}
+                              onClick={closeCart}
+                              className="min-w-0 text-base font-semibold"
+                            >
+                              <span className="block leading-tight">
+                                {item.merchandise.product.title}
+                              </span>
+                              {item.merchandise.title !== DEFAULT_OPTION ? (
+                                <p className="mt-1 text-sm font-normal text-neutral-500 dark:text-neutral-400">
+                                  {item.merchandise.title}
+                                </p>
+                              ) : null}
+                            </Link>
+                            <div className="flex flex-col items-end justify-between gap-3">
                               <Price
-                                className="flex justify-end space-y-2 text-right text-sm"
+                                className="text-right text-sm font-semibold"
                                 amount={item.cost.totalAmount.amount}
                                 currencyCode={item.cost.totalAmount.currencyCode}
+                                currencyCodeClassName="sr-only"
                               />
                               <div className="ml-auto flex h-9 flex-row items-center rounded-full border border-neutral-200 dark:border-neutral-700">
                                 <EditItemQuantityButton item={item} type="minus" />
@@ -416,6 +455,9 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                             </div>
                           </div>
                           <div className="px-1 pb-4">
+                            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.06em] text-neutral-500">
+                              Student names for delivery labels
+                            </p>
                             {Array.from({ length: item.quantity }).map((_, index) => (
                               <input
                                 key={`${item.id}-${index}`}
@@ -424,7 +466,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                                 onChange={(e) =>
                                   handleChildNameChange(item.id, index, e.target.value)
                                 }
-                                placeholder={`Child ${index + 1}'s name`}
+                                placeholder={`Student ${index + 1} name`}
                                 className="mt-2 w-full rounded-md border border-neutral-200 px-3 py-2 text-sm placeholder-neutral-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-neutral-700 dark:bg-black dark:text-white dark:placeholder-neutral-400"
                                 autoComplete="off"
                                 inputMode="text"
@@ -437,13 +479,14 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                       );
                     })}
                   </ul>
-                  <div className="py-4 text-sm text-neutral-500 dark:text-neutral-400">
+                  <div className="mt-auto py-4 text-sm text-neutral-500 dark:text-neutral-400">
                     <div className="mb-3 flex items-center justify-between border-b border-neutral-200 pb-1 dark:border-neutral-700">
                       <p>Taxes</p>
                       <Price
                         className="text-right text-base text-black dark:text-white"
                         amount={localCart.cost.totalTaxAmount.amount}
                         currencyCode={localCart.cost.totalTaxAmount.currencyCode}
+                        currencyCodeClassName="sr-only"
                       />
                     </div>
                     <div className="mb-3 flex items-center justify-between border-b border-neutral-200 pb-1 pt-1 dark:border-neutral-700">
@@ -456,12 +499,13 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                         className="text-right text-base text-black dark:text-white"
                         amount={localCart.cost.totalAmount.amount}
                         currencyCode={localCart.cost.totalAmount.currencyCode}
+                        currencyCodeClassName="sr-only"
                       />
                     </div>
                   </div>
                   <button
                     type="button"
-                    className={`block w-full rounded-full p-3 text-center text-sm font-medium text-white ${
+                    className={`sticky bottom-0 block w-full rounded-full p-3 text-center text-sm font-medium text-white shadow-[0_-12px_24px_rgba(255,255,255,0.92)] ${
                       isCheckoutDisabled || isSavingNotes
                         ? 'cursor-not-allowed bg-gray-400'
                         : 'bg-blue-600 opacity-90 hover:opacity-100'
@@ -471,7 +515,7 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                     aria-label="Proceed to checkout"
                   >
                     {isCheckoutDisabled
-                      ? 'Please Enter All Child Names'
+                      ? 'Enter student names to checkout'
                       : isSavingNotes
                       ? 'Saving...'
                       : 'Proceed to Checkout'}
