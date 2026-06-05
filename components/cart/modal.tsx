@@ -42,6 +42,20 @@ type WindowWithGtag = Window & {
       page_location?: string;
       event_callback?: () => void;
       event_timeout?: number;
+      [key: string]:
+        | string
+        | number
+        | boolean
+        | undefined
+        | (() => void)
+        | Array<{
+            item_id: string;
+            item_name: string;
+            item_variant?: string;
+            item_category?: string;
+            price?: number;
+            quantity?: number;
+          }>;
       items?: Array<{
         item_id: string;
         item_name: string;
@@ -65,9 +79,54 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
 
+  const getCartAnalyticsPayload = () => {
+    const cartItems = localCart?.lines ?? [];
+    const value = Number(localCart?.cost.totalAmount.amount ?? 0);
+    const currency = localCart?.cost.totalAmount.currencyCode ?? 'USD';
+
+    return {
+      currency,
+      value,
+      cart_line_count: cartItems.length,
+      cart_total_items: cartItems.reduce((sum, item) => sum + item.quantity, 0),
+      page_location: window.location.href,
+      items: cartItems.map((item) => {
+        const quantity = item.quantity;
+        const totalAmount = Number(item.cost.totalAmount.amount);
+        const price = quantity > 0 ? totalAmount / quantity : totalAmount;
+
+        return {
+          item_id: item.merchandise.product.handle || item.merchandise.product.id,
+          item_name: item.merchandise.product.title,
+          item_variant:
+            item.merchandise.title === DEFAULT_OPTION ? undefined : item.merchandise.title,
+          item_category: item.merchandise.product.collection,
+          price,
+          quantity
+        };
+      })
+    };
+  };
+
+  const trackCartEvent = (
+    eventName: string,
+    params?: Record<string, string | number | boolean>
+  ) => {
+    (window as WindowWithGtag).gtag?.('event', eventName, {
+      ...getCartAnalyticsPayload(),
+      ...params
+    });
+  };
+
   useEffect(() => {
     setLocalCart(cart);
   }, [cart]);
+
+  useEffect(() => {
+    if (isOpen) {
+      trackCartEvent('cart_drawer_opened');
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     const handleCartOpen = () => {
@@ -308,9 +367,16 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
     e.preventDefault();
 
     if (isCheckoutDisabled) {
+      trackCartEvent('checkout_blocked', {
+        reason: 'missing_student_names'
+      });
       alert('Please enter names for all children before proceeding to checkout.');
       return;
     }
+
+    trackCartEvent('checkout_attempt', {
+      status: 'ready'
+    });
 
     // Simply close the cart modal and navigate to the checkout URL
     // The cart notes have already been saved in the background
@@ -372,14 +438,22 @@ export default function CartModal({ cart }: { cart: Cart | undefined }) {
                   <div className="grid grid-cols-2 gap-2 py-4">
                     <Link
                       href={schoolKitsPath}
-                      onClick={closeCart}
+                      onClick={() => {
+                        trackCartEvent('cart_add_another_kit_click', {
+                          destination: schoolKitsPath
+                        });
+                        closeCart();
+                      }}
                       className="rounded-full border border-[#0B80A7] px-4 py-3 text-center text-sm font-bold text-[#0B80A7] transition hover:bg-[#E6F7FC]"
                     >
                       Add another kit
                     </Link>
                     <button
                       type="button"
-                      onClick={closeCart}
+                      onClick={() => {
+                        trackCartEvent('cart_keep_shopping_click');
+                        closeCart();
+                      }}
                       className="rounded-full border border-neutral-300 px-4 py-3 text-center text-sm font-semibold text-neutral-700 transition hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-900"
                     >
                       Keep shopping
