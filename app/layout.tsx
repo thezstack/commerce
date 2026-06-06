@@ -1,5 +1,4 @@
 import { GoogleAnalytics } from '@next/third-parties/google';
-import WebVitalsReporter from 'components/analytics/web-vitals';
 import Footer from 'components/layout/footer';
 import Navbar from 'components/layout/navbar';
 import { ensureStartsWith } from 'lib/utils';
@@ -57,7 +56,6 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       </head>
       <body className="flex min-h-svh flex-col bg-neutral-50 text-black selection:bg-teal-300">
         <GoogleAnalytics gaId={googleAnalyticsId} />
-        <WebVitalsReporter />
         <Suspense>
           <Navbar />
           <main className="flex-1">{children}</main>
