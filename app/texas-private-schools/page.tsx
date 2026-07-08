@@ -8,10 +8,41 @@ import bottomCta from '../../media/Frame 37280bottom_cta.png';
 import littlePerson from '../../media/little_person_homePage.png';
 import classroomStudents from '../../media/tefa-classroom-students.png';
 
+const title = 'TEFA Approved School Supply Kits for Texas Private Schools';
+const description =
+  'SchoolKits is TEFA approved and helps Texas private school administrators set up grade-specific school supply kits for families.';
+
 export const metadata: Metadata = {
-  title: 'TEFA Approved School Supply Kits for Texas Private Schools',
-  description:
-    'SchoolKits is TEFA approved and helps Texas private school administrators set up grade-specific school supply kits for families.'
+  title,
+  description,
+  alternates: {
+    canonical: '/texas-private-schools'
+  },
+  openGraph: {
+    title,
+    description,
+    url: '/texas-private-schools',
+    siteName: 'School Kits',
+    type: 'website',
+    images: [
+      {
+        url: '/opengraph-image',
+        width: 1200,
+        height: 630,
+        alt: 'School Kits'
+      }
+    ]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title,
+    description,
+    images: ['/opengraph-image']
+  },
+  robots: {
+    index: true,
+    follow: true
+  }
 };
 
 const highlights = [

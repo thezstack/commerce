@@ -5,6 +5,8 @@ import { MetadataRoute } from 'next';
 type Route = {
   url: string;
   lastModified: string;
+  changeFrequency?: MetadataRoute.Sitemap[number]['changeFrequency'];
+  priority?: number;
 };
 
 // Fix the URL format to avoid double https://
@@ -14,17 +16,22 @@ const baseUrl =
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   validateEnvironmentVariables();
 
-  const routesMap = [
-    '',
-    '/for-schools',
-    '/for-schools-quote',
-    '/texas-private-schools',
-    '/privacy-policy',
-    '/terms',
-    '/affiliate-disclosure'
-  ].map((route) => ({
-    url: `${baseUrl}${route}`,
-    lastModified: new Date().toISOString()
+  const staticRoutes = [
+    { path: '', priority: 1 },
+    { path: '/for-schools', priority: 0.8 },
+    { path: '/for-schools-quote', priority: 0.8 },
+    { path: '/tefa-parents', priority: 0.9 },
+    { path: '/texas-private-schools', priority: 0.8 },
+    { path: '/privacy-policy', priority: 0.3 },
+    { path: '/terms', priority: 0.3 },
+    { path: '/affiliate-disclosure', priority: 0.3 }
+  ] as const;
+
+  const routesMap = staticRoutes.map((route) => ({
+    url: `${baseUrl}${route.path}`,
+    lastModified: new Date().toISOString(),
+    changeFrequency: 'weekly' as const,
+    priority: route.priority
   }));
 
   const collectionsPromise = getCollections().then((collections) =>

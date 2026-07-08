@@ -8,8 +8,8 @@ import { Suspense } from 'react';
 import MobileMenu from './mobile-menu';
 const { SITE_NAME } = process.env;
 const TEFA_NAV_ITEM: Menu = {
-  title: 'TEFA',
-  path: '/texas-private-schools'
+  title: 'TEFA Parents',
+  path: '/tefa-parents'
 };
 
 export default async function Navbar() {
