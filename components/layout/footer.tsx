@@ -59,8 +59,8 @@ const Footer = () => {
               Affiliate Disclosure
             </Link>
             <span className="text-gray-400">|</span>
-            <Link href="/texas-private-schools" className="text-[#0B80A7] hover:underline">
-              TEFA
+            <Link href="/tefa-parents" className="text-[#0B80A7] hover:underline">
+              TEFA Parents
             </Link>
             <span className="text-gray-400">|</span>
             <Link href="/blog" className="text-[#0B80A7] hover:underline">

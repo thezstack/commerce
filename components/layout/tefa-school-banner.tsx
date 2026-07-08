@@ -25,7 +25,7 @@ export default function TefaSchoolBanner() {
     setIsVisible(false);
   };
 
-  if (!isVisible || pathname === '/texas-private-schools') {
+  if (!isVisible || pathname === '/tefa-parents') {
     return null;
   }
 
@@ -33,11 +33,11 @@ export default function TefaSchoolBanner() {
     <div className="border-b border-[#B7E5F2] bg-[#EAF8FC]">
       <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 text-sm text-[#073B4C] sm:px-6 lg:px-8">
         <Link
-          href="/texas-private-schools"
+          href="/tefa-parents"
           className="min-w-0 flex-1 font-semibold underline-offset-4 hover:underline"
         >
-          Texas private schools: SchoolKits is TEFA approved for school supply kits.
-          <span className="ml-1 whitespace-nowrap text-[#0B80A7]">Contact us</span>
+          TEFA parents: find School Kits Supply through TEFA Finder.
+          <span className="ml-1 whitespace-nowrap text-[#0B80A7]">Get help</span>
         </Link>
         <button
           type="button"
