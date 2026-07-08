@@ -8,6 +8,7 @@ import { Open_Sans } from 'next/font/google';
 import { ReactNode, Suspense } from 'react';
 import './globals.css';
 const { TWITTER_CREATOR, TWITTER_SITE, SITE_NAME } = process.env;
+const siteName = SITE_NAME || 'School Kits';
 const googleAnalyticsId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID || 'G-4SWM464SP9';
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
   ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL.replace(/^https?:\/\//, '')}`
@@ -24,8 +25,8 @@ const openSans = Open_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: SITE_NAME!,
-    template: `%s | ${SITE_NAME}`
+    default: siteName,
+    template: `%s | ${siteName}`
   },
   robots: {
     follow: true,

@@ -1,14 +1,17 @@
 import ContactForm from 'components/contact';
 import ScrollReveal from 'components/qr-landing/scroll-reveal';
+import TefaFinderScreenshot from 'components/tefa-finder-screenshot';
 import { ArrowRight, CheckCircle2, Search, SlidersHorizontal } from 'lucide-react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import classroomStudents from '../../media/tefa-classroom-students.png';
+import tefaFinderScreenshot from '../../media/tefa-finder-school-kits-supply.png';
 
 const title = 'TEFA Parent Ordering Help';
 const description =
   'How parents can find School Kits Supply for TEFA school supply orders by searching School Kits and filtering by Supplies in TEFA Finder or Odyssey.';
+const tefaFinderSearchUrl = 'https://finder.educationfreedom.texas.gov/?q=school+kits&t=supplies';
 
 export const metadata: Metadata = {
   title,
@@ -24,10 +27,10 @@ export const metadata: Metadata = {
     type: 'article',
     images: [
       {
-        url: '/opengraph-image',
+        url: '/tefa-parents/opengraph-image',
         width: 1200,
         height: 630,
-        alt: 'School Kits'
+        alt: 'School Kits TEFA Parent Ordering Help'
       }
     ]
   },
@@ -35,7 +38,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title,
     description,
-    images: ['/opengraph-image']
+    images: ['/tefa-parents/opengraph-image']
   },
   robots: {
     index: true,
@@ -78,8 +81,17 @@ export default function TefaParentsPage() {
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
-                href="#questions"
+                href={tefaFinderSearchUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center justify-center rounded-full bg-[#0B80A7] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#096c8c]"
+              >
+                Open TEFA Finder search
+                <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+              </Link>
+              <Link
+                href="#questions"
+                className="inline-flex items-center justify-center rounded-full border border-[#B7E5F2] bg-white px-6 py-3 text-sm font-bold text-[#0B80A7] transition hover:bg-[#EAF8FC]"
               >
                 Ask a question
                 <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
@@ -138,6 +150,8 @@ export default function TefaParentsPage() {
             ))}
           </div>
 
+          <TefaFinderScreenshot image={tefaFinderScreenshot} />
+
           <div className="mt-8 rounded-lg border border-[#B7E5F2] bg-[#EAF8FC] p-5">
             <div className="flex gap-3">
               <CheckCircle2
@@ -145,10 +159,8 @@ export default function TefaParentsPage() {
                 aria-hidden="true"
               />
               <p className="text-sm leading-6 text-[#315565]">
-                I do not have visibility into exactly how the Odyssey parent portal routes families
-                to vendor listings, and there is not a direct parent listing URL to share. On the
-                TEFA Finder website, families can find our listing by searching for "School Kits"
-                and filtering by "Supplies."
+                Look for the School Kits Supply listing by searching for "School Kits" and choosing
+                the Supplies category.
               </p>
             </div>
           </div>
