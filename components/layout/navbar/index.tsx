@@ -7,15 +7,22 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import MobileMenu from './mobile-menu';
 const { SITE_NAME } = process.env;
+const TEFA_NAV_ITEM: Menu = {
+  title: 'TEFA',
+  path: '/texas-private-schools'
+};
 
 export default async function Navbar() {
   const menu = await getMenu('next-js-frontend-header-menu');
+  const navigationMenu = menu.some((item) => item.path === TEFA_NAV_ITEM.path)
+    ? menu
+    : [...menu, TEFA_NAV_ITEM];
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#E5E5E5] bg-white py-4 shadow-sm">
       <nav className="flex items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="block flex-none md:hidden">
-          <MobileMenu menu={menu} />
+          <MobileMenu menu={navigationMenu} />
         </div>
         <div className="flex w-full items-center">
           <div className="flex w-full ">
@@ -28,9 +35,9 @@ export default async function Navbar() {
                 SchoolKits
               </div>
             </Link>
-            {menu.length ? (
+            {navigationMenu.length ? (
               <ul className="hidden space-x-4 md:flex md:flex-1 md:items-center">
-                {menu.map((item: Menu) => (
+                {navigationMenu.map((item: Menu) => (
                   <li key={item.title}>
                     <Link
                       href={item.path}

@@ -3,11 +3,27 @@
 import { X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+const DISMISSED_COOKIE = 'schoolkits-tefa-banner-dismissed';
+const DISMISSED_COOKIE_MAX_AGE = 60 * 60 * 24 * 180;
 
 export default function TefaSchoolBanner() {
   const pathname = usePathname();
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const isDismissed = document.cookie
+      .split('; ')
+      .some((cookie) => cookie === `${DISMISSED_COOKIE}=true`);
+
+    setIsVisible(!isDismissed);
+  }, []);
+
+  const dismissBanner = () => {
+    document.cookie = `${DISMISSED_COOKIE}=true; Max-Age=${DISMISSED_COOKIE_MAX_AGE}; Path=/; SameSite=Lax`;
+    setIsVisible(false);
+  };
 
   if (!isVisible || pathname === '/texas-private-schools') {
     return null;
@@ -26,7 +42,7 @@ export default function TefaSchoolBanner() {
         <button
           type="button"
           aria-label="Dismiss TEFA banner"
-          onClick={() => setIsVisible(false)}
+          onClick={dismissBanner}
           className="flex h-8 w-8 flex-none items-center justify-center rounded-full text-[#0B80A7] hover:bg-white"
         >
           <X className="h-4 w-4" aria-hidden="true" />
