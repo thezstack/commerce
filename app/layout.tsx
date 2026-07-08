@@ -57,6 +57,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       <body className="flex min-h-svh flex-col bg-neutral-50 text-black selection:bg-teal-300">
         <GoogleAnalytics gaId={googleAnalyticsId} />
         <Suspense>
+          <TefaSchoolBanner />
           <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />
