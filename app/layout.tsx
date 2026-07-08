@@ -1,6 +1,7 @@
 import { GoogleAnalytics } from '@next/third-parties/google';
 import Footer from 'components/layout/footer';
 import Navbar from 'components/layout/navbar';
+import TefaSchoolBanner from 'components/layout/tefa-school-banner';
 import { ensureStartsWith } from 'lib/utils';
 import type { Metadata } from 'next';
 import { Open_Sans } from 'next/font/google';
