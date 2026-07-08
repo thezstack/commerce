@@ -2,6 +2,7 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 import WebVitalsReporter from 'components/analytics/web-vitals';
 import Footer from 'components/layout/footer';
 import Navbar from 'components/layout/navbar';
+import TefaSchoolBanner from 'components/layout/tefa-school-banner';
 import { ensureStartsWith } from 'lib/utils';
 import type { Metadata } from 'next';
 import { Open_Sans } from 'next/font/google';
@@ -59,6 +60,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <GoogleAnalytics gaId={googleAnalyticsId} />
         <WebVitalsReporter />
         <Suspense>
+          <TefaSchoolBanner />
           <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />
