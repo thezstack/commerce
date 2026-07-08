@@ -1,10 +1,12 @@
 import ContactForm from 'components/contact';
 import ScrollReveal from 'components/qr-landing/scroll-reveal';
+import TefaFinderScreenshot from 'components/tefa-finder-screenshot';
 import { ArrowRight, CheckCircle2, Search, SlidersHorizontal } from 'lucide-react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import classroomStudents from '../../media/tefa-classroom-students.png';
+import tefaFinderScreenshot from '../../media/tefa-finder-school-kits-supply.png';
 
 const title = 'TEFA Parent Ordering Help';
 const description =
@@ -24,10 +26,10 @@ export const metadata: Metadata = {
     type: 'article',
     images: [
       {
-        url: '/opengraph-image',
+        url: '/tefa-parents/opengraph-image',
         width: 1200,
         height: 630,
-        alt: 'School Kits'
+        alt: 'School Kits TEFA Parent Ordering Help'
       }
     ]
   },
@@ -35,7 +37,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title,
     description,
-    images: ['/opengraph-image']
+    images: ['/tefa-parents/opengraph-image']
   },
   robots: {
     index: true,
@@ -138,6 +140,8 @@ export default function TefaParentsPage() {
             ))}
           </div>
 
+          <TefaFinderScreenshot image={tefaFinderScreenshot} />
+
           <div className="mt-8 rounded-lg border border-[#B7E5F2] bg-[#EAF8FC] p-5">
             <div className="flex gap-3">
               <CheckCircle2
@@ -145,10 +149,8 @@ export default function TefaParentsPage() {
                 aria-hidden="true"
               />
               <p className="text-sm leading-6 text-[#315565]">
-                I do not have visibility into exactly how the Odyssey parent portal routes families
-                to vendor listings, and there is not a direct parent listing URL to share. On the
-                TEFA Finder website, families can find our listing by searching for "School Kits"
-                and filtering by "Supplies."
+                Look for the School Kits Supply listing by searching for "School Kits" and choosing
+                the Supplies category.
               </p>
             </div>
           </div>
