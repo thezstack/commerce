@@ -8,6 +8,9 @@ import crayola from '../media/Crayola.svg';
 import elmer from '../media/elmer.svg';
 import expo from '../media/expo.svg';
 import fiskar from '../media/Fiskar.png';
+import mead from '../media/Mead.png';
+import kleenex from '../media/kleenex.svg';
+import sharpie from '../media/sharpie.svg';
 import supplies from '../media/Frame 37280bottom_cta.png';
 
 export const metadata = {
@@ -106,6 +109,31 @@ export default function HomePage() {
           </article>
         ))}
       </section>
+      <section className={styles.brandSection} aria-labelledby="brand-heading">
+        <p className={styles.eyebrow}>QUALITY STARTS WITH THE SUPPLIES</p>
+        <h2 id="brand-heading">Familiar brands. Ready for their classrooms.</h2>
+        <p className={styles.brandCopy}>
+          From Crayola to Elmer’s, we build kits with well-known brands and teacher-endorsed house
+          brands, guided by your school’s supply lists.
+        </p>
+        <ul className={styles.brands}>
+          {[
+            { src: crayola, name: 'Crayola' },
+            { src: elmer, name: 'Elmer’s' },
+            { src: expo, name: 'EXPO' },
+            { src: avery, name: 'Avery' },
+            { src: sharpie, name: 'Sharpie' },
+            { src: fiskar, name: 'Fiskars' },
+            { src: kleenex, name: 'Kleenex' },
+            { src: mead, name: 'Mead' }
+          ].map((brand) => (
+            <li key={brand.name}>
+              <Image src={brand.src} alt={brand.name} width={160} height={160} />
+              <span aria-hidden="true">{brand.name}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
       <section id="how-it-works" className={styles.how}>
         <div className={styles.sectionIntro}>
           <p className={styles.eyebrow}>THE SCHOOL SUPPLIES, HANDLED</p>
@@ -161,17 +189,6 @@ export default function HomePage() {
               <Check size={19} aria-hidden="true" /> Delivery coordinated with your school
             </li>
           </ul>
-          <div className={styles.brands}>
-            {[
-              { src: crayola, name: 'Crayola' },
-              { src: elmer, name: 'Elmer’s' },
-              { src: expo, name: 'EXPO' },
-              { src: avery, name: 'Avery' },
-              { src: fiskar, name: 'Fiskars' }
-            ].map((brand) => (
-              <Image key={brand.name} src={brand.src} alt={brand.name} width={80} height={45} />
-            ))}
-          </div>
         </div>
       </section>
       <section className={styles.partnership}>
