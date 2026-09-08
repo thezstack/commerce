@@ -9,8 +9,8 @@ const desktopMedia = {
   poster: '/media/classroom-morning.jpg'
 };
 const mobileMedia = {
-  video: '/media/schoolkits-mobile-scenes.mp4',
-  poster: '/media/schoolkits-mobile-scenes.jpg'
+  video: '/media/school-life-mobile.mp4',
+  poster: '/media/school-life-mobile.jpg'
 };
 const selectMedia = () =>
   window.matchMedia('(max-width: 600px)').matches ? mobileMedia : desktopMedia;
@@ -93,7 +93,7 @@ export default function ClassroomVideo() {
       />
       <div className={styles.videoControl}>
         {failed ? (
-          <span role="status">School supply preview shown</span>
+          <span role="status">School day preview shown</span>
         ) : (
           <button
             type="button"

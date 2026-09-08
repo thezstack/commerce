@@ -22,19 +22,30 @@ unchanged.
   explicitly play it. Autoplay rejection leaves a manual play button; media
   load failure retains the background poster and a status message.
 
-## Mobile sequence revision
+## Mobile school-life sequence
 
-The user subsequently authorized additional Runway generation. Task
-`261c6c2b-be86-4130-903e-b1e998106175` (SUCCEEDED) created three portrait scenes: kit packing,
-supply close-ups, and classroom delivery. These are generated illustrative
-scenes, not documentary footage of SchoolKits staff or facilities.
+The user clarified that the mobile footage must convey happy school life:
+classrooms, teachers, students, and parents. The earlier packing sequence is
+replaced by completed Runway task `eb8c9042-8835-45ea-8f3c-97c52957378b`.
 
-The 15-second, 720×1280 silent sequence is compressed to about 1.5 MB with
-H.264 faststart. The scenes use intentional cuts, including the loop boundary.
-The mobile hero uses its own portrait MP4 and extracted poster behind the HTML
-copy. The desktop clip is retained. Only the viewport-appropriate source loads;
-reduced-motion and Data Saver preferences leave the video source unset until an
-explicit play action. A manual pause is preserved when changing viewport sizes.
+Visual references reviewed from the existing site: `tefa-classroom-students.png`,
+`school-quote-students-parents.png`, `parent_homePage_circle.png`,
+`boy_homePage_circle.png`, and `girl_homePage_circle.png`. The classroom photo
+was supplied to Runway as the opening image reference. The scenes show children
+learning together, a teacher supporting a student, and a parent-child arrival.
+These are generated illustrative scenes, not documentary footage of a client
+school.
+
+Runway retained the reference image’s wide aspect ratio. The mobile export
+uses a centered square crop over a softly blurred extension of the same scene,
+keeping the people below the strongest text overlay. It is a 15-second
+720×1280 H.264 faststart export with intentional scene cuts.
+
+The mobile hero uses its own silent portrait MP4 and extracted poster behind the
+HTML copy. The approved desktop clip is retained. Only the viewport-appropriate
+source loads; reduced-motion and Data Saver preferences leave the video source
+unset until an explicit play action. A manual pause is preserved when changing
+viewport sizes.
 
 ## Validation
 
