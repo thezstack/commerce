@@ -45,3 +45,9 @@
     transform: translate3d(10px, -8px, 0);
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  html.scroll-smooth {
+    scroll-behavior: auto;
+  }
+}
