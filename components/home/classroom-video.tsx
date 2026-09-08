@@ -4,10 +4,20 @@ import { Pause, Play } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import styles from './homepage.module.css';
 
-const source = '/media/classroom-morning.mp4';
+const desktopMedia = {
+  video: '/media/classroom-morning.mp4',
+  poster: '/media/classroom-morning.jpg'
+};
+const mobileMedia = {
+  video: '/media/schoolkits-mobile-scenes.mp4',
+  poster: '/media/schoolkits-mobile-scenes.jpg'
+};
+const selectMedia = () =>
+  window.matchMedia('(max-width: 600px)').matches ? mobileMedia : desktopMedia;
 
 export default function ClassroomVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const pausedByUser = useRef(false);
   const [playing, setPlaying] = useState(false);
   const [failed, setFailed] = useState(false);
 
@@ -15,22 +25,30 @@ export default function ClassroomVideo() {
     const video = videoRef.current;
     if (!video) return;
     const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const syncPreference = () => {
-      if (preference.matches) {
+    const mobile = window.matchMedia('(max-width: 600px)');
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } })
+      .connection;
+    const syncMedia = () => {
+      const media = selectMedia();
+      video.poster = media.poster;
+      setFailed(false);
+      if (preference.matches || connection?.saveData) {
         video.autoplay = false;
         video.pause();
         video.removeAttribute('src');
         video.load();
       } else {
-        video.autoplay = true;
-        video.src = source;
-        void video.play().catch(() => setPlaying(false));
+        video.autoplay = !pausedByUser.current;
+        if (video.getAttribute('src') !== media.video) video.src = media.video;
+        if (!pausedByUser.current) void video.play().catch(() => setPlaying(false));
       }
     };
-    syncPreference();
-    preference.addEventListener('change', syncPreference);
+    syncMedia();
+    preference.addEventListener('change', syncMedia);
+    mobile.addEventListener('change', syncMedia);
     return () => {
-      preference.removeEventListener('change', syncPreference);
+      preference.removeEventListener('change', syncMedia);
+      mobile.removeEventListener('change', syncMedia);
       video.pause();
     };
   }, []);
@@ -39,10 +57,13 @@ export default function ClassroomVideo() {
     const video = videoRef.current;
     if (!video) return;
     if (!video.paused) {
+      pausedByUser.current = true;
+      video.autoplay = false;
       video.pause();
       return;
     }
-    if (!video.getAttribute('src')) video.src = source;
+    pausedByUser.current = false;
+    if (!video.getAttribute('src')) video.src = selectMedia().video;
     try {
       await video.play();
     } catch {
@@ -72,13 +93,13 @@ export default function ClassroomVideo() {
       />
       <div className={styles.videoControl}>
         {failed ? (
-          <span role="status">Classroom preview shown</span>
+          <span role="status">School supply preview shown</span>
         ) : (
           <button
             type="button"
             onClick={toggle}
             aria-controls="classroom-video"
-            aria-label={playing ? 'Pause classroom video' : 'Play classroom video'}
+            aria-label={playing ? 'Pause background video' : 'Play background video'}
           >
             {playing ? (
               <Pause size={15} aria-hidden="true" />

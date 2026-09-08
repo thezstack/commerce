@@ -363,23 +363,23 @@
   }
   .hero {
     min-height: 750px;
-    background-position: 66% bottom;
-    background-size: auto 370px;
+    background-image: url('/media/schoolkits-mobile-scenes.jpg');
+    background-position: center;
+    background-size: cover;
   }
   .video {
-    top: auto;
-    bottom: 0;
-    height: 370px;
-    object-position: 66% center;
+    inset: 0;
+    height: 100%;
+    object-position: center;
   }
   .tint {
     background: linear-gradient(
       180deg,
-      #fff 0%,
-      #fff 46%,
-      rgba(255, 255, 255, 0.94) 55%,
-      rgba(255, 255, 255, 0.22) 72%,
-      rgba(255, 255, 255, 0.02) 100%
+      rgba(255, 255, 255, 0.96) 0%,
+      rgba(255, 255, 255, 0.93) 34%,
+      rgba(255, 255, 255, 0.85) 52%,
+      rgba(255, 255, 255, 0.28) 72%,
+      rgba(255, 255, 255, 0.04) 100%
     );
   }
   .heroContent {
