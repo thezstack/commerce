@@ -475,3 +475,18 @@
     scroll-behavior: auto;
   }
 }
+
+.emailOption {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #315565;
+}
+.emailOption a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: #07566f;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}

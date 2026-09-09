@@ -1,3 +1,4 @@
+import BookingButton from 'components/marketing/booking-button';
 import ClassroomVideo from 'components/home/classroom-video';
 import styles from 'components/home/homepage.module.css';
 import { ArrowDown, ArrowRight, Gift, HandHeart, HeartHandshake, Check } from 'lucide-react';
@@ -87,13 +88,19 @@ export default function HomePage() {
             Custom kits from your supply lists. Packed by us. Delivered to classrooms.
           </p>
           <div className={styles.actions}>
-            <Link className={styles.primary} href="/for-schools">
+            <BookingButton className={styles.primary}>
               Partner with us <ArrowRight size={18} aria-hidden="true" />
-            </Link>
+            </BookingButton>
             <Link className={styles.secondary} href="#how-it-works">
               See how it works <ArrowDown size={17} aria-hidden="true" />
             </Link>
           </div>
+          <p className={styles.emailOption}>
+            Prefer email?{' '}
+            <a href="mailto:hello@schoolkits.org?subject=School%20partnership%20inquiry">
+              Email our team
+            </a>
+          </p>
         </div>
       </section>
       <section className={styles.benefits} aria-label="More possibilities for your school">
@@ -202,9 +209,15 @@ export default function HomePage() {
           Bring your lists, your timeline, and your goals. We’ll talk through the program and the
           fundraising, staff appreciation, and sponsorship options available to your school.
         </p>
-        <Link className={styles.primary} href="/for-schools">
+        <BookingButton className={styles.primary}>
           Partner with us <ArrowRight size={18} aria-hidden="true" />
-        </Link>
+        </BookingButton>
+        <p className={styles.emailOption}>
+          Prefer email?{' '}
+          <a href="mailto:hello@schoolkits.org?subject=School%20partnership%20inquiry">
+            hello@schoolkits.org
+          </a>
+        </p>
         <p className={styles.parentNote}>
           Here to order for your child? <Link href="/schools">Shop by school</Link>
         </p>
