@@ -25,7 +25,6 @@ export default function HomeMotion({
         animation.complete();
         element.style.removeProperty('opacity');
         element.style.removeProperty('transform');
-        element.style.removeProperty('clip-path');
       });
       animations.clear();
     };
@@ -36,34 +35,21 @@ export default function HomeMotion({
           const element = target as HTMLElement;
           revealed.add(element);
           observer.unobserve(element);
-          const isBrand = element.dataset.motion === 'brand';
-          const animation = isBrand
-            ? animate(
-                element,
-                {
-                  opacity: [0.5, 1, 1],
-                  y: [22, -3, 0],
-                  rotate: [Number(element.dataset.tilt), 0.6, 0],
-                  scale: [0.92, 1.025, 1]
-                },
-                {
-                  duration: 0.7,
-                  delay: Number(element.dataset.reveal || 0) / 1000,
-                  times: [0, 0.72, 1],
-                  ease: [0.22, 1, 0.36, 1]
-                }
-              )
-            : animate(
-                element,
-                {
-                  clipPath: ['inset(0 0 100% 0)', 'inset(0 0 0% 0)'],
-                  y: [14, 0]
-                },
-                {
-                  duration: 0.7,
-                  ease: [0.22, 1, 0.36, 1]
-                }
-              );
+          const animation = animate(
+            element,
+            {
+              opacity: [0.5, 1, 1],
+              y: [22, -3, 0],
+              rotate: [Number(element.dataset.tilt), 0.6, 0],
+              scale: [0.92, 1.025, 1]
+            },
+            {
+              duration: 0.7,
+              delay: Number(element.dataset.reveal || 0) / 1000,
+              times: [0, 0.72, 1],
+              ease: [0.22, 1, 0.36, 1]
+            }
+          );
           animations.set(element, animation);
         });
       },
