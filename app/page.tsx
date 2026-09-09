@@ -1,3 +1,4 @@
+import HomeMotion from 'components/home/home-motion';
 import BookingButton from 'components/marketing/booking-button';
 import ClassroomVideo from 'components/home/classroom-video';
 import styles from 'components/home/homepage.module.css';
@@ -67,7 +68,7 @@ const steps = [
 
 export default function HomePage() {
   return (
-    <div className={styles.home}>
+    <HomeMotion className={styles.home}>
       <div className={styles.parentLink}>
         Already a SchoolKits family?{' '}
         <Link href="/schools">
@@ -78,16 +79,20 @@ export default function HomePage() {
         <ClassroomVideo />
         <div className={styles.tint} />
         <div className={styles.heroContent}>
-          <p className={styles.eyebrow}>MORE FOR YOUR SCHOOL. READY FOR YOUR CLASSROOMS.</p>
-          <h1 id="homepage-heading">Your school-supply program should do more.</h1>
-          <p className={styles.heroCopy}>
+          <p data-reveal="0" className={styles.eyebrow}>
+            MORE FOR YOUR SCHOOL. READY FOR YOUR CLASSROOMS.
+          </p>
+          <h1 data-reveal="60" id="homepage-heading">
+            Your school-supply program should do more.
+          </h1>
+          <p data-reveal="100" className={styles.heroCopy}>
             Bring more to your school community—with fundraising, staff appreciation, and
             sponsorship options worth a conversation.
           </p>
-          <p className={styles.serviceCopy}>
+          <p data-reveal="140" className={styles.serviceCopy}>
             Custom kits from your supply lists. Packed by us. Delivered to classrooms.
           </p>
-          <div className={styles.actions}>
+          <div data-reveal="180" className={styles.actions}>
             <BookingButton className={styles.primary}>
               Partner with us <ArrowRight size={18} aria-hidden="true" />
             </BookingButton>
@@ -98,8 +103,8 @@ export default function HomePage() {
         </div>
       </section>
       <section className={styles.benefits} aria-label="More possibilities for your school">
-        {benefits.map(({ title, icon: Icon, description }) => (
-          <article key={title}>
+        {benefits.map(({ title, icon: Icon, description }, index) => (
+          <article data-reveal={index * 70} key={title}>
             <div className={styles.benefitTitle}>
               <span>
                 <Icon size={23} strokeWidth={1.6} aria-hidden="true" />
@@ -112,7 +117,9 @@ export default function HomePage() {
       </section>
       <section className={styles.brandSection} aria-labelledby="brand-heading">
         <p className={styles.eyebrow}>QUALITY STARTS WITH THE SUPPLIES</p>
-        <h2 id="brand-heading">Familiar brands. Ready for their classrooms.</h2>
+        <h2 data-reveal="0" id="brand-heading">
+          Familiar brands. Ready for their classrooms.
+        </h2>
         <p className={styles.brandCopy}>
           From Crayola to Elmer’s, we build kits with well-known brands and teacher-endorsed house
           brands, guided by your school’s supply lists.
@@ -127,8 +134,8 @@ export default function HomePage() {
             { src: fiskar, name: 'Fiskars' },
             { src: kleenex, name: 'Kleenex' },
             { src: mead, name: 'Mead' }
-          ].map((brand) => (
-            <li key={brand.name}>
+          ].map((brand, index) => (
+            <li data-reveal={(index % 4) * 50} key={brand.name}>
               <Image src={brand.src} alt={brand.name} width={160} height={160} />
               <span aria-hidden="true">{brand.name}</span>
             </li>
@@ -136,7 +143,7 @@ export default function HomePage() {
         </ul>
       </section>
       <section id="how-it-works" className={styles.how}>
-        <div className={styles.sectionIntro}>
+        <div data-reveal="0" className={styles.sectionIntro}>
           <p className={styles.eyebrow}>THE SCHOOL SUPPLIES, HANDLED</p>
           <h2>
             A thoughtful program.
@@ -148,8 +155,8 @@ export default function HomePage() {
           </p>
         </div>
         <div className={styles.steps}>
-          {steps.map((step) => (
-            <article key={step.number}>
+          {steps.map((step, index) => (
+            <article data-reveal={index * 70} key={step.number}>
               <span className={styles.number}>{step.number}</span>
               <p className={styles.owner}>{step.owner}</p>
               <h3>{step.title}</h3>
@@ -159,7 +166,7 @@ export default function HomePage() {
         </div>
       </section>
       <section className={styles.evidence}>
-        <div className={styles.suppliesImage}>
+        <div data-reveal="0" className={styles.suppliesImage}>
           <Image
             src={supplies}
             alt="A selection of school supplies ready for the classroom"
@@ -168,7 +175,7 @@ export default function HomePage() {
             className="object-cover"
           />
         </div>
-        <div className={styles.evidenceCopy}>
+        <div data-reveal="80" className={styles.evidenceCopy}>
           <p className={styles.eyebrow}>BUILT AROUND THE TEACHER’S LIST</p>
           <h2>
             The supplies they asked for.
@@ -192,7 +199,7 @@ export default function HomePage() {
           </ul>
         </div>
       </section>
-      <section className={styles.partnership}>
+      <section data-reveal="0" className={styles.partnership}>
         <p className={styles.eyebrow}>LET’S START WITH YOUR SCHOOL</p>
         <h2>
           What could your supply
@@ -210,6 +217,6 @@ export default function HomePage() {
           Here to order for your child? <Link href="/schools">Shop by school</Link>
         </p>
       </section>
-    </div>
+    </HomeMotion>
   );
 }

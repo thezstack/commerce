@@ -475,3 +475,29 @@
     scroll-behavior: auto;
   }
 }
+
+@media (prefers-reduced-motion: no-preference) and (hover: hover) {
+  .primary,
+  .secondary,
+  .brands li {
+    transition:
+      transform 180ms ease,
+      box-shadow 180ms ease,
+      background-color 180ms ease;
+  }
+  .primary:hover,
+  .secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 14px rgba(7, 59, 76, 0.12);
+  }
+  .brands li:hover {
+    box-shadow: 0 6px 18px rgba(7, 59, 76, 0.09);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
