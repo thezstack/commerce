@@ -50,7 +50,15 @@ export default function BookingButton({
       >
         <div className="fixed inset-0 bg-[#073B4C]/50" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center sm:p-6">
-          <Dialog.Panel className="flex h-dvh w-full flex-col overflow-hidden bg-white pt-[env(safe-area-inset-top)] shadow-2xl sm:h-[min(900px,90dvh)] sm:max-w-6xl sm:rounded-2xl">
+          <Dialog.Panel
+            className={`flex h-dvh w-full flex-col overflow-hidden bg-white pt-[env(safe-area-inset-top)] shadow-2xl sm:rounded-2xl ${
+              step === 'booking'
+                ? 'sm:h-[min(900px,90dvh)] sm:max-w-6xl'
+                : step === 'contact'
+                ? 'sm:h-[min(800px,90dvh)] sm:max-w-2xl'
+                : 'sm:h-[min(520px,90dvh)] sm:max-w-4xl'
+            }`}
+          >
             <div className="flex shrink-0 items-center justify-between gap-3 border-b border-[#CFE8F0] px-4 py-3 sm:px-6">
               <div>
                 {step !== 'choice' && (
