@@ -79,7 +79,6 @@ export default function HomePage() {
         <ClassroomVideo />
         <div className={styles.tint} />
         <div className={styles.heroContent}>
-          <p className={styles.eyebrow}>SCHOOL SUPPLIES WITH YOUR SCHOOL IN MIND</p>
           <h1 id="homepage-heading">
             Your school-supply program should do{' '}
             <span data-reveal="0" data-motion="emphasis" className={styles.titleEmphasis}>
@@ -87,12 +86,7 @@ export default function HomePage() {
             </span>
           </h1>
           <p className={styles.heroCopy}>
-            Let’s talk about how your supply program can support your school through fundraising,
-            staff appreciation, and sponsorship opportunities.
-          </p>
-          <p className={styles.serviceCopy}>
-            We build custom kits from your school’s supply lists, pack them, and deliver to
-            classrooms.
+            Custom kits from your school’s lists, packed by us and delivered to classrooms.
           </p>
           <div className={styles.actions}>
             <BookingButton className={styles.primary}>
