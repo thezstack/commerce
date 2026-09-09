@@ -63,13 +63,8 @@ const ContactForm = ({
       document.head.appendChild(script);
     }
 
-    return () => {
-      // Cleanup if component unmounts
-      const script = document.querySelector('script[src*="recaptcha"]');
-      if (script) {
-        script.remove();
-      }
-    };
+    // reCAPTCHA is shared for the page lifetime. Keep a pending loader intact
+    // when the dialog closes so reopening cannot strand a partially loaded API.
   }, []);
 
   // Function to get reCAPTCHA token
