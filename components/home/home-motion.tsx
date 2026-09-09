@@ -45,9 +45,9 @@ export default function HomeMotion({
             element.dataset.motion === 'headline'
               ? animate(
                   element,
-                  { scale: [0.9, 1], y: [10, 0] },
+                  { opacity: [0.35, 1] },
                   {
-                    duration: 0.95,
+                    duration: 0.65,
                     ease: [0.22, 1, 0.36, 1]
                   }
                 )
