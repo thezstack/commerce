@@ -27,42 +27,42 @@ const benefits = [
     title: 'Fundraising',
     icon: HandHeart,
     description:
-      'Put your supply program to work for your school. Talk with us about available fundraising options and how they could fit your goals.'
+      'Have a fundraising goal in mind? Let’s discuss how your school’s supply program could support it and what options are available.'
   },
   {
     title: 'Staff appreciation',
     icon: Gift,
     description:
-      'Make your team part of the conversation. Ask about staff appreciation options alongside your school’s supply program.'
+      'Ask how staff appreciation could be part of your supply program. We’ll talk through the available options for recognizing your team.'
   },
   {
     title: 'Sponsorships',
     icon: HeartHandshake,
     description:
-      'Explore ways to involve your community in supporting students. We’ll discuss sponsorship options and what may be available for your school.'
+      'Interested in community support for your students? Talk with us about sponsorship options and what may be available for your school.'
   }
 ];
 const steps = [
   {
     number: '01',
-    title: 'Your lists. Your classroom needs.',
+    title: 'Share your school’s supply lists.',
     owner: 'YOUR SCHOOL + SCHOOLKITS',
     description:
       'Share your grade-level supply lists, estimated student count, and timeline. We work with your team to build custom kits around those requirements.'
   },
   {
     number: '02',
-    title: 'A simple way for families to order.',
+    title: 'Families order through your school’s page.',
     owner: 'YOUR SCHOOL + FAMILIES',
     description:
       'Share your school’s ordering page and deadlines with parents. Families choose their school and purchase their child’s kit online.'
   },
   {
     number: '03',
-    title: 'We pack. We deliver.',
+    title: 'We pack the kits and deliver to classrooms.',
     owner: 'SCHOOLKITS',
     description:
-      'Our team handles the packing and classroom delivery. Your school confirms the delivery timing, classroom details, and point of contact with us.'
+      'We handle packing and classroom delivery. Your school confirms when and where the kits should arrive and who we should contact.'
   }
 ];
 
@@ -79,7 +79,7 @@ export default function HomePage() {
         <ClassroomVideo />
         <div className={styles.tint} />
         <div className={styles.heroContent}>
-          <p className={styles.eyebrow}>MORE FOR YOUR SCHOOL. READY FOR YOUR CLASSROOMS.</p>
+          <p className={styles.eyebrow}>SCHOOL SUPPLIES WITH YOUR SCHOOL IN MIND</p>
           <h1 id="homepage-heading">
             Your school-supply program should do{' '}
             <span data-reveal="0" data-motion="emphasis" className={styles.titleEmphasis}>
@@ -87,11 +87,12 @@ export default function HomePage() {
             </span>
           </h1>
           <p className={styles.heroCopy}>
-            Bring more to your school community—with fundraising, staff appreciation, and
-            sponsorship options worth a conversation.
+            Let’s talk about how your supply program can support your school through fundraising,
+            staff appreciation, and sponsorship opportunities.
           </p>
           <p className={styles.serviceCopy}>
-            Custom kits from your supply lists. Packed by us. Delivered to classrooms.
+            We build custom kits from your school’s supply lists, pack them, and deliver to
+            classrooms.
           </p>
           <div className={styles.actions}>
             <BookingButton className={styles.primary}>
@@ -118,10 +119,10 @@ export default function HomePage() {
       </section>
       <section className={styles.brandSection} aria-labelledby="brand-heading">
         <p className={styles.eyebrow}>QUALITY STARTS WITH THE SUPPLIES</p>
-        <h2 id="brand-heading">Familiar brands. Ready for their classrooms.</h2>
+        <h2 id="brand-heading">Familiar brands for your classrooms.</h2>
         <p className={styles.brandCopy}>
-          From Crayola to Elmer’s, we build kits with well-known brands and teacher-endorsed house
-          brands, guided by your school’s supply lists.
+          Crayola, Elmer’s, and other familiar names belong in the classroom. We build kits around
+          your supply lists, using these brands alongside teacher-endorsed house brands.
         </p>
         <ul className={styles.brands}>
           {[
@@ -145,14 +146,15 @@ export default function HomePage() {
       </section>
       <section id="how-it-works" className={styles.how}>
         <div className={styles.sectionIntro}>
-          <p className={styles.eyebrow}>THE SCHOOL SUPPLIES, HANDLED</p>
+          <p className={styles.eyebrow}>HOW THE PROGRAM WORKS</p>
           <h2>
-            A thoughtful program.
-            <br />A straightforward process.
+            From your supply lists
+            <br />
+            to your classrooms.
           </h2>
           <p>
-            You know your classrooms. We help turn their supply lists into kits, with a clear role
-            for everyone along the way.
+            Your school shares the lists and keeps families informed. Parents order online, and we
+            handle the kits. Here’s how we work together.
           </p>
         </div>
         <div className={styles.steps}>
@@ -179,13 +181,13 @@ export default function HomePage() {
         <div className={styles.evidenceCopy}>
           <p className={styles.eyebrow}>BUILT AROUND THE TEACHER’S LIST</p>
           <h2>
-            The supplies they asked for.
+            Every kit starts
             <br />
-            The preparation we handle.
+            with your teachers’ lists.
           </h2>
           <p>
-            Our program starts with your school’s requirements, with familiar brands and
-            teacher-endorsed house brands to meet classroom needs.
+            Each grade or class has its own supply needs. We work from your school’s requirements to
+            put together the kits and coordinate delivery with your team.
           </p>
           <ul>
             <li>
@@ -203,13 +205,14 @@ export default function HomePage() {
       <section className={styles.partnership}>
         <p className={styles.eyebrow}>LET’S START WITH YOUR SCHOOL</p>
         <h2>
-          What could your supply
+          Let’s plan your school’s
           <br />
-          program do for you?
+          supply program.
         </h2>
         <p>
-          Bring your lists, your timeline, and your goals. We’ll talk through the program and the
-          fundraising, staff appreciation, and sponsorship options available to your school.
+          Tell us what your school needs and when you need it. We’ll walk through the program
+          together, including any fundraising, staff appreciation, or sponsorship questions you
+          have.
         </p>
         <BookingButton className={styles.primary}>
           Partner with us <ArrowRight size={18} aria-hidden="true" />

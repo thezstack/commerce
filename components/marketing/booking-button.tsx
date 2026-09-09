@@ -107,8 +107,8 @@ export default function BookingButton({
               {step === 'choice' && (
                 <div className="mx-auto max-w-3xl px-5 py-8 sm:px-8 sm:py-12">
                   <p className="mb-7 text-[16px] leading-relaxed text-[#315565]">
-                    Tell us a little about your school, or pick a time to talk. Choose whichever
-                    works best for you.
+                    Send your questions for an email reply, or book a short call to talk them
+                    through.
                   </p>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <button
@@ -122,8 +122,8 @@ export default function BookingButton({
                       <Mail className="mb-4 text-[#0B80A7]" aria-hidden="true" />
                       <span className="block text-xl font-bold text-[#073B4C]">Send a message</span>
                       <span className="mt-3 block text-[16px] leading-relaxed text-[#315565]">
-                        Have a question or want to share your school’s needs? Send the details here
-                        so our team can follow up by email.
+                        Share your school’s needs or ask a question. Our team will follow up by
+                        email.
                       </span>
                       <span className="mt-5 flex items-center gap-2 font-semibold text-[#0B80A7]">
                         Open contact form <ArrowRight size={18} aria-hidden="true" />
@@ -139,8 +139,8 @@ export default function BookingButton({
                         Book a 15-minute call
                       </span>
                       <span className="mt-3 block text-[16px] leading-relaxed text-[#315565]">
-                        Prefer a conversation? Choose a time to discuss your supply lists, timeline,
-                        and school program options.
+                        Talk through your supply lists, timing, and questions about the program with
+                        our team.
                       </span>
                       <span className="mt-5 flex items-center gap-2 font-semibold text-[#0B80A7]">
                         Choose a time <ArrowRight size={18} aria-hidden="true" />
