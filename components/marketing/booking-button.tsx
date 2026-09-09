@@ -1,8 +1,9 @@
 'use client';
 
 import { Dialog } from '@headlessui/react';
-import { X } from 'lucide-react';
-import { useRef, useState, type ReactNode } from 'react';
+import { ArrowLeft, ArrowRight, CalendarDays, Mail, X } from 'lucide-react';
+import ContactForm from 'components/contact';
+import { Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
 import { schoolBookingUrl } from 'lib/school-contact';
 
 export default function BookingButton({
@@ -17,6 +18,12 @@ export default function BookingButton({
   source?: 'homepage' | 'for_schools';
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [step, setStep] = useState<'choice' | 'contact' | 'booking'>('choice');
+  const [contactVisited, setContactVisited] = useState(false);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (isOpen) titleRef.current?.focus();
+  }, [step, isOpen]);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const openBooking = () => {
     (
@@ -27,6 +34,7 @@ export default function BookingButton({
       event_category: 'lead',
       event_label: 'google_calendar_booking_button'
     });
+    setStep('choice');
     setIsOpen(true);
   };
   return (
@@ -45,34 +53,112 @@ export default function BookingButton({
           <Dialog.Panel className="flex h-dvh w-full flex-col overflow-hidden bg-white pt-[env(safe-area-inset-top)] shadow-2xl sm:h-[min(900px,90dvh)] sm:max-w-6xl sm:rounded-2xl">
             <div className="flex shrink-0 items-center justify-between gap-3 border-b border-[#CFE8F0] px-4 py-3 sm:px-6">
               <div>
-                <Dialog.Title className="text-lg font-bold text-[#073B4C]">
-                  Schedule a call
-                </Dialog.Title>
-                <a
-                  href={bookingUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-[#0B80A7] underline underline-offset-4"
+                {step !== 'choice' && (
+                  <button
+                    type="button"
+                    onClick={() => setStep('choice')}
+                    className="mb-1 flex min-h-10 items-center gap-2 text-sm font-semibold text-[#0B80A7]"
+                  >
+                    <ArrowLeft size={16} aria-hidden="true" />
+                    All contact options
+                  </button>
+                )}
+                <Dialog.Title
+                  ref={titleRef}
+                  tabIndex={-1}
+                  className="text-lg font-bold text-[#073B4C] outline-none"
                 >
-                  Open in Google Calendar (new tab)
-                </a>
+                  {step === 'choice'
+                    ? 'Let’s talk about your school'
+                    : step === 'contact'
+                    ? 'Send us a message'
+                    : 'Book a 15-minute call'}
+                </Dialog.Title>
+                {step === 'booking' && (
+                  <a
+                    href={bookingUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-[#0B80A7] underline underline-offset-4"
+                  >
+                    Open in Google Calendar (new tab)
+                  </a>
+                )}
               </div>
               <button
                 ref={closeButtonRef}
                 type="button"
                 onClick={() => setIsOpen(false)}
-                aria-label="Close booking calendar"
+                aria-label="Close contact options"
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#E7F7FB] text-[#073B4C] hover:bg-[#CFE8F0] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0B80A7]"
               >
                 <X className="h-6 w-6" aria-hidden="true" />
               </button>
             </div>
-            <div className="min-h-0 flex-1 pb-[env(safe-area-inset-bottom)]">
-              <iframe
-                src={bookingUrl}
-                title="Book a 15-minute call with School Kits"
-                className="block h-full w-full border-0"
-              />
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)]">
+              {step === 'choice' && (
+                <div className="mx-auto max-w-3xl px-5 py-8 sm:px-8 sm:py-12">
+                  <p className="mb-7 text-[16px] leading-relaxed text-[#315565]">
+                    Tell us a little about your school, or pick a time to talk. Choose whichever
+                    works best for you.
+                  </p>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setContactVisited(true);
+                        setStep('contact');
+                      }}
+                      className="rounded-2xl border border-[#CFE8F0] bg-[#F3FAFC] p-6 text-left transition hover:border-[#0B80A7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0B80A7]"
+                    >
+                      <Mail className="mb-4 text-[#0B80A7]" aria-hidden="true" />
+                      <span className="block text-xl font-bold text-[#073B4C]">Send a message</span>
+                      <span className="mt-3 block text-[16px] leading-relaxed text-[#315565]">
+                        Have a question or want to share your school’s needs? Send the details here
+                        so our team can follow up by email.
+                      </span>
+                      <span className="mt-5 flex items-center gap-2 font-semibold text-[#0B80A7]">
+                        Open contact form <ArrowRight size={18} aria-hidden="true" />
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setStep('booking')}
+                      className="rounded-2xl border border-[#CFE8F0] bg-white p-6 text-left transition hover:border-[#0B80A7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0B80A7]"
+                    >
+                      <CalendarDays className="mb-4 text-[#0B80A7]" aria-hidden="true" />
+                      <span className="block text-xl font-bold text-[#073B4C]">
+                        Book a 15-minute call
+                      </span>
+                      <span className="mt-3 block text-[16px] leading-relaxed text-[#315565]">
+                        Prefer a conversation? Choose a time to discuss your supply lists, timeline,
+                        and school program options.
+                      </span>
+                      <span className="mt-5 flex items-center gap-2 font-semibold text-[#0B80A7]">
+                        Choose a time <ArrowRight size={18} aria-hidden="true" />
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              )}
+              {contactVisited && (
+                <div hidden={step !== 'contact'} className="mx-auto max-w-2xl px-5 py-6 sm:px-8">
+                  <p className="mb-5 text-[16px] leading-relaxed text-[#315565]">
+                    Include your school’s name and what you’d like help with. We’ll reply to the
+                    email address you provide.
+                  </p>
+                  <Suspense fallback={<p role="status">Loading contact form…</p>}>
+                    <ContactForm variant="modal" metadata={{ persona: 'school_administrator' }} />
+                  </Suspense>
+                </div>
+              )}
+              {step === 'booking' && (
+                <iframe
+                  src={bookingUrl}
+                  title="Book a 15-minute call with School Kits"
+                  className="block h-full w-full border-0"
+                />
+              )}
             </div>
           </Dialog.Panel>
         </div>

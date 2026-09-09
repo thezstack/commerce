@@ -95,12 +95,6 @@ export default function HomePage() {
               See how it works <ArrowDown size={17} aria-hidden="true" />
             </Link>
           </div>
-          <p className={styles.emailOption}>
-            Prefer email?{' '}
-            <a href="mailto:hello@schoolkits.org?subject=School%20partnership%20inquiry">
-              Email our team
-            </a>
-          </p>
         </div>
       </section>
       <section className={styles.benefits} aria-label="More possibilities for your school">
@@ -212,12 +206,6 @@ export default function HomePage() {
         <BookingButton className={styles.primary}>
           Partner with us <ArrowRight size={18} aria-hidden="true" />
         </BookingButton>
-        <p className={styles.emailOption}>
-          Prefer email?{' '}
-          <a href="mailto:hello@schoolkits.org?subject=School%20partnership%20inquiry">
-            hello@schoolkits.org
-          </a>
-        </p>
         <p className={styles.parentNote}>
           Here to order for your child? <Link href="/schools">Shop by school</Link>
         </p>
