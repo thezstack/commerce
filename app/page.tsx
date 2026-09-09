@@ -6,13 +6,13 @@ import { ArrowDown, ArrowRight, Gift, HandHeart, HeartHandshake, Check } from 'l
 import Image from 'next/image';
 import Link from 'next/link';
 import avery from '../media/Avery.svg';
-import crayola from '../media/Crayola.svg';
+import crayola from '../media/crayola-card.webp';
 import elmer from '../media/elmer.svg';
 import expo from '../media/expo.svg';
 import fiskar from '../media/Fiskar.png';
 import mead from '../media/Mead.png';
 import kleenex from '../media/kleenex.svg';
-import sharpie from '../media/sharpie.svg';
+import sharpie from '../media/sharpie-card.webp';
 import supplies from '../media/Frame 37280bottom_cta.png';
 
 export const metadata = {

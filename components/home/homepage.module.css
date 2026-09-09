@@ -29,7 +29,7 @@
   min-height: 590px;
   isolation: isolate;
   overflow: hidden;
-  background: #f7f4ee url('/media/classroom-morning.jpg') center top / cover no-repeat;
+  background: #f7f4ee;
 }
 .video {
   position: absolute;
@@ -38,15 +38,20 @@
   height: 100%;
   object-fit: cover;
   object-position: center top;
+  z-index: -2;
+  pointer-events: none;
+}
+.poster {
+  position: absolute;
+  inset: 0;
   z-index: -3;
   pointer-events: none;
 }
-.videoPoster {
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  background: inherit;
-  pointer-events: none;
+.poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
 }
 .tint {
   position: absolute;
@@ -372,9 +377,9 @@
   }
   .hero {
     min-height: 750px;
-    background-image: url('/media/school-life-mobile.jpg');
-    background-position: center;
-    background-size: cover;
+  }
+  .poster img {
+    object-position: center;
   }
   .video {
     inset: 0;

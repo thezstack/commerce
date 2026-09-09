@@ -5,12 +5,12 @@ import { useEffect, useRef, useState } from 'react';
 import styles from './homepage.module.css';
 
 const desktopMedia = {
-  video: '/media/classroom-morning.mp4',
-  poster: '/media/classroom-morning.jpg'
+  video: '/media/optimized/classroom-morning.52d906a71334.mp4',
+  poster: '/media/optimized/classroom-morning.fcab18338d7b.webp'
 };
 const mobileMedia = {
-  video: '/media/school-life-mobile.mp4',
-  poster: '/media/school-life-mobile.jpg'
+  video: '/media/optimized/school-life-mobile.5bd547d598de.mp4',
+  poster: '/media/optimized/school-life-mobile.78e4356aeb2f.webp'
 };
 const selectMedia = () =>
   window.matchMedia('(max-width: 600px)').matches ? mobileMedia : desktopMedia;
@@ -88,11 +88,36 @@ export default function ClassroomVideo() {
 
   return (
     <>
+      <link
+        rel="preload"
+        as="image"
+        href={mobileMedia.poster}
+        media="(max-width: 600px)"
+        fetchPriority="high"
+      />
+      <link
+        rel="preload"
+        as="image"
+        href={desktopMedia.poster}
+        media="(min-width: 601px)"
+        fetchPriority="high"
+      />
+      <picture className={styles.poster} aria-hidden="true">
+        <source media="(max-width: 600px)" srcSet={mobileMedia.poster} />
+        {/* Native picture selects one poster before hydration, including on phones. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={desktopMedia.poster}
+          alt=""
+          fetchPriority="high"
+          loading="eager"
+          decoding="async"
+        />
+      </picture>
       <video
         ref={videoRef}
         id="classroom-video"
         className={styles.video}
-        poster="/media/classroom-morning.jpg"
         autoPlay
         muted
         loop
@@ -113,10 +138,8 @@ export default function ClassroomVideo() {
           setFailed(true);
           setPlaying(false);
         }}
-        style={failed ? { visibility: 'hidden' } : undefined}
+        style={showPoster || failed ? { visibility: 'hidden' } : undefined}
       />
-      {/* Keep the video visible while attempting autoplay; cover only its fallback state. */}
-      {(showPoster || failed) && <div className={styles.videoPoster} aria-hidden="true" />}
       <div className={styles.videoControl}>
         {failed ? (
           <span role="status">School day preview shown</span>
