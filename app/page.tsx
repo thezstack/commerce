@@ -80,8 +80,11 @@ export default function HomePage() {
         <div className={styles.tint} />
         <div className={styles.heroContent}>
           <p className={styles.eyebrow}>MORE FOR YOUR SCHOOL. READY FOR YOUR CLASSROOMS.</p>
-          <h1 data-reveal="0" data-motion="headline" id="homepage-heading">
-            Your school-supply program should do more.
+          <h1 id="homepage-heading">
+            Your school-supply program should do{' '}
+            <span data-reveal="0" data-motion="emphasis" className={styles.titleEmphasis}>
+              more.
+            </span>
           </h1>
           <p className={styles.heroCopy}>
             Bring more to your school community—with fundraising, staff appreciation, and

@@ -517,3 +517,9 @@
 .partnership [data-motion='headline'] {
   transform-origin: center;
 }
+
+.titleEmphasis {
+  display: inline-block;
+  font-size: 1.08em;
+  transform-origin: left bottom;
+}

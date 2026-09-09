@@ -42,7 +42,16 @@ export default function HomeMotion({
           revealed.add(element);
           observer.unobserve(element);
           const animation =
-            element.dataset.motion === 'headline'
+            element.dataset.motion === 'emphasis'
+              ? animate(
+                  element,
+                  { opacity: [0.15, 1], scale: [0.86, 1] },
+                  {
+                    duration: 1.1,
+                    ease: [0.22, 1, 0.36, 1]
+                  }
+                )
+              : element.dataset.motion === 'headline'
               ? animate(
                   element,
                   { opacity: [0.35, 1] },
