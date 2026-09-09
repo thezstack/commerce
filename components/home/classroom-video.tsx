@@ -9,8 +9,8 @@ const desktopMedia = {
   poster: '/media/optimized/classroom-morning.fcab18338d7b.webp'
 };
 const mobileMedia = {
-  video: '/media/optimized/school-life-mobile.5bd547d598de.mp4',
-  poster: '/media/optimized/school-life-mobile.78e4356aeb2f.webp'
+  video: '/media/optimized/reading-art-garden.df723a4dd2cd.mp4',
+  poster: '/media/optimized/reading-art-garden.f685337dc6a3.webp'
 };
 const selectMedia = () =>
   window.matchMedia('(max-width: 600px)').matches ? mobileMedia : desktopMedia;

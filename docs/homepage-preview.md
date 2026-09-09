@@ -105,3 +105,13 @@ fallback.
 Vercel's configured production branch is `main`. Merging this branch will trigger
 production deployment. Merge and production launch require explicit approval;
 preview sharing protection remains unchanged.
+
+## Alternate mobile video preview
+
+Branch `agent/homepage-reading-art-garden` replaces only the mobile hero with
+Runway task `6fdf6ab0-eadf-453f-9ccd-6f3924d36b86`: reading circle, collaborative
+art, and outdoor garden learning. The source is silent, 720×1280, and 15.041
+seconds. The served 540×960 H.264 faststart copy is 935,163 bytes, with an
+extracted WebP poster. Content-hashed filenames retain immutable caching.
+The original desktop video is unchanged. This is a separate review option;
+the original feature branch and its pull request retain the previous video.
