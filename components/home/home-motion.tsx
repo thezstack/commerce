@@ -56,7 +56,7 @@ export default function HomeMotion({
           const card = shell.querySelector<HTMLElement>('[data-brand-card]');
           if (!card) continue;
           const wasVisible = visibleCards.get(card) ?? false;
-          const shouldEnter = entry.isIntersecting && entry.intersectionRatio >= 0.25;
+          const shouldEnter = entry.isIntersecting && entry.intersectionRatio >= 0.1;
           const shouldExit = !entry.isIntersecting || entry.intersectionRatio <= 0.05;
           if ((!shouldEnter || wasVisible) && (!shouldExit || !wasVisible)) continue;
           animations.get(card)?.stop();
@@ -74,7 +74,7 @@ export default function HomeMotion({
           );
         }
       },
-      { threshold: [0, 0.05, 0.25] }
+      { threshold: [0, 0.05, 0.1] }
     );
 
     const reset = () => {
@@ -103,13 +103,10 @@ export default function HomeMotion({
           0,
           Math.min(rect.bottom, innerHeight) - Math.max(rect.top, 0)
         );
-        const alreadyVisible = visibleHeight >= rect.height * 0.25;
+        const alreadyVisible = visibleHeight >= rect.height * 0.1;
         visibleCards.set(card, alreadyVisible);
         if (!alreadyVisible) {
           card.style.opacity = '0';
-          card.style.transform = `translateY(18px) scale(0.94) rotate(${Number(
-            shell.dataset.tilt
-          )}deg)`;
         }
         cardObserver.observe(shell);
       });
