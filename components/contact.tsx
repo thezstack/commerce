@@ -63,13 +63,8 @@ const ContactForm = ({
       document.head.appendChild(script);
     }
 
-    return () => {
-      // Cleanup if component unmounts
-      const script = document.querySelector('script[src*="recaptcha"]');
-      if (script) {
-        script.remove();
-      }
-    };
+    // reCAPTCHA is shared for the page lifetime. Keep a pending loader intact
+    // when the dialog closes so reopening cannot strand a partially loaded API.
   }, []);
 
   // Function to get reCAPTCHA token
@@ -92,7 +87,7 @@ const ContactForm = ({
   };
 
   // Form submission handler with API endpoint
-  const handleFormSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
@@ -166,7 +161,7 @@ const ContactForm = ({
 
   if (submitSuccess) {
     return (
-      <div className="mx-auto max-w-6xl p-4 text-center sm:p-6 lg:p-8">
+      <div role="status" className="mx-auto max-w-6xl p-4 text-center sm:p-6 lg:p-8">
         <h2 className="mb-4 text-2xl font-bold">Thank you for contacting us!</h2>
         <p>We have received your message and will get back to you soon.</p>
       </div>
@@ -174,7 +169,7 @@ const ContactForm = ({
   }
 
   const inputClassName = (fieldName: string) =>
-    `w-full rounded-md border p-2 text-sm ${
+    `w-full rounded-md border p-3 text-[16px] ${
       fieldErrors[fieldName]
         ? 'border-red-500 bg-red-50 focus:border-red-500 focus:outline-red-500'
         : ''
@@ -208,11 +203,11 @@ const ContactForm = ({
                 You’re reaching out about: <span className="font-semibold">{resolvedSchool}</span>
               </p>
             ) : null}
-            <p className="mb-6 text-sm sm:text-base lg:text-lg">
+            <p className="mb-6 text-sm sm:text-[16px] lg:text-lg">
               We work closely with schools to create customized supply kits that meet exact
               classroom requirements, saving time and reducing stress for everyone involved.
             </p>
-            <p className="mb-4 text-sm sm:text-base lg:text-lg">
+            <p className="mb-4 text-sm sm:text-[16px] lg:text-lg">
               By partnering with SchoolKits, you'll:
             </p>
             <ul className="mb-6 space-y-2">
@@ -239,7 +234,7 @@ const ContactForm = ({
                 </li>
               ))}
             </ul>
-            <p className="mb-6 text-sm sm:text-base lg:text-lg">
+            <p className="mb-6 text-sm sm:text-[16px] lg:text-lg">
               Let's work together to create a smoother back-to-school season. Fill out the form
               below to start the conversation about bringing SchoolKits to your school.
             </p>
@@ -255,7 +250,7 @@ const ContactForm = ({
         )}
 
         <div className={variant === 'modal' ? 'sm:col-span-2' : 'lg:w-1/2'}>
-          <div className="space-y-4">
+          <form onSubmit={handleFormSubmit} className="space-y-4">
             <div>
               <label htmlFor="fullName" className="mb-1 block text-sm font-medium text-[#073B4C]">
                 Full name
@@ -329,16 +324,19 @@ const ContactForm = ({
             </div>
 
             <button
-              type="button"
-              className="w-full rounded-full bg-[#0B80A7] px-4 py-3 text-sm font-medium text-white transition-colors duration-300 hover:bg-[#096c8c] sm:text-base"
+              type="submit"
+              className="w-full rounded-full bg-[#0B80A7] px-4 py-3 text-sm font-medium text-white transition-colors duration-300 hover:bg-[#096c8c] sm:text-[16px]"
               disabled={isSubmitting}
-              onClick={handleFormSubmit}
             >
               {isSubmitting ? 'Sending...' : 'Send message'}
             </button>
 
-            {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
-          </div>
+            {error && (
+              <p role="alert" className="mt-2 text-sm text-red-500">
+                {error}
+              </p>
+            )}
+          </form>
         </div>
       </div>
     </div>

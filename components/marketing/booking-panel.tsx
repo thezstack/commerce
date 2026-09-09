@@ -1,76 +1,9 @@
-'use client';
-
 import { CalendarDays } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import BookingButton from './booking-button';
 
-type BookingPanelProps = {
-  bookingUrl?: string;
-};
-
-type GoogleSchedulingButton = {
-  load: (options: { url: string; color: string; label: string; target: HTMLElement }) => void;
-};
-
-type WindowWithGoogleScheduling = Window & {
-  calendar?: {
-    schedulingButton?: GoogleSchedulingButton;
-  };
-  gtag?: (command: 'event', eventName: string, params?: Record<string, string>) => void;
-};
-
-const scriptSrc = 'https://calendar.google.com/calendar/scheduling-button-script.js';
-const stylesheetHref = 'https://calendar.google.com/calendar/scheduling-button-script.css';
+type BookingPanelProps = { bookingUrl?: string };
 
 export default function BookingPanel({ bookingUrl }: BookingPanelProps) {
-  const buttonTargetRef = useRef<HTMLDivElement>(null);
-
-  const trackBookingClick = () => {
-    (window as WindowWithGoogleScheduling).gtag?.('event', 'for_schools_booking_click', {
-      event_category: 'lead',
-      event_label: 'google_calendar_booking_button'
-    });
-  };
-
-  useEffect(() => {
-    if (!bookingUrl || !buttonTargetRef.current) return;
-
-    const loadButton = () => {
-      const schedulingButton = (window as WindowWithGoogleScheduling).calendar?.schedulingButton;
-      if (!schedulingButton || !buttonTargetRef.current) return;
-
-      buttonTargetRef.current.innerHTML = '';
-      schedulingButton.load({
-        url: bookingUrl,
-        color: '#039BE5',
-        label: 'Book an appointment',
-        target: buttonTargetRef.current
-      });
-    };
-
-    if (!document.querySelector(`link[href="${stylesheetHref}"]`)) {
-      const link = document.createElement('link');
-      link.href = stylesheetHref;
-      link.rel = 'stylesheet';
-      document.head.appendChild(link);
-    }
-
-    const existingScript = document.querySelector<HTMLScriptElement>(`script[src="${scriptSrc}"]`);
-    if (existingScript) {
-      if ((window as WindowWithGoogleScheduling).calendar?.schedulingButton) {
-        loadButton();
-      } else {
-        existingScript.addEventListener('load', loadButton, { once: true });
-      }
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = scriptSrc;
-    script.async = true;
-    script.addEventListener('load', loadButton, { once: true });
-    document.body.appendChild(script);
-  }, [bookingUrl]);
-
   if (!bookingUrl) {
     return (
       <div className="rounded-lg border border-[#CFE8F0] bg-white p-5 shadow-sm">
@@ -109,7 +42,13 @@ export default function BookingPanel({ bookingUrl }: BookingPanelProps) {
           </p>
         </div>
       </div>
-      <div ref={buttonTargetRef} onClickCapture={trackBookingClick} className="mt-5" />
+      <BookingButton
+        bookingUrl={bookingUrl}
+        source="for_schools"
+        className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[#0B80A7] px-5 py-3 text-base font-bold text-white transition hover:bg-[#096c8c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#0B80A7] sm:w-auto"
+      >
+        Book an appointment
+      </BookingButton>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { schoolBookingUrl } from 'lib/school-contact';
 import BookingPanel from 'components/marketing/booking-panel';
 import TrackedLink from 'components/marketing/tracked-link';
 import ScrollReveal from 'components/qr-landing/scroll-reveal';
@@ -11,9 +12,6 @@ export const metadata: Metadata = {
   description:
     'Book a short intro call to learn how School Kits builds grade-level school supply packs from your school lists.'
 };
-
-const schoolBookingUrl =
-  'https://calendar.google.com/calendar/appointments/schedules/AcZssZ1qJNg1BpLbvbB1NQa80HJjY1SaTDw55Piok6Rra0E03zzdg2dVqfVtVzgnrJU_YJ1FOb-ibNR_?gv=true';
 
 const quoteDetails = [
   {
