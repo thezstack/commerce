@@ -519,6 +519,7 @@
 }
 
 .titleEmphasis {
+  color: #0b779a;
   display: inline-block;
   font-size: 1.08em;
   transform-origin: left bottom;
