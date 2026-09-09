@@ -20,6 +20,7 @@ export default function ClassroomVideo() {
   const pausedByUser = useRef(false);
   const [playing, setPlaying] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [showPoster, setShowPoster] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -29,18 +30,28 @@ export default function ClassroomVideo() {
     const connection = (navigator as Navigator & { connection?: { saveData?: boolean } })
       .connection;
     const syncMedia = () => {
+      // Set these properties before assigning a source for iOS inline autoplay.
+      video.muted = true;
+      video.defaultMuted = true;
+      video.playsInline = true;
       const media = selectMedia();
       video.poster = media.poster;
       setFailed(false);
       if (preference.matches || connection?.saveData) {
+        setShowPoster(true);
         video.autoplay = false;
         video.pause();
         video.removeAttribute('src');
         video.load();
       } else {
+        setShowPoster(pausedByUser.current);
         video.autoplay = !pausedByUser.current;
         if (video.getAttribute('src') !== media.video) video.src = media.video;
-        if (!pausedByUser.current) void video.play().catch(() => setPlaying(false));
+        if (!pausedByUser.current)
+          void video.play().catch(() => {
+            setPlaying(false);
+            setShowPoster(true);
+          });
       }
     };
     syncMedia();
@@ -63,10 +74,14 @@ export default function ClassroomVideo() {
       return;
     }
     pausedByUser.current = false;
+    setShowPoster(false);
+    video.muted = true;
+    video.playsInline = true;
     if (!video.getAttribute('src')) video.src = selectMedia().video;
     try {
       await video.play();
     } catch {
+      setShowPoster(true);
       setPlaying(false);
     }
   };
@@ -78,23 +93,30 @@ export default function ClassroomVideo() {
         id="classroom-video"
         className={styles.video}
         poster="/media/classroom-morning.jpg"
+        autoPlay
         muted
         loop
         playsInline
         preload="none"
         aria-hidden="true"
         controls={false}
-        onPlaying={() => setPlaying(true)}
+        onPlaying={() => {
+          setShowPoster(false);
+          setPlaying(true);
+        }}
         onEmptied={() => setPlaying(false)}
-        onPause={() => setPlaying(false)}
+        onPause={() => {
+          setPlaying(false);
+          setShowPoster(true);
+        }}
         onError={() => {
           setFailed(true);
           setPlaying(false);
         }}
         style={failed ? { visibility: 'hidden' } : undefined}
       />
-      {/* Cover native mobile play overlays until frames are actually playing. */}
-      {(!playing || failed) && <div className={styles.videoPoster} aria-hidden="true" />}
+      {/* Keep the video visible while attempting autoplay; cover only its fallback state. */}
+      {(showPoster || failed) && <div className={styles.videoPoster} aria-hidden="true" />}
       <div className={styles.videoControl}>
         {failed ? (
           <span role="status">School day preview shown</span>
