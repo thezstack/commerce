@@ -485,21 +485,20 @@
 }
 
 @media (prefers-reduced-motion: no-preference) and (hover: hover) {
-  .primary,
-  .secondary,
   .brands li {
     transition:
-      transform 180ms ease,
-      box-shadow 180ms ease,
-      background-color 180ms ease;
+      box-shadow 200ms ease,
+      border-color 200ms ease;
   }
-  .primary:hover,
-  .secondary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 14px rgba(7, 59, 76, 0.12);
+  .brands img {
+    transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
   }
   .brands li:hover {
-    box-shadow: 0 6px 18px rgba(7, 59, 76, 0.09);
+    box-shadow: 0 8px 20px rgba(7, 59, 76, 0.12);
+    border-color: #aac4cb;
+  }
+  .brands li:hover img {
+    transform: rotate(-3deg) scale(1.06);
   }
 }
 
@@ -507,5 +506,6 @@
   .home [data-reveal] {
     opacity: 1 !important;
     transform: none !important;
+    clip-path: none !important;
   }
 }
