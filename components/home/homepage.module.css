@@ -38,7 +38,15 @@
   height: 100%;
   object-fit: cover;
   object-position: center top;
+  z-index: -3;
+  pointer-events: none;
+}
+.videoPoster {
+  position: absolute;
+  inset: 0;
   z-index: -2;
+  background: inherit;
+  pointer-events: none;
 }
 .tint {
   position: absolute;

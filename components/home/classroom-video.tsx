@@ -83,7 +83,9 @@ export default function ClassroomVideo() {
         playsInline
         preload="none"
         aria-hidden="true"
-        onPlay={() => setPlaying(true)}
+        controls={false}
+        onPlaying={() => setPlaying(true)}
+        onEmptied={() => setPlaying(false)}
         onPause={() => setPlaying(false)}
         onError={() => {
           setFailed(true);
@@ -91,6 +93,8 @@ export default function ClassroomVideo() {
         }}
         style={failed ? { visibility: 'hidden' } : undefined}
       />
+      {/* Cover native mobile play overlays until frames are actually playing. */}
+      {(!playing || failed) && <div className={styles.videoPoster} aria-hidden="true" />}
       <div className={styles.videoControl}>
         {failed ? (
           <span role="status">School day preview shown</span>
@@ -99,7 +103,7 @@ export default function ClassroomVideo() {
             type="button"
             onClick={toggle}
             aria-controls="classroom-video"
-            aria-label={playing ? 'Pause background video' : 'Play background video'}
+            aria-label={playing ? 'Pause video' : 'Play video'}
           >
             {playing ? (
               <Pause size={15} aria-hidden="true" />
