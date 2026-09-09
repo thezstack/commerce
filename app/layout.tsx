@@ -1,4 +1,4 @@
-import { GoogleAnalytics } from '@next/third-parties/google';
+import Script from 'next/script';
 import Footer from 'components/layout/footer';
 import Navbar from 'components/layout/navbar';
 import { ensureStartsWith } from 'lib/utils';
@@ -56,7 +56,19 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         />
       </head>
       <body className="flex min-h-svh flex-col bg-neutral-50 text-black selection:bg-teal-300">
-        <GoogleAnalytics gaId={googleAnalyticsId} />
+        <Script id="_next-ga-init" strategy="afterInteractive">{`
+          window.dataLayer = window.dataLayer || [];
+          window.gtag = window.gtag || function(){window.dataLayer.push(arguments);};
+          window.gtag('js', new Date());
+          window.gtag('config', ${JSON.stringify(googleAnalyticsId).replace(/</g, '\\u003c')});
+        `}</Script>
+        <Script
+          id="_next-ga"
+          strategy="lazyOnload"
+          src={`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(
+            googleAnalyticsId
+          )}`}
+        />
         <Suspense>
           <Navbar />
           <main className="flex-1">{children}</main>
