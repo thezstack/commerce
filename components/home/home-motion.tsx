@@ -3,7 +3,7 @@
 import { animate } from 'motion';
 import { useEffect, useRef, type ReactNode } from 'react';
 
-// Content is visible in the server render and when JavaScript or motion is unavailable.
+// Server-rendered content stays visible without JavaScript or with reduced motion.
 export default function HomeMotion({
   children,
   className
@@ -17,84 +17,121 @@ export default function HomeMotion({
     const root = rootRef.current;
     if (!root) return;
     const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const elements = Array.from(root.querySelectorAll<HTMLElement>('[data-reveal]'));
-    const revealed = new Set<Element>();
+    const emphasis = root.querySelector<HTMLElement>('[data-motion="emphasis"]');
+    const shells = Array.from(root.querySelectorAll<HTMLElement>('[data-motion="brand"]'));
     const animations = new Map<HTMLElement, ReturnType<typeof animate>>();
-    const reset = () => {
-      animations.forEach((animation, element) => {
-        animation.complete();
-        element.style.removeProperty('opacity');
-        element.style.removeProperty('transform');
-      });
-      animations.clear();
-    };
-    const observer = new IntersectionObserver(
+    const visibleCards = new Map<HTMLElement, boolean>();
+    let titleRevealed = false;
+
+    const titleObserver = new IntersectionObserver(
       (entries) => {
-        entries.forEach(({ target, isIntersecting, intersectionRatio }) => {
-          if (
-            !isIntersecting ||
-            intersectionRatio < 0.65 ||
-            preference.matches ||
-            revealed.has(target)
-          )
-            return;
-          const element = target as HTMLElement;
-          revealed.add(element);
-          observer.unobserve(element);
-          const animation =
-            element.dataset.motion === 'emphasis'
+        for (const entry of entries) {
+          if (preference.matches || titleRevealed || entry.intersectionRatio < 0.65) continue;
+          const element = entry.target as HTMLElement;
+          titleRevealed = true;
+          titleObserver.unobserve(element);
+          animations.set(
+            element,
+            animate(
+              element,
+              { opacity: [0.15, 1], scale: [0.86, 1] },
+              {
+                duration: 1.1,
+                ease: [0.22, 1, 0.36, 1]
+              }
+            )
+          );
+        }
+      },
+      { threshold: 0.65, rootMargin: '0px 0px -64px 0px' }
+    );
+
+    // Observe the stationary list item; animate its inner card so transforms cannot
+    // move the observed bounds across the trigger and repeatedly restart the motion.
+    const cardObserver = new IntersectionObserver(
+      (entries) => {
+        if (preference.matches) return;
+        for (const entry of entries) {
+          const shell = entry.target as HTMLElement;
+          const card = shell.querySelector<HTMLElement>('[data-brand-card]');
+          if (!card) continue;
+          const wasVisible = visibleCards.get(card) ?? false;
+          const shouldEnter = entry.isIntersecting && entry.intersectionRatio >= 0.25;
+          const shouldExit = !entry.isIntersecting || entry.intersectionRatio <= 0.05;
+          if ((!shouldEnter || wasVisible) && (!shouldExit || !wasVisible)) continue;
+          animations.get(card)?.stop();
+          visibleCards.set(card, shouldEnter);
+          animations.set(
+            card,
+            shouldEnter
               ? animate(
-                  element,
-                  { opacity: [0.15, 1], scale: [0.86, 1] },
+                  card,
+                  { opacity: 1, y: [null, -3, 0], scale: [null, 1.025, 1], rotate: [null, 0.6, 0] },
                   {
-                    duration: 1.1,
+                    duration: 0.65,
+                    delay: Number(shell.dataset.reveal || 0) / 1000,
+                    times: [0, 0.72, 1],
                     ease: [0.22, 1, 0.36, 1]
                   }
                 )
               : animate(
-                  element,
+                  card,
+                  { opacity: 0, y: 18, scale: 0.94, rotate: Number(shell.dataset.tilt) },
                   {
-                    opacity: [0.5, 1, 1],
-                    y: [22, -3, 0],
-                    rotate: [Number(element.dataset.tilt), 0.6, 0],
-                    scale: [0.92, 1.025, 1]
-                  },
-                  {
-                    duration: 0.7,
-                    delay: Number(element.dataset.reveal || 0) / 1000,
-                    times: [0, 0.72, 1],
-                    ease: [0.22, 1, 0.36, 1]
+                    duration: 0.22,
+                    ease: 'easeOut'
                   }
-                );
-          animations.set(element, animation);
-        });
+                )
+          );
+        }
       },
-      { threshold: 0.65, rootMargin: '0px 0px -64px 0px' }
+      { threshold: [0, 0.05, 0.25] }
     );
-    const syncPreference = () => {
-      observer.disconnect();
-      reset();
-      if (!preference.matches)
-        elements.forEach((element) => {
-          if (!revealed.has(element)) observer.observe(element);
-        });
+
+    const reset = () => {
+      animations.forEach((animation) => animation.stop());
+      animations.clear();
+      [
+        emphasis,
+        ...shells.map((shell) => shell.querySelector<HTMLElement>('[data-brand-card]'))
+      ].forEach((element) => {
+        element?.style.removeProperty('opacity');
+        element?.style.removeProperty('transform');
+      });
+      visibleCards.clear();
     };
-    // Keyboard users should never have to wait for a focused control to appear.
-    const revealFocused = (event: FocusEvent) => {
-      const element = (event.target as HTMLElement).closest<HTMLElement>('[data-reveal]');
-      if (!element) return;
-      animations.get(element)?.complete();
-      revealed.add(element);
-      observer.unobserve(element);
+    const syncPreference = () => {
+      titleObserver.disconnect();
+      cardObserver.disconnect();
+      reset();
+      if (preference.matches) return;
+      if (emphasis && !titleRevealed) titleObserver.observe(emphasis);
+      shells.forEach((shell) => {
+        const card = shell.querySelector<HTMLElement>('[data-brand-card]');
+        if (!card) return;
+        const rect = shell.getBoundingClientRect();
+        const visibleHeight = Math.max(
+          0,
+          Math.min(rect.bottom, innerHeight) - Math.max(rect.top, 0)
+        );
+        const alreadyVisible = visibleHeight >= rect.height * 0.25;
+        visibleCards.set(card, alreadyVisible);
+        if (!alreadyVisible) {
+          card.style.opacity = '0';
+          card.style.transform = `translateY(18px) scale(0.94) rotate(${Number(
+            shell.dataset.tilt
+          )}deg)`;
+        }
+        cardObserver.observe(shell);
+      });
     };
     syncPreference();
     preference.addEventListener('change', syncPreference);
-    root.addEventListener('focusin', revealFocused);
     return () => {
-      observer.disconnect();
+      titleObserver.disconnect();
+      cardObserver.disconnect();
       reset();
       preference.removeEventListener('change', syncPreference);
-      root.removeEventListener('focusin', revealFocused);
     };
   }, []);
 

@@ -135,13 +135,15 @@ export default function HomePage() {
             { src: mead, name: 'Mead' }
           ].map((brand, index) => (
             <li
-              data-reveal={(index % 4) * 65}
+              data-reveal={(index % 2) * 45}
               data-motion="brand"
               data-tilt={index % 2 ? 4 : -4}
               key={brand.name}
             >
-              <Image src={brand.src} alt={brand.name} width={160} height={160} />
-              <span aria-hidden="true">{brand.name}</span>
+              <div data-brand-card className={styles.brandCard}>
+                <Image src={brand.src} alt={brand.name} width={160} height={160} />
+                <span aria-hidden="true">{brand.name}</span>
+              </div>
             </li>
           ))}
         </ul>

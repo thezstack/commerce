@@ -290,7 +290,8 @@
   max-width: 1320px;
   margin: 35px auto 0;
 }
-.brands li {
+.brandCard {
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -471,7 +472,7 @@
     width: 120px;
     height: 100px;
   }
-  .brands li {
+  .brandCard {
     padding: 10px;
   }
   .partnership {
@@ -485,7 +486,7 @@
 }
 
 @media (prefers-reduced-motion: no-preference) and (hover: hover) {
-  .brands li {
+  .brandCard {
     transition:
       box-shadow 200ms ease,
       border-color 200ms ease;
@@ -493,7 +494,7 @@
   .brands img {
     transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .brands li:hover {
+  .brands li:hover .brandCard {
     box-shadow: 0 8px 20px rgba(7, 59, 76, 0.12);
     border-color: #aac4cb;
   }
@@ -503,7 +504,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home [data-reveal] {
+  .home [data-reveal],
+  .home [data-brand-card] {
     opacity: 1 !important;
     transform: none !important;
     clip-path: none !important;
