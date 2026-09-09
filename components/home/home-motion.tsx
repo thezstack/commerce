@@ -63,25 +63,14 @@ export default function HomeMotion({
           visibleCards.set(card, shouldEnter);
           animations.set(
             card,
-            shouldEnter
-              ? animate(
-                  card,
-                  { opacity: 1, y: [null, -3, 0], scale: [null, 1.025, 1], rotate: [null, 0.6, 0] },
-                  {
-                    duration: 0.65,
-                    delay: Number(shell.dataset.reveal || 0) / 1000,
-                    times: [0, 0.72, 1],
-                    ease: [0.22, 1, 0.36, 1]
-                  }
-                )
-              : animate(
-                  card,
-                  { opacity: 0, y: 18, scale: 0.94, rotate: Number(shell.dataset.tilt) },
-                  {
-                    duration: 0.22,
-                    ease: 'easeOut'
-                  }
-                )
+            animate(
+              card,
+              { opacity: shouldEnter ? 1 : 0 },
+              {
+                duration: 0.35,
+                ease: 'easeOut'
+              }
+            )
           );
         }
       },

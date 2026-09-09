@@ -133,13 +133,8 @@ export default function HomePage() {
             { src: fiskar, name: 'Fiskars' },
             { src: kleenex, name: 'Kleenex' },
             { src: mead, name: 'Mead' }
-          ].map((brand, index) => (
-            <li
-              data-reveal={(index % 2) * 45}
-              data-motion="brand"
-              data-tilt={index % 2 ? 4 : -4}
-              key={brand.name}
-            >
+          ].map((brand) => (
+            <li data-reveal="0" data-motion="brand" key={brand.name}>
               <div data-brand-card className={styles.brandCard}>
                 <Image src={brand.src} alt={brand.name} width={160} height={160} />
                 <span aria-hidden="true">{brand.name}</span>
