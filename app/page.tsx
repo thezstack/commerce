@@ -103,7 +103,7 @@ export default function HomePage() {
       <section className={styles.benefits} aria-label="More possibilities for your school">
         {benefits.map(({ title, icon: Icon, description }) => (
           <article key={title}>
-            <div className={styles.benefitTitle}>
+            <div data-reveal="0" data-motion="headline" className={styles.benefitTitle}>
               <span>
                 <Icon size={23} strokeWidth={1.6} aria-hidden="true" />
               </span>
