@@ -80,7 +80,9 @@ export default function HomePage() {
         <div className={styles.tint} />
         <div className={styles.heroContent}>
           <p className={styles.eyebrow}>MORE FOR YOUR SCHOOL. READY FOR YOUR CLASSROOMS.</p>
-          <h1 id="homepage-heading">Your school-supply program should do more.</h1>
+          <h1 data-reveal="0" data-motion="headline" id="homepage-heading">
+            Your school-supply program should do more.
+          </h1>
           <p className={styles.heroCopy}>
             Bring more to your school community—with fundraising, staff appreciation, and
             sponsorship options worth a conversation.
@@ -113,7 +115,9 @@ export default function HomePage() {
       </section>
       <section className={styles.brandSection} aria-labelledby="brand-heading">
         <p className={styles.eyebrow}>QUALITY STARTS WITH THE SUPPLIES</p>
-        <h2 id="brand-heading">Familiar brands. Ready for their classrooms.</h2>
+        <h2 data-reveal="0" data-motion="headline" id="brand-heading">
+          Familiar brands. Ready for their classrooms.
+        </h2>
         <p className={styles.brandCopy}>
           From Crayola to Elmer’s, we build kits with well-known brands and teacher-endorsed house
           brands, guided by your school’s supply lists.
@@ -144,7 +148,7 @@ export default function HomePage() {
       <section id="how-it-works" className={styles.how}>
         <div className={styles.sectionIntro}>
           <p className={styles.eyebrow}>THE SCHOOL SUPPLIES, HANDLED</p>
-          <h2>
+          <h2 data-reveal="0" data-motion="headline">
             A thoughtful program.
             <br />A straightforward process.
           </h2>
@@ -176,7 +180,7 @@ export default function HomePage() {
         </div>
         <div className={styles.evidenceCopy}>
           <p className={styles.eyebrow}>BUILT AROUND THE TEACHER’S LIST</p>
-          <h2>
+          <h2 data-reveal="0" data-motion="headline">
             The supplies they asked for.
             <br />
             The preparation we handle.
@@ -200,7 +204,7 @@ export default function HomePage() {
       </section>
       <section className={styles.partnership}>
         <p className={styles.eyebrow}>LET’S START WITH YOUR SCHOOL</p>
-        <h2>
+        <h2 data-reveal="0" data-motion="headline">
           What could your supply
           <br />
           program do for you?

@@ -509,3 +509,11 @@
     clip-path: none !important;
   }
 }
+
+.home [data-motion='headline'] {
+  transform-origin: left center;
+}
+.brandSection [data-motion='headline'],
+.partnership [data-motion='headline'] {
+  transform-origin: center;
+}

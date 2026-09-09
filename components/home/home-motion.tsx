@@ -30,30 +30,46 @@ export default function HomeMotion({
     };
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach(({ target, isIntersecting }) => {
-          if (!isIntersecting || preference.matches || revealed.has(target)) return;
+        entries.forEach(({ target, isIntersecting, intersectionRatio }) => {
+          if (
+            !isIntersecting ||
+            intersectionRatio < 0.65 ||
+            preference.matches ||
+            revealed.has(target)
+          )
+            return;
           const element = target as HTMLElement;
           revealed.add(element);
           observer.unobserve(element);
-          const animation = animate(
-            element,
-            {
-              opacity: [0.5, 1, 1],
-              y: [22, -3, 0],
-              rotate: [Number(element.dataset.tilt), 0.6, 0],
-              scale: [0.92, 1.025, 1]
-            },
-            {
-              duration: 0.7,
-              delay: Number(element.dataset.reveal || 0) / 1000,
-              times: [0, 0.72, 1],
-              ease: [0.22, 1, 0.36, 1]
-            }
-          );
+          const animation =
+            element.dataset.motion === 'headline'
+              ? animate(
+                  element,
+                  { scale: [0.9, 1], y: [10, 0] },
+                  {
+                    duration: 0.95,
+                    ease: [0.22, 1, 0.36, 1]
+                  }
+                )
+              : animate(
+                  element,
+                  {
+                    opacity: [0.5, 1, 1],
+                    y: [22, -3, 0],
+                    rotate: [Number(element.dataset.tilt), 0.6, 0],
+                    scale: [0.92, 1.025, 1]
+                  },
+                  {
+                    duration: 0.7,
+                    delay: Number(element.dataset.reveal || 0) / 1000,
+                    times: [0, 0.72, 1],
+                    ease: [0.22, 1, 0.36, 1]
+                  }
+                );
           animations.set(element, animation);
         });
       },
-      { threshold: 0.12 }
+      { threshold: 0.65, rootMargin: '0px 0px -64px 0px' }
     );
     const syncPreference = () => {
       observer.disconnect();
