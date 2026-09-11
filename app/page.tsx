@@ -15,11 +15,27 @@ import kleenex from '../media/kleenex.svg';
 import sharpie from '../media/sharpie-card.webp';
 import supplies from '../media/Frame 37280bottom_cta.png';
 
+const shareTitle = 'SchoolKits | More for your school';
+const shareDescription =
+  'Custom kits from your school’s lists, packed by SchoolKits and delivered to classrooms. Ask about fundraising, staff appreciation, and sponsorship options.';
+
 export const metadata = {
-  title: 'A school-supply program that does more | SchoolKits',
+  title: { absolute: shareTitle },
   description:
     'Custom school supply kits, packed by SchoolKits and delivered to classrooms. Talk with us about fundraising, staff appreciation, and sponsorship options for your school.',
-  openGraph: { type: 'website' }
+  openGraph: {
+    type: 'website',
+    url: 'https://schoolkits.org/',
+    siteName: 'SchoolKits',
+    locale: 'en_US',
+    title: shareTitle,
+    description: shareDescription
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: shareTitle,
+    description: shareDescription
+  }
 };
 
 const benefits = [

@@ -1,7 +1,6 @@
 import Script from 'next/script';
 import Footer from 'components/layout/footer';
 import Navbar from 'components/layout/navbar';
-import { ensureStartsWith } from 'lib/utils';
 import type { Metadata } from 'next';
 import { Open_Sans } from 'next/font/google';
 import { ReactNode, Suspense } from 'react';
@@ -9,11 +8,19 @@ import './globals.css';
 const { TWITTER_CREATOR, TWITTER_SITE, SITE_NAME } = process.env;
 const siteName = SITE_NAME || 'School Kits';
 const googleAnalyticsId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID || 'G-4SWM464SP9';
-const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
-  ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL.replace(/^https?:\/\//, '')}`
+// Preview assets must resolve on the deployment being reviewed, not production.
+const siteHost =
+  process.env.VERCEL_ENV === 'preview' && process.env.VERCEL_URL
+    ? process.env.VERCEL_URL
+    : process.env.NEXT_PUBLIC_VERCEL_URL;
+const baseUrl = siteHost
+  ? `https://${siteHost.replace(/^https?:\/\//, '')}`
   : 'http://localhost:3000';
-const twitterCreator = TWITTER_CREATOR ? ensureStartsWith(TWITTER_CREATOR, '@') : undefined;
-const twitterSite = TWITTER_SITE ? ensureStartsWith(TWITTER_SITE, 'https://') : undefined;
+// Social card attribution accepts handles, never website/template URLs.
+const twitterHandle = (value?: string) =>
+  value && /^@?[A-Za-z0-9_]{1,15}$/.test(value) ? `@${value.replace(/^@/, '')}` : undefined;
+const twitterCreator = twitterHandle(TWITTER_CREATOR);
+const twitterSite = twitterHandle(TWITTER_SITE);
 const googleSiteVerification = process.env.GOOGLE_SITE_VERIFICATION;
 const openSans = Open_Sans({
   weight: ['400', '600', '700'],
@@ -31,14 +38,11 @@ export const metadata: Metadata = {
     follow: true,
     index: true
   },
-  ...(twitterCreator &&
-    twitterSite && {
-      twitter: {
-        card: 'summary_large_image',
-        creator: twitterCreator,
-        site: twitterSite
-      }
-    }),
+  twitter: {
+    card: 'summary_large_image',
+    ...(twitterCreator && { creator: twitterCreator }),
+    ...(twitterSite && { site: twitterSite })
+  },
   ...(googleSiteVerification && {
     verification: {
       google: googleSiteVerification
