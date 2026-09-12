@@ -4,16 +4,10 @@ import { Pause, Play } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import styles from './homepage.module.css';
 
-const desktopMedia = {
-  video: '/media/optimized/classroom-morning.52d906a71334.mp4',
-  poster: '/media/optimized/classroom-morning.fcab18338d7b.webp'
-};
-const mobileMedia = {
+const media = {
   video: '/media/optimized/school-life-mobile.5bd547d598de.mp4',
   poster: '/media/optimized/school-life-mobile.78e4356aeb2f.webp'
 };
-const selectMedia = () =>
-  window.matchMedia('(max-width: 600px)').matches ? mobileMedia : desktopMedia;
 
 export default function ClassroomVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -26,7 +20,6 @@ export default function ClassroomVideo() {
     const video = videoRef.current;
     if (!video) return;
     const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const mobile = window.matchMedia('(max-width: 600px)');
     const connection = (navigator as Navigator & { connection?: { saveData?: boolean } })
       .connection;
     const syncMedia = () => {
@@ -34,7 +27,6 @@ export default function ClassroomVideo() {
       video.muted = true;
       video.defaultMuted = true;
       video.playsInline = true;
-      const media = selectMedia();
       video.poster = media.poster;
       setFailed(false);
       if (preference.matches || connection?.saveData) {
@@ -56,10 +48,8 @@ export default function ClassroomVideo() {
     };
     syncMedia();
     preference.addEventListener('change', syncMedia);
-    mobile.addEventListener('change', syncMedia);
     return () => {
       preference.removeEventListener('change', syncMedia);
-      mobile.removeEventListener('change', syncMedia);
       video.pause();
     };
   }, []);
@@ -77,7 +67,7 @@ export default function ClassroomVideo() {
     setShowPoster(false);
     video.muted = true;
     video.playsInline = true;
-    if (!video.getAttribute('src')) video.src = selectMedia().video;
+    if (!video.getAttribute('src')) video.src = media.video;
     try {
       await video.play();
     } catch {
@@ -88,31 +78,10 @@ export default function ClassroomVideo() {
 
   return (
     <>
-      <link
-        rel="preload"
-        as="image"
-        href={mobileMedia.poster}
-        media="(max-width: 600px)"
-        fetchPriority="high"
-      />
-      <link
-        rel="preload"
-        as="image"
-        href={desktopMedia.poster}
-        media="(min-width: 601px)"
-        fetchPriority="high"
-      />
+      <link rel="preload" as="image" href={media.poster} fetchPriority="high" />
       <picture className={styles.poster} aria-hidden="true">
-        <source media="(max-width: 600px)" srcSet={mobileMedia.poster} />
-        {/* Native picture selects one poster before hydration, including on phones. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={desktopMedia.poster}
-          alt=""
-          fetchPriority="high"
-          loading="eager"
-          decoding="async"
-        />
+        <img src={media.poster} alt="" fetchPriority="high" loading="eager" decoding="async" />
       </picture>
       <video
         ref={videoRef}
