@@ -99,7 +99,7 @@ export default async function ResourcesPage() {
             >
               Resources for Schools &amp; PTOs
             </h1>
-            <p className="mt-5 max-w-xl text-base leading-8 text-[#49616A]">
+            <p className="mt-5 max-w-xl text-[17px] leading-7 text-[#49616A]">
               Helpful guides for school leaders, PTOs, and PTAs planning their next supply program.
               Compare your options, prepare your team, and decide what works for your campus.
             </p>
