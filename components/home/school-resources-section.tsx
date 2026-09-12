@@ -29,7 +29,7 @@ export default function SchoolResourcesSection() {
           </p>
           <div className="my-6 divide-y divide-[#DCE8E7] border-y border-[#DCE8E7]">
             <Link
-              href="/resources#guides"
+              href="/blog#guides"
               className="flex min-h-14 items-center gap-3 py-4 text-sm font-semibold hover:text-[#0B779A]"
             >
               <BookOpen className="h-5 w-5 flex-none text-[#0B779A]" aria-hidden="true" />
@@ -37,7 +37,7 @@ export default function SchoolResourcesSection() {
               <ArrowRight className="ml-auto h-4 w-4 flex-none" aria-hidden="true" />
             </Link>
             <Link
-              href="/resources#planning-checklist"
+              href="/blog#planning-checklist"
               className="flex min-h-14 items-center gap-3 py-4 text-sm font-semibold hover:text-[#0B779A]"
             >
               <ClipboardList className="h-5 w-5 flex-none text-[#0B779A]" aria-hidden="true" />
@@ -46,7 +46,7 @@ export default function SchoolResourcesSection() {
             </Link>
           </div>
           <Link
-            href="/resources"
+            href="/blog"
             className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#0B779A] px-6 py-3 text-sm font-bold text-white hover:bg-[#07566F]"
           >
             Explore school resources <ArrowRight className="h-4 w-4" aria-hidden="true" />
