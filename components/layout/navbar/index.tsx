@@ -6,51 +6,49 @@ import { Menu } from 'lib/shopify/types';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import MobileMenu from './mobile-menu';
-const { SITE_NAME } = process.env;
-const TEFA_NAV_ITEM: Menu = {
-  title: 'TEFA Parents',
-  path: '/tefa-parents'
-};
+const additionalNavigation: Menu[] = [
+  { title: 'School & PTO Resources', path: '/resources' },
+  { title: 'TEFA Parents', path: '/tefa-parents' }
+];
 
 export default async function Navbar() {
   const menu = await getMenu('next-js-frontend-header-menu');
-  const navigationMenu = menu.some((item) => item.path === TEFA_NAV_ITEM.path)
-    ? menu
-    : [...menu, TEFA_NAV_ITEM];
+  const navigationMenu = [
+    ...menu,
+    ...additionalNavigation.filter((item) => !menu.some((entry) => entry.path === item.path))
+  ];
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#E5E5E5] bg-white py-4 shadow-sm">
-      <nav className="flex items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="block flex-none md:hidden">
+      <nav
+        aria-label="Main navigation"
+        className="flex items-center gap-3 px-4 sm:px-6 lg:gap-6 lg:px-8"
+      >
+        <div className="block flex-none lg:hidden">
           <MobileMenu menu={navigationMenu} />
         </div>
-        <div className="flex w-full items-center">
-          <div className="flex w-full ">
-            <Link
-              href="/"
-              className="mr-2 flex w-full items-center justify-center md:w-auto lg:mr-6"
-            >
-              <LogoSquare />
-              <div className="ml-2 font-['Futura'] text-2xl font-extrabold leading-[110%]">
-                SchoolKits
-              </div>
-            </Link>
-            {navigationMenu.length ? (
-              <ul className="hidden space-x-4 md:flex md:flex-1 md:items-center">
-                {navigationMenu.map((item: Menu) => (
-                  <li key={item.title}>
-                    <Link
-                      href={item.path}
-                      className="font-semibold text-custom-blue underline-offset-4 hover:text-custom-blue hover:underline dark:text-neutral-400 dark:hover:text-neutral-300"
-                    >
-                      {item.title}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
-          <div className="flex justify-end md:w-2/3">
+        <div className="flex min-w-0 flex-1 items-center gap-6">
+          <Link href="/" className="flex flex-1 items-center justify-center lg:flex-none">
+            <LogoSquare />
+            <div className="ml-2 font-['Futura'] text-2xl font-extrabold leading-[110%]">
+              SchoolKits
+            </div>
+          </Link>
+          {navigationMenu.length ? (
+            <ul className="hidden flex-1 items-center gap-4 text-sm lg:flex xl:gap-6">
+              {navigationMenu.map((item: Menu) => (
+                <li key={item.title}>
+                  <Link
+                    href={item.path}
+                    className="inline-flex min-h-11 items-center font-semibold text-custom-blue underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#073B4C]"
+                  >
+                    {item.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <div className="flex flex-none justify-end">
             <Suspense fallback={<OpenCart />}>
               <Cart />
             </Suspense>

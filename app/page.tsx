@@ -1,4 +1,5 @@
 import HomeMotion from 'components/home/home-motion';
+import SchoolResourcesSection from 'components/home/school-resources-section';
 import BookingButton from 'components/marketing/booking-button';
 import ClassroomVideo from 'components/home/classroom-video';
 import styles from 'components/home/homepage.module.css';
@@ -212,6 +213,7 @@ export default function HomePage() {
           </ul>
         </div>
       </section>
+      <SchoolResourcesSection />
       <section className={styles.partnership}>
         <p className={styles.eyebrow}>LET’S START WITH YOUR SCHOOL</p>
         <h2>
