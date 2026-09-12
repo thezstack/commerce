@@ -20,6 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '', priority: 1 },
     { path: '/for-schools', priority: 0.8 },
     { path: '/for-schools-quote', priority: 0.8 },
+    { path: '/blog', priority: 0.8 },
     { path: '/tefa-parents', priority: 0.9 },
     { path: '/texas-private-schools', priority: 0.8 },
     { path: '/privacy-policy', priority: 0.3 },

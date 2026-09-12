@@ -29,6 +29,12 @@ const Footer = () => {
                 Get in touch now
               </Link>
             </div>
+            <div>
+              <h3 className="mb-2 font-bold">FOR SCHOOLS &amp; PTOS</h3>
+              <Link href="/blog" className="text-[#0B80A7] hover:underline">
+                Resources for Schools &amp; PTOs
+              </Link>
+            </div>
           </div>
         </div>
         <hr className="mb-6 border-t border-gray-200" />
@@ -64,7 +70,7 @@ const Footer = () => {
             </Link>
             <span className="text-gray-400">|</span>
             <Link href="/blog" className="text-[#0B80A7] hover:underline">
-              Blog
+              School &amp; PTO Resources
             </Link>
           </div>
         </div>
