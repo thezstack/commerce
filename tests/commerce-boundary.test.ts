@@ -174,3 +174,28 @@ test('quote file metadata and completion go to Commerce without proxying file co
     globalThis.fetch = original;
   }
 });
+
+test('upstream incident logs redact payloads and suppress expected rate limits', async () => {
+  const fetchBefore = globalThis.fetch;
+  const errorBefore = console.error;
+  const logs: string[] = [];
+  console.error = (line: string) => { logs.push(line); };
+  try {
+    globalThis.fetch = async () => Response.json({success:false, requestId:'private@example.test'}, {status:503});
+    await assert.rejects(commerceMutation(req({}), '/inquiries', {email:'private@example.test'}));
+    assert.equal(logs.length, 1);
+    const event = JSON.parse(logs[0]!);
+    assert.equal(event.event, 'commerce.upstream_failed');
+    assert.equal(event.downstreamStatus, 503);
+    assert.equal(event.service, 'skstorefront');
+    assert.ok(!logs[0]!.includes('private'));
+    assert.ok(!logs[0]!.includes(env.COMMERCE_STOREFRONT_TOKEN));
+    globalThis.fetch = async () => Response.json({success:false}, {status:429});
+    await assert.rejects(commerceMutation(req({}), '/inquiries', {}));
+    assert.equal(logs.length, 1);
+    globalThis.fetch = async () => { throw new Error('secret-token private@example.test'); };
+    await assert.rejects(commerceRead('/schools/index', 0));
+    assert.equal(logs.length, 2);
+    assert.ok(!logs[1]!.includes('secret-token'));
+  } finally { globalThis.fetch = fetchBefore; console.error = errorBefore; }
+});

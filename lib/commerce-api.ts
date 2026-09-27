@@ -1,5 +1,5 @@
 import 'server-only';
-import { createHmac } from 'node:crypto';
+import { createHmac, randomUUID } from 'node:crypto';
 import { isIP } from 'node:net';
 
 export class CommerceRequestError extends Error {
@@ -23,12 +23,41 @@ export function commerceConfig() {
 
 export async function commerceRead(path: string, revalidate: number) {
   const { base, token } = commerceConfig();
-  return fetch(`${base}/api/commerce${path}`, {
-    headers: commerceHeaders(token),
-    next: { revalidate },
-    redirect: 'error',
-    signal: AbortSignal.timeout(12000)
-  });
+  try {
+    const response = await fetch(`${base}/api/commerce${path}`, {
+      headers: commerceHeaders(token),
+      next: { revalidate },
+      redirect: 'error',
+      signal: AbortSignal.timeout(12000)
+    });
+    if (response.status >= 500 || response.status === 401 || response.status === 403)
+      logCommerceFailure('commerce.upstream_failed', response.status);
+    return response;
+  } catch (error) {
+    logCommerceFailure('commerce.request_failed');
+    throw error;
+  }
+}
+
+// Deliberately omit payloads, paths, exception messages, credentials and IPs.
+function logCommerceFailure(event: string, downstreamStatus?: number, upstreamRequestId?: unknown) {
+  console.error(
+    JSON.stringify({
+      schemaVersion: 1,
+      timestamp: new Date().toISOString(),
+      level: 'error',
+      service: 'skstorefront',
+      environment: process.env.VERCEL_ENV || 'development',
+      release: process.env.VERCEL_GIT_COMMIT_SHA,
+      event,
+      requestId: randomUUID(),
+      downstreamStatus,
+      upstreamRequestId:
+        typeof upstreamRequestId === 'string' && /^[a-f0-9-]{36}$/i.test(upstreamRequestId)
+          ? upstreamRequestId
+          : undefined
+    })
+  );
 }
 
 function commerceHeaders(token: string): Record<string, string> {
@@ -102,13 +131,8 @@ export async function commerceMutation(request: Request, path: string, data: unk
   });
   const result = await response.json();
   if (!response.ok || !result.success) {
-    console.error(
-      JSON.stringify({
-        event: 'commerce.upstream_failed',
-        status: response.status,
-        requestId: result.requestId
-      })
-    );
+    if (response.status !== 429)
+      logCommerceFailure('commerce.upstream_failed', response.status, result.requestId);
     throw new CommerceRequestError(
       response.status === 429 ? 429 : 502,
       response.status === 429
@@ -122,7 +146,7 @@ export async function commerceMutation(request: Request, path: string, data: unk
 export function commerceError(error: unknown) {
   if (error instanceof CommerceRequestError)
     return Response.json({ success: false, error: error.message }, { status: error.status });
-  console.error(JSON.stringify({ event: 'commerce.request_failed' }));
+  logCommerceFailure('commerce.request_failed');
   return Response.json(
     { success: false, error: 'Could not submit your request. Please try again.' },
     { status: 503 }
