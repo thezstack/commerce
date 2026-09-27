@@ -2,6 +2,7 @@
 'use client';
 
 import { submitCommerceForm } from 'lib/commerce-form';
+import { uploadCommerceFile } from 'lib/commerce-upload';
 
 import { Check, FileText, UploadCloud, X } from 'lucide-react';
 import Image from 'next/image';
@@ -156,24 +157,21 @@ const ContactForm = ({
       let supplyListMessage = '';
       if (file) {
         if (uploadedFile.current?.file !== file) {
-          const uploadData = new FormData();
-          uploadData.append('file', file);
-          const uploadResponse = await fetch('/api/quote-supply-list-upload', {
-            method: 'POST',
-            body: uploadData
-          });
-          const uploadResult = await uploadResponse.json().catch(() => null);
-          if (!uploadResponse.ok || !uploadResult?.success || !uploadResult?.url) {
+          try {
+            const uploadResult = await uploadCommerceFile(file);
+            uploadedFile.current = { file, url: uploadResult.url };
+          } catch (error) {
             setValidationErrors([
               {
                 field: 'supplyList',
                 message:
-                  uploadResult?.error || 'Could not upload your supply list. Please try again.'
+                  error instanceof Error
+                    ? error.message
+                    : 'Could not upload your supply list. Please try again.'
               }
             ]);
             return;
           }
-          uploadedFile.current = { file, url: uploadResult.url };
         }
         supplyListMessage = `Supply list upload:\nFile: ${file.name}\nURL: ${uploadedFile.current.url}`;
       }
