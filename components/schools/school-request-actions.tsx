@@ -1,5 +1,7 @@
 'use client';
 
+import { submitCommerceForm } from 'lib/commerce-form';
+
 import clsx from 'clsx';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
@@ -35,25 +37,17 @@ export default function SchoolRequestActions({
     setError('');
 
     try {
-      const response = await fetch('/api/school-request', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          schoolName,
-          schoolSlug,
-          persona,
-          context,
-          contactName,
-          contactEmail,
-          contactMessage
-        })
+      const result = await submitCommerceForm('/api/school-request', {
+        schoolName,
+        schoolSlug,
+        persona,
+        context,
+        contactName,
+        contactEmail,
+        contactMessage
       });
 
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
+      if (!result.success) {
         setError(result.error || 'Failed to submit request. Please try again.');
         return;
       }

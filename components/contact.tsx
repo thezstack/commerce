@@ -1,6 +1,8 @@
 // app/components/ContactForm.tsx
 'use client';
 
+import { submitCommerceForm } from 'lib/commerce-form';
+
 import { Check, FileText, UploadCloud, X } from 'lucide-react';
 import Image from 'next/image';
 import classroomStudents from '../media/tefa-classroom-students.png';
@@ -193,17 +195,9 @@ const ContactForm = ({
       };
 
       // Send data to API endpoint
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
+      const result = await submitCommerceForm('/api/contact', formData);
 
-      const result = await response.json();
-
-      if (response.ok && result.success) {
+      if (result.success) {
         window.gtag?.('event', 'school_contact_form_submit', {
           event_category: 'lead',
           event_label: resolvedPersona || 'contact_form'

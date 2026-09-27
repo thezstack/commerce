@@ -1,3 +1,5 @@
+import { commerceRead } from './commerce-api';
+
 export type PricingComparisonItem = {
   item: string;
   schoolKits: string;
@@ -162,9 +164,7 @@ const normalizePayload = (payload: unknown, schoolSlug: string): QrLandingData =
   const record = (payload ?? {}) as Record<string, unknown>;
   const schoolRecord = (record.school ?? {}) as Record<string, unknown>;
   const schoolName =
-    (record.schoolName as string) ||
-    (schoolRecord.name as string) ||
-    formatSchoolName(schoolSlug);
+    (record.schoolName as string) || (schoolRecord.name as string) || formatSchoolName(schoolSlug);
   const schoolLogoUrl =
     (record.schoolLogoUrl as string) ||
     (record.logoUrl as string) ||
@@ -172,9 +172,7 @@ const normalizePayload = (payload: unknown, schoolSlug: string): QrLandingData =
     (schoolRecord.logo_url as string) ||
     null;
 
-  const heroTitle =
-    (record.heroTitle as string) ||
-    'Reduce back-to-school supply chaos.';
+  const heroTitle = (record.heroTitle as string) || 'Reduce back-to-school supply chaos.';
   const heroDescription =
     (record.heroDescription as string) ||
     'A 2-minute walkthrough of SchoolKits: school-approved lists, optional kits, and end-to-end fulfillment.';
@@ -194,15 +192,16 @@ const normalizePayload = (payload: unknown, schoolSlug: string): QrLandingData =
     schoolLogoUrl,
     heroTitle,
     heroDescription,
-    heroChecklist: heroChecklist.length ? heroChecklist : [
-      'How much staff time does this save?',
-      'Do we keep full control of our lists?',
-      'Is pricing transparent for families?',
-      'What reporting do we get?',
-      'What is the lowest-effort next step?'
-    ],
-    socialProofTitle:
-      (record.socialProofTitle as string) || 'Trusted by school leaders and PTAs',
+    heroChecklist: heroChecklist.length
+      ? heroChecklist
+      : [
+          'How much staff time does this save?',
+          'Do we keep full control of our lists?',
+          'Is pricing transparent for families?',
+          'What reporting do we get?',
+          'What is the lowest-effort next step?'
+        ],
+    socialProofTitle: (record.socialProofTitle as string) || 'Trusted by school leaders and PTAs',
     socialProofSubtitle:
       (record.socialProofSubtitle as string) ||
       'Partners choose SchoolKits for transparency, low lift, and reliable fulfillment.',
@@ -231,8 +230,7 @@ const normalizePayload = (payload: unknown, schoolSlug: string): QrLandingData =
     pricingNote:
       (record.pricingNote as string) ||
       'Admin-only comparison based on school-approved lists and real kit totals.',
-    reportingTitle:
-      (record.reportingTitle as string) || 'Visibility for admins and PTAs',
+    reportingTitle: (record.reportingTitle as string) || 'Visibility for admins and PTAs',
     reportingDescription:
       (record.reportingDescription as string) ||
       'A custom dashboard is already set up to surface the metrics you care about, with no extra setup required.',
@@ -241,8 +239,7 @@ const normalizePayload = (payload: unknown, schoolSlug: string): QrLandingData =
     nextStepDescription:
       (record.nextStepDescription as string) ||
       'If this looks like a fit for your school or parent organization, we can walk through details and answer questions.',
-    nextStepNote:
-      (record.nextStepNote as string) || 'No obligation. No commitment required.',
+    nextStepNote: (record.nextStepNote as string) || 'No obligation. No commitment required.',
     ctaPrimary:
       (record.ctaPrimary as { label: string; href: string }) || buildDefaultCtaPrimary(schoolSlug),
     ctaSecondary: (record.ctaSecondary as { label: string; href: string }) || defaultCtaSecondary,
@@ -251,94 +248,8 @@ const normalizePayload = (payload: unknown, schoolSlug: string): QrLandingData =
 };
 
 export async function getQrLandingData(schoolSlug: string): Promise<QrLandingData | null> {
-  const apiBase = process.env.CORE_API_URL
-    ? `${process.env.CORE_API_URL.replace(/\/$/, '')}/api/qr-landing`
-    : undefined;
-  if (!apiBase) {
-    const mockPayloads: Record<string, Record<string, unknown>> = {
-      'houston-quran-academy': {
-        schoolName: 'Houston Quran Academy',
-        competitorName: 'Local retailer',
-        socialProofLogos: [
-          { label: 'Katy ISD' },
-          { label: 'Houston ISD' },
-          { label: 'Spring ISD' }
-        ],
-        socialProofTestimonials: [
-          {
-            quote:
-              'The program kept our lists intact and saved hours of follow-up with families. We loved the low-lift rollout.',
-            name: 'Amina R.',
-            role: 'PTA President',
-            school: 'Houston Quran Academy'
-          },
-          {
-            quote:
-              'Clear pricing and on-time delivery made this an easy yes for our staff and parents.',
-            name: 'David K.',
-            role: 'School Operations',
-            school: 'Houston Quran Academy'
-          }
-        ],
-        pricingItems: [
-          { item: 'Grade 3 core supplies', schoolKits: '$45', retail: '$52' },
-          { item: 'Grade 5 core supplies', schoolKits: '$57', retail: '$64' },
-          { item: 'Middle school essentials', schoolKits: '$73', retail: '$81' }
-        ],
-        reportingItems: ['Participation overview', 'Orders by grade', 'Delivery roster']
-      },
-      'ilm-academy': {
-        schoolName: 'ILM Academy',
-        heroBadge: 'Admin / PTA walkthrough',
-        competitorName: 'Big box retailer',
-        socialProofLogos: [
-          { label: 'Katy ISD' },
-          { label: 'Houston ISD' },
-          { label: 'Spring ISD' }
-        ],
-        pricingItems: [
-          { item: 'Elementary core supplies', schoolKits: '$49', retail: '$56' },
-          { item: 'Upper elementary essentials', schoolKits: '$59', retail: '$67' },
-          { item: 'Middle school essentials', schoolKits: '$73', retail: '$81' }
-        ],
-        reportingItems: ['Orders by grade', 'Classroom delivery sort list', 'Participation overview']
-      },
-      'iman-academy': {
-        schoolName: 'Iman Academy',
-        competitorName: 'Current vendor',
-        socialProofLogos: [
-          { label: 'Katy ISD' },
-          { label: 'Houston ISD' },
-          { label: 'Spring ISD' }
-        ],
-        pricingItems: [
-          { item: 'Grade 1 core supplies', schoolKits: '$39', retail: '$46' },
-          { item: 'Grade 3 core supplies', schoolKits: '$45', retail: '$52' },
-          { item: 'Grade 6 core supplies', schoolKits: '$62', retail: '$70' }
-        ],
-        reportingItems: ['Orders by grade', 'Participation overview', 'Optional fundraising summary']
-      }
-    };
-
-    const payload = mockPayloads[schoolSlug] ?? null;
-    return normalizePayload(payload, schoolSlug);
-  }
-
-  const url = `${apiBase.replace(/\/$/, '')}/${encodeURIComponent(schoolSlug)}`;
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (process.env.SCHOOL_KITS_QR_LANDING_TOKEN) {
-    headers.Authorization = `Bearer ${process.env.SCHOOL_KITS_QR_LANDING_TOKEN}`;
-  }
-
-  try {
-    const response = await fetch(url, { headers, next: { revalidate: 300 } });
-    if (response.status === 404) return null;
-    if (!response.ok) {
-      return normalizePayload(null, schoolSlug);
-    }
-    const payload = await response.json();
-    return normalizePayload(payload, schoolSlug);
-  } catch (error) {
-    return normalizePayload(null, schoolSlug);
-  }
+  const response = await commerceRead(`/qr-landing/${encodeURIComponent(schoolSlug)}`, 300);
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error('QR_LANDING_UNAVAILABLE');
+  return normalizePayload(await response.json(), schoolSlug);
 }
