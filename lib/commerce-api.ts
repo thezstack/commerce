@@ -24,11 +24,20 @@ export function commerceConfig() {
 export async function commerceRead(path: string, revalidate: number) {
   const { base, token } = commerceConfig();
   return fetch(`${base}/api/commerce${path}`, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: commerceHeaders(token),
     next: { revalidate },
     redirect: 'error',
     signal: AbortSignal.timeout(12000)
   });
+}
+
+function commerceHeaders(token: string): Record<string, string> {
+  const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
+  // A protected API preview still requires its separate application credential.
+  if (process.env.VERCEL_ENV === 'preview' && process.env.COMMERCE_PREVIEW_BYPASS_TOKEN) {
+    headers['x-vercel-protection-bypass'] = process.env.COMMERCE_PREVIEW_BYPASS_TOKEN;
+  }
+  return headers;
 }
 
 export async function readCommerceBody(request: Request) {
@@ -83,7 +92,7 @@ export async function commerceMutation(request: Request, path: string, data: unk
     cache: 'no-store',
     signal: AbortSignal.timeout(45000),
     headers: {
-      Authorization: `Bearer ${token}`,
+      ...commerceHeaders(token),
       'Content-Type': 'application/json',
       'Idempotency-Key': key,
       'X-Commerce-Owner': owner,

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
-import { commerceMutation, readCommerceBody } from '../lib/commerce-api';
+import { commerceMutation, commerceRead, readCommerceBody } from '../lib/commerce-api';
 import { POST as contact } from '../app/api/contact/route';
 import { POST as school } from '../app/api/school-request/route';
 import { POST as restock } from '../app/api/restock-request/route';
@@ -18,6 +18,37 @@ const env = {
 };
 Object.assign(process.env, env);
 delete process.env.VERCEL;
+test('deployment protection credential is sent only from preview, for reads and writes', async () => {
+  const original = globalThis.fetch;
+  const previousEnvironment = process.env.VERCEL_ENV;
+  const previousBypass = process.env.COMMERCE_PREVIEW_BYPASS_TOKEN;
+  const headers: Headers[] = [];
+  globalThis.fetch = async (_url, init) => {
+    headers.push(new Headers(init?.headers));
+    return Response.json({ success: true });
+  };
+  try {
+    process.env.COMMERCE_PREVIEW_BYPASS_TOKEN = 'test-preview-only';
+    for (const environment of ['preview', 'production']) {
+      process.env.VERCEL_ENV = environment;
+      await commerceRead('/schools/index', 0);
+      await commerceMutation(req({}), '/uploads', {});
+    }
+    assert.deepEqual(
+      headers.map((h) => h.get('x-vercel-protection-bypass')),
+      ['test-preview-only', 'test-preview-only', null, null]
+    );
+    assert.ok(
+      headers.every((h) => h.get('authorization') === `Bearer ${env.COMMERCE_STOREFRONT_TOKEN}`)
+    );
+  } finally {
+    globalThis.fetch = original;
+    if (previousEnvironment === undefined) delete process.env.VERCEL_ENV;
+    else process.env.VERCEL_ENV = previousEnvironment;
+    if (previousBypass === undefined) delete process.env.COMMERCE_PREVIEW_BYPASS_TOKEN;
+    else process.env.COMMERCE_PREVIEW_BYPASS_TOKEN = previousBypass;
+  }
+});
 const key = randomUUID();
 const req = (body: unknown, origin = 'https://commerce.example.com', requestKey: string = key) =>
   new NextRequest('https://commerce.example.com/api/contact', {
