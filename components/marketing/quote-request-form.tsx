@@ -1,5 +1,8 @@
 'use client';
 
+import { submitCommerceForm } from 'lib/commerce-form';
+import { uploadCommerceFile } from 'lib/commerce-upload';
+
 import { useEffect, useId, useState } from 'react';
 
 type WindowWithGtag = Window & {
@@ -51,30 +54,6 @@ export default function QuoteRequestForm() {
     }
   };
 
-  const uploadSupplyListFile = async () => {
-    if (!supplyListFile) return null;
-
-    const uploadFormData = new FormData();
-    uploadFormData.append('file', supplyListFile);
-
-    const response = await fetch('/api/quote-supply-list-upload', {
-      method: 'POST',
-      body: uploadFormData
-    });
-    const result = await response.json();
-
-    if (!result.success) {
-      throw new Error(result.error || 'Could not upload the supply list. Please try again.');
-    }
-
-    return {
-      fileName: result.fileName as string,
-      fileSize: result.fileSize as number,
-      mimeType: result.mimeType as string,
-      url: result.url as string
-    };
-  };
-
   const submitQuoteRequest = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubmitting(true);
@@ -117,7 +96,7 @@ export default function QuoteRequestForm() {
     }
 
     try {
-      const uploadedFile = await uploadSupplyListFile();
+      const uploadedFile = await uploadCommerceFile(supplyListFile);
       const trimmedNotes = notes.trim();
       const messageWithFile = [
         'Quote request landing page',
@@ -136,18 +115,13 @@ export default function QuoteRequestForm() {
         .filter(Boolean)
         .join('\n\n');
 
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fullName,
-          email: contactEmail,
-          school: '',
-          message: messageWithFile,
-          recaptchaToken
-        })
+      const result = await submitCommerceForm('/api/contact', {
+        fullName,
+        email: contactEmail,
+        school: '',
+        message: messageWithFile,
+        recaptchaToken: await getRecaptchaToken()
       });
-      const result = await response.json();
 
       if (!result.success) {
         setError(result.error || 'Could not send the request. Please try again.');

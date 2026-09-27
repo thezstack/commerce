@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { commerceError, commerceMutation, readCommerceBody } from 'lib/commerce-api';
 import { z } from 'zod';
 
 const optionalTrimmedString = z.preprocess(
@@ -29,24 +30,10 @@ const SchoolRequestSchema = z
     }
   });
 
-function getCoreApiBaseUrl(): string | null {
-  const url = process.env.CORE_API_URL;
-  if (!url) return null;
-  return url.replace(/\/$/, '');
-}
-
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body = await readCommerceBody(request);
     const validated = SchoolRequestSchema.parse(body);
-
-    const coreApiBaseUrl = getCoreApiBaseUrl();
-    if (!coreApiBaseUrl) {
-      return NextResponse.json(
-        { success: false, error: 'Server configuration error. Please try again later.' },
-        { status: 500 }
-      );
-    }
 
     const personaLabel = validated.persona === 'parent' ? 'Parent' : 'Teacher/Admin';
     const contextLabel =
@@ -56,48 +43,30 @@ export async function POST(request: NextRequest) {
     const fullName = validated.contactName;
     const email = validated.contactEmail;
 
-    const coreResponse = await fetch(`${coreApiBaseUrl}/api/contact`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        fullName,
-        email,
-        school: validated.schoolName,
-        message: [
-          `Type: School request`,
-          `Persona: ${personaLabel}`,
-          `Context: ${contextLabel}`,
-          validated.schoolSlug ? `School slug: ${validated.schoolSlug}` : null,
-          validated.contactMessage ? `Contact note: ${validated.contactMessage}` : null
-        ]
-          .filter(Boolean)
-          .join('\n')
-      })
+    const result = await commerceMutation(request, '/inquiries', {
+      fullName,
+      email,
+      school: validated.schoolName,
+      message: [
+        `Type: School request`,
+        `Persona: ${personaLabel}`,
+        `Context: ${contextLabel}`,
+        validated.schoolSlug ? `School slug: ${validated.schoolSlug}` : null,
+        validated.contactMessage ? `Contact note: ${validated.contactMessage}` : null
+      ]
+        .filter(Boolean)
+        .join('\n')
     });
 
-    if (!coreResponse.ok) {
-      return NextResponse.json(
-        { success: false, error: 'Failed to submit request. Please try again later.' },
-        { status: 502 }
-      );
-    }
-
-    return NextResponse.json({ success: true });
+    return NextResponse.json(result);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.error('Invalid school request submission:', error.errors);
       return NextResponse.json(
         { success: false, error: 'Please enter your name and email, then try again.' },
         { status: 400 }
       );
     }
 
-    console.error('School request submission failed:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to submit request. Please try again later.' },
-      { status: 500 }
-    );
+    return commerceError(error);
   }
 }

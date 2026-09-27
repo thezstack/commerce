@@ -1,5 +1,7 @@
 'use client';
 
+import { submitCommerceForm } from 'lib/commerce-form';
+
 import { PlusIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import { addItem } from 'components/cart/actions';
@@ -156,23 +158,15 @@ export function AddToCart({
     setRequestError('');
 
     try {
-      const response = await fetch('/api/restock-request', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          productName: productTitle,
-          productHandle,
-          schoolName: schoolName ?? '',
-          variantTitle: variant?.title === 'Default Title' ? '' : variant?.title ?? '',
-          pagePath: pathname
-        })
+      const result = await submitCommerceForm('/api/restock-request', {
+        productName: productTitle,
+        productHandle,
+        schoolName: schoolName ?? '',
+        variantTitle: variant?.title === 'Default Title' ? '' : variant?.title ?? '',
+        pagePath: pathname
       });
 
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
+      if (!result.success) {
         setRequestError(result.error || 'Failed to submit request. Please try again.');
         return;
       }
