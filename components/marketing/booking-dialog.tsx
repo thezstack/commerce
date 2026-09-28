@@ -20,14 +20,46 @@ export default function BookingDialog({
 }) {
   const [step, setStep] = useState<'choice' | 'contact' | 'booking'>('choice');
   const [contactVisited, setContactVisited] = useState(false);
+  const [viewportContainer, setViewportContainer] = useState<HTMLDivElement | null>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (isOpen) setStep('choice');
   }, [isOpen]);
   useEffect(() => {
-    if (isOpen) titleRef.current?.focus();
+    if (isOpen) titleRef.current?.focus({ preventScroll: true });
   }, [step, isOpen]);
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    const container = viewportContainer;
+    if (!isOpen || !viewport || !container) return;
+
+    let frame = 0;
+    // iOS keyboards shrink/pan the visual viewport without resizing 100dvh.
+    // Follow its bounds, including iframe focus, without disabling user zoom.
+    const update = () => {
+      container.style.top = `${viewport.offsetTop}px`;
+      container.style.left = `${viewport.offsetLeft}px`;
+      container.style.width = `${viewport.width}px`;
+      container.style.height = `${viewport.height}px`;
+    };
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(update);
+    };
+    update();
+    viewport.addEventListener('resize', schedule);
+    viewport.addEventListener('scroll', schedule);
+    window.addEventListener('resize', schedule);
+    return () => {
+      cancelAnimationFrame(frame);
+      viewport.removeEventListener('resize', schedule);
+      viewport.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+      container.removeAttribute('style');
+    };
+  }, [isOpen, viewportContainer]);
+
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog onClose={setIsOpen} initialFocus={closeButtonRef} className="relative z-[100]">
@@ -42,7 +74,11 @@ export default function BookingDialog({
         >
           <div className="fixed inset-0 bg-[#073B4C]/50" aria-hidden="true" />
         </Transition.Child>
-        <div className="fixed inset-0 flex items-center justify-center sm:p-6">
+        <div
+          ref={setViewportContainer}
+          data-contact-viewport
+          className="fixed left-0 top-0 flex h-dvh w-full items-center justify-center sm:p-6"
+        >
           <Transition.Child
             as={Fragment}
             enter="transition-[opacity,transform] duration-300 ease-out motion-reduce:transition-none"
@@ -53,7 +89,7 @@ export default function BookingDialog({
             leaveTo="opacity-0 translate-y-2 motion-reduce:transform-none"
           >
             <Dialog.Panel
-              className={`flex h-dvh w-full flex-col overflow-hidden bg-white pt-[env(safe-area-inset-top)] shadow-2xl sm:rounded-2xl ${
+              className={`flex h-full max-h-full w-full min-w-0 flex-col overflow-hidden bg-white pt-[env(safe-area-inset-top)] shadow-2xl sm:rounded-2xl ${
                 step === 'booking'
                   ? 'sm:h-[min(900px,90dvh)] sm:max-w-6xl'
                   : step === 'contact'
@@ -105,7 +141,7 @@ export default function BookingDialog({
                   <X className="h-6 w-6" aria-hidden="true" />
                 </button>
               </div>
-              <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)]">
+              <div className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)]">
                 {step === 'choice' && (
                   <div className="mx-auto max-w-3xl px-5 py-8 sm:px-8 sm:py-12">
                     <p className="mb-7 text-[16px] leading-relaxed text-[#315565]">
